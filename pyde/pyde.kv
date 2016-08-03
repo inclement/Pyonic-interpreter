@@ -1,0 +1,126 @@
+#:import PythonLexer pygments.lexers.PythonLexer
+
+<Label>:
+    color: 0, 0, 0, 1
+
+<Manager>:
+    HomeScreen:
+
+
+<HomeScreen>:
+    name: 'home'
+    BoxLayout:
+        orientation: 'vertical'
+        HeightLabel:
+            size_hint_y: None
+            height: sp(80)
+            font_size: sp(40)
+            text: 'PyDE'
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+        HomeScreenButton:
+            text: 'interpreter'
+            on_press: root.manager.open_interpreter()
+        HomeScreenButton:
+            text: 'file'
+        Widget:
+
+<InterpreterScreen>:
+    name: 'interpreter'
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint_y: None
+            height: sp(80)
+            Button:
+                text: 'back'
+                width: 2*self.texture_size[0]
+                size_hint_x: None
+                color: 1, 1, 1, 1
+                on_press: root.manager.go_back()
+            Widget:
+        InterpreterGui:
+    
+<HeightButton>:
+    size_hint_y: None
+
+<HomeScreenButton>:
+    color: 1, 1, 1, 1
+
+<InterpreterGui>:
+    output_window: output_window
+    code_input: input
+    scrollview: scrollview
+    orientation: 'vertical'
+    canvas:
+        Color:
+            rgba: 0.9, 0.9, 0.9, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    AnchorLayout:
+        ScrollView:
+            id: scrollview
+            size_hint_x: None
+            width: root.width - dp(40)
+            GridLayout:
+                height: self.minimum_height
+                size_hint_y: None
+                cols: 1
+                id: output_window
+                canvas.before:
+                    Color:
+                        rgba: 0.55, 0.55, 0.55, 0.55
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                    Color:
+                        rgba: 0, 0, 0, 1
+                    Line:
+                        rectangle: [self.x, self.y, self.width, self.height]
+    BoxLayout:
+        size_hint_y: None
+        height: sp(120)
+        MonoLabel:
+            text: '>>>'
+            width: self.texture_size[0] * 1.5
+            size_hint_x: None
+        CodeInput:
+            id: input
+            lexer: PythonLexer()
+            canvas.after:
+                Color:
+                    rgba: 1, 0, 0, root.input_fail_alpha
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+        Button:
+            text: 'GO'
+            color: 1, 1, 1, 1
+            width: self.texture_size[0] * 3
+            size_hint_x: None
+            on_release: root.interpret_line_from_code_input()
+            
+<MonoLabel@Label>:
+    font_name: 'RobotoMono-Regular.ttf'
+
+
+<OutputLabel>:
+    size_hint_y: None
+    height: self.texture_size[1] + dp(20)
+    text_size: self.width, None
+    font_name: 'RobotoMono-Regular.ttf'
+    canvas.before:
+        Color:
+            rgba: 0.95, 0.95, 0.95, 0.95
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: 0, 0, 0, 1
+        Line:
+            rectangle: [self.x, self.y, self.width, self.height]
