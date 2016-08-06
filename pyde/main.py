@@ -8,10 +8,16 @@ from kivy.uix.label import Label
 from kivy.properties import (StringProperty, ObjectProperty,
                              NumericProperty)
 from kivy.animation import Animation
+from kivy.clock import Clock
 from kivy.core.window import Window
-Window.clearcolor = (1, 1, 1, 1)
+
+import argparse
+
+import sys
 
 import pyde.widgets  # noqa
+from pyde.interpreter import InterpreterScreen
+
 
 class Manager(ScreenManager):
     back_screen_name = StringProperty('')
@@ -43,50 +49,30 @@ class Manager(ScreenManager):
             self.add_widget(InterpreterScreen())
         self.switch('interpreter')
 
+
 class HomeScreen(Screen):
     pass
 
-class InterpreterScreen(Screen):
-    pass
-
-class OutputLabel(Label):
-    pass
-
-class InterpreterGui(BoxLayout):
-    output_window = ObjectProperty()
-    code_input = ObjectProperty()
-    scrollview = ObjectProperty()
-
-    input_fail_alpha = NumericProperty(0.)
-
-    def __init__(self, *args, **kwargs):
-        super(InterpreterGui, self).__init__(*args, **kwargs)
-        self.animation = Animation(input_fail_alpha=0., t='out_expo',
-                                   duration=0.5)
-    
-    def interpret_line_from_code_input(self):
-        text = self.code_input.text
-        if text == '':
-            self.flash_input_fail()
-            return
-        self.code_input.text = ''
-        self.interpret_line(text)
-        self.code_input.focus = True
-
-    def flash_input_fail(self):
-        self.animation.stop(self)
-        self.input_fail_alpha = 1.
-        self.animation.start(self)
-
-    def interpret_line(self, text):
-        l = OutputLabel(text=text)
-        self.output_window.add_widget(l)
-        self.scrollview.scroll_to(l)
 
 
 class PydeApp(App):
     def build(self):
+        Window.clearcolor = (1, 1, 1, 1)
+        self.parse_args()
         return Manager()
+
+    def parse_args(self):
+        print('args are', sys.argv[1:])
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--test', choices=['interpreter'])
+
+        args = parser.parse_args(sys.argv[1:])
+
+        if args.test == 'interpreter':
+            Clock.schedule_once(self.test_interpreter, 0)
+
+    def test_interpreter(self, *args):
+        self.root.open_interpreter()
 
 
 if __name__ == "__main__":

@@ -67,8 +67,9 @@
             id: scrollview
             size_hint_x: None
             width: root.width - dp(40)
+            bar_width: dp(5)
             GridLayout:
-                height: self.minimum_height
+                height: max(scrollview.height, self.minimum_height)
                 size_hint_y: None
                 cols: 1
                 id: output_window
@@ -124,3 +125,13 @@
             rgba: 0, 0, 0, 1
         Line:
             rectangle: [self.x, self.y, self.width, self.height]
+
+<BreakMarker>:
+    size_hint_y: None
+    height: dp(2)
+    canvas:
+        Color:
+            rgba: 1, 0, 0, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
