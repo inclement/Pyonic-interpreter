@@ -13,7 +13,7 @@ send_port = 3001
 receive_port = 3000
 
 def receive_message(message, *args):
-    normal_stdout.write('received' + str(message))
+    real_stdout.write('received' + str(message))
     address = message[0]
 
     body = [s.decode('utf-8') for s in message[2:]]
@@ -46,7 +46,7 @@ class OscOut(object):
         self.target_port = target_port
 
     def write(self, s):
-        normal_stdout.write(s)
+        real_stdout.write(s)
         s = self.buffer + s
         lines = s.split('\n')
         for l in lines[:-1]:
@@ -64,14 +64,14 @@ osc.init()
 oscid = osc.listen(ipAddr='127.0.0.1', port=receive_port)
 osc.bind(oscid, receive_message, b'/interpret')
 
-normal_stdout = sys.stdout
-normal_stderr = sys.stderr
+real_stdout = sys.stdout
+real_stderr = sys.stderr
 sys.stdout = OscOut(b'/stdout', send_port)
 sys.stderr = OscOut(b'/stderr', send_port)
 
 def real_print(s):
-    normal_stdout.write(str(s) + '\n')
-    normal_stdout.flush()
+    real_stdout.write(str(s) + '\n')
+    real_stdout.flush()
 
 while True:
     osc.readQueue(oscid)
