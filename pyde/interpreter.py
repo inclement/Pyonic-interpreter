@@ -30,6 +30,8 @@ class InterpreterScreen(Screen):
 
 
 class InterpreterInput(CodeInput):
+    root = ObjectProperty()
+    
     def insert_text(self, text, from_undo=False):
         super(InterpreterInput, self).insert_text(text, from_undo=from_undo)
         try:
@@ -43,6 +45,13 @@ class InterpreterInput(CodeInput):
                     self.insert_text(' ')
         except IndexError:
             pass
+
+    def keyboard_on_key_down(self, window, keycode, text, modifiers):
+        if keycode[1] == 'enter' and 'shift' in modifiers:
+            self.root.interpret_line_from_code_input()
+            return
+        super(InterpreterInput, self).keyboard_on_key_down(
+            window, keycode, text, modifiers)
 
 class InterpreterGui(BoxLayout):
     output_window = ObjectProperty()
