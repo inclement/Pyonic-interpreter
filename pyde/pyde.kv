@@ -6,7 +6,8 @@
     color: 0, 0, 0, 1
 
 <Manager>:
-    HomeScreen:
+    # HomeScreen:
+    InterpreterScreen:
 
 
 <HomeScreen>:
@@ -35,16 +36,16 @@
     name: 'interpreter'
     BoxLayout:
         orientation: 'vertical'
-        BoxLayout:
-            size_hint_y: None
-            height: sp(60)
-            Button:
-                text: 'back'
-                width: 2*self.texture_size[0]
-                size_hint_x: None
-                color: 1, 1, 1, 1
-                on_press: root.manager.go_back()
-            Widget:
+        # BoxLayout:
+        #     size_hint_y: None
+        #     height: sp(60)
+        #     Button:
+        #         text: 'back'
+        #         width: 2*self.texture_size[0]
+        #         size_hint_x: None
+        #         color: 1, 1, 1, 1
+        #         on_press: root.manager.go_back()
+        #     Widget:
         InterpreterGui:
     
 <HeightButton>:
@@ -87,7 +88,7 @@
                         rectangle: [self.x, self.y, self.width, self.height]
     BoxLayout:
         size_hint_y: None
-        height: sp(120)
+        height: sp(100)
         MonoLabel:
             text: '>>>'
             width: self.texture_size[0] * 1.5
@@ -103,9 +104,10 @@
                 Rectangle:
                     pos: self.pos
                     size: self.size
-        Button:
-            text: 'GO'
-            color: 1, 1, 1, 1
+        NonDefocusingButton:
+            text: 'N'
+            font_name: 'assets/fontello.ttf'
+            font_size: sp(20)
             width: self.texture_size[0] * 3
             size_hint_x: None
             on_release: root.interpret_line_from_code_input()
@@ -113,18 +115,27 @@
         size_hint_y: None
         height: sp(30)
         orientation: 'horizontal'
+        # NonDefocusingButton:
+        #     size_hint_x: 4
+        #     text: 'previous line'
+        #     disabled: True if root.browsing_previous_lines == 'no' else False
+        #     on_press: root.insert_previous_line()
         NonDefocusingButton:
-            text: 'left'
+            text: 'h'
+            font_name: 'assets/fontello.ttf'
             on_press: print(args[0])
             on_press: input.do_cursor_movement('cursor_left')
         NonDefocusingButton:
-            text: 'down'
+            text: 'n'
+            font_name: 'assets/fontello.ttf'
             on_press: input.do_cursor_movement('cursor_down')
         NonDefocusingButton:
-            text: 'up'
+            text: 'e'
+            font_name: 'assets/fontello.ttf'
             on_press: input.do_cursor_movement('cursor_up')
         NonDefocusingButton:
-            text: 'right'
+            text: 'i'
+            font_name: 'assets/fontello.ttf'
             on_press: input.do_cursor_movement('cursor_right')
 
 <NonDefocusingButton>:

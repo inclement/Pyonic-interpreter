@@ -30,24 +30,24 @@ class Manager(ScreenManager):
         self.transition = SlideTransition(direction='left')
         self.current = target
 
-    def go_back(self):
-        app = App.get_running_app()
+    # def go_back(self):
+    #     app = App.get_running_app()
 
-        self.transition = SlideTransition(direction='right')
+    #     self.transition = SlideTransition(direction='right')
 
-        if self.current == self.back_screen_name:
-            self.back_screen_name = 'home'
+    #     if self.current == self.back_screen_name:
+    #         self.back_screen_name = 'home'
 
-        if self.back_screen_name in self.screen_names:
-            self.current = self.back_screen_name
-        else:
-            self.current = 'Home'
-        self.transition = SlideTransition(direction='left')
+    #     if self.back_screen_name in self.screen_names:
+    #         self.current = self.back_screen_name
+    #     else:
+    #         self.current = 'Home'
+    #     self.transition = SlideTransition(direction='left')
 
-    def open_interpreter(self):
-        if not self.has_screen('interpreter'):
-            self.add_widget(InterpreterScreen())
-        self.switch('interpreter')
+    # def open_interpreter(self):
+    #     if not self.has_screen('interpreter'):
+    #         self.add_widget(InterpreterScreen())
+    #     self.switch('interpreter')
 
 
 class HomeScreen(Screen):
@@ -58,6 +58,7 @@ class HomeScreen(Screen):
 class PydeApp(App):
     def build(self):
         Window.clearcolor = (1, 1, 1, 1)
+        Window.softinput_mode = 'resize'
         self.parse_args()
         return Manager()
 
