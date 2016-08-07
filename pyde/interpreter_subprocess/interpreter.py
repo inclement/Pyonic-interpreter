@@ -32,9 +32,9 @@ def interpret_code(code):
         traceback.print_exc()
         return
 
-    instructions = ast.parse(code)
-    if isinstance(instructions.body[-1], ast.Expr):
-        exec('print({})'.format(instructions.body[-1].value.id))
+    # instructions = ast.parse(code)
+    # if isinstance(instructions.body[-1], ast.Expr):
+    #     exec('print({})'.format(instructions.body[-1].value.id))
 
 
 class OscOut(object):

@@ -3,9 +3,11 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 from kivy.uix.widget import Widget
+from kivy.uix.button import Button
 from kivy.uix.codeinput import CodeInput
+from kivy.uix.behaviors import FocusBehavior
 from kivy.properties import (ObjectProperty, NumericProperty,
-                             OptionProperty)
+                             OptionProperty, BooleanProperty)
 from kivy.animation import Animation
 
 from kivy.clock import Clock
@@ -22,8 +24,33 @@ class OutputLabel(Label):
 
 
 class InputLabel(Label):
-    pass
-    
+    index = NumericProperty(0)
+    root = ObjectProperty()
+
+    blue_shift = NumericProperty(0.)
+
+    blue_anim = Animation(blue_shift=0., t='out_expo',
+                          duration=0.5)
+
+    def flash(self):
+        self.blue_shift = 1.
+        self.blue_anim.start(self)
+
+    def on_touch_down(self, touch):
+        if not self.collide_point(*touch.pos):
+            return super(InputLabel, self).on_touch_down(touch)
+
+        self.flash()
+        self.root.insert_previous_code(self.index)
+        return True
+
+
+class NonDefocusingButton(Button):
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            FocusBehavior.ignored_touch.append(touch)
+        return super(NonDefocusingButton, self).on_touch_down(touch)
+        
 
 class InterpreterScreen(Screen):
     pass
@@ -36,7 +63,9 @@ class InterpreterInput(CodeInput):
         super(InterpreterInput, self).insert_text(text, from_undo=from_undo)
         try:
             if text == '\n' and self.text.split('\n')[-2][-1].strip()[-1] == ':':
-                for i in range(4):
+                previous_line = self.text.split('\n')[-2]
+                num_spaces = len(previous_line) - len(previous_line.lstrip())
+                for i in range(num_spaces + 4):
                     self.insert_text(' ')
             elif text == '\n':
                 previous_line = self.text.split('\n')[-2]
@@ -60,13 +89,15 @@ class InterpreterGui(BoxLayout):
 
     input_fail_alpha = NumericProperty(0.)
 
+    lock_input = BooleanProperty(False)
+
     def __init__(self, *args, **kwargs):
         super(InterpreterGui, self).__init__(*args, **kwargs)
         self.animation = Animation(input_fail_alpha=0., t='out_expo',
                                    duration=0.5)
 
         self.interpreter = InterpreterWrapper(self)
-    
+
     def interpret_line_from_code_input(self):
         text = self.code_input.text
         if text == '':
@@ -82,11 +113,11 @@ class InterpreterGui(BoxLayout):
         self.animation.start(self)
 
     def interpret_line(self, text):
-        self.add_input_label(text)
-        self.interpreter.interpret_line(text)
+        index = self.interpreter.interpret_line(text)
+        self.add_input_label(text, index)
 
-    def add_input_label(self, text):
-        l = InputLabel(text=text)
+    def add_input_label(self, text, index):
+        l = InputLabel(text=text, index=index, root=self)
         self.output_window.add_widget(l)
         self.scrollview.scroll_to(l)
 
@@ -99,6 +130,13 @@ class InterpreterGui(BoxLayout):
         b = BreakMarker()
         self.output_window.add_widget(b)
         self.scrollview.scroll_to(b)
+
+    def insert_previous_code(self, index):
+        code = self.interpreter.inputs[index]
+        if self.code_input.text == '':
+            self.code_input.text = code
+        else:
+            self.code_input.text += '\n' + code
 
 class BreakMarker(Widget):
     pass
@@ -113,6 +151,9 @@ class InterpreterWrapper(object):
         subprocess.Popen(['python3', '{}'.format(interpreter_script_path)])
 
         self.gui = gui
+
+        self.input_index = 0  # The current input number
+        self.inputs = {}  # All the inputs so far
 
         self.interpreter_port = 3000
         self.receive_port = 3001
@@ -146,6 +187,7 @@ class InterpreterWrapper(object):
         if address == b'/interpreter':
             if body[0] == 'completed_exec':
                 self.gui.add_break()
+                self.gui.lock_input = False
                 self.end_osc_listen()
 
         elif address == b'/stdout':
@@ -156,7 +198,12 @@ class InterpreterWrapper(object):
 
     def interpret_line(self, text):
         self.send_osc_message(text.encode('utf-8'))
+        self.gui.lock_input = True
+        input_index = self.input_index
+        self.inputs[input_index] = text
+        self.input_index += 1
         self.begin_osc_listen()
+        return input_index
 
     def send_osc_message(self, message):
         osc.sendMsg(b'/interpret', [message], port=self.interpreter_port,

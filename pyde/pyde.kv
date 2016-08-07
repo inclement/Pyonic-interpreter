@@ -1,4 +1,6 @@
 #:import PythonLexer pygments.lexers.PythonLexer
+#:import Clock kivy.clock.Clock
+#:import FocusBehavior kivy.uix.behaviors.FocusBehavior
 
 <Label>:
     color: 0, 0, 0, 1
@@ -94,6 +96,7 @@
             id: input
             lexer: PythonLexer()
             root: root
+            disabled: root.lock_input
             canvas.after:
                 Color:
                     rgba: 1, 0, 0, root.input_fail_alpha
@@ -106,6 +109,26 @@
             width: self.texture_size[0] * 3
             size_hint_x: None
             on_release: root.interpret_line_from_code_input()
+    BoxLayout:
+        size_hint_y: None
+        height: sp(30)
+        orientation: 'horizontal'
+        NonDefocusingButton:
+            text: 'left'
+            on_press: print(args[0])
+            on_press: input.do_cursor_movement('cursor_left')
+        NonDefocusingButton:
+            text: 'down'
+            on_press: input.do_cursor_movement('cursor_down')
+        NonDefocusingButton:
+            text: 'up'
+            on_press: input.do_cursor_movement('cursor_up')
+        NonDefocusingButton:
+            text: 'right'
+            on_press: input.do_cursor_movement('cursor_right')
+
+<NonDefocusingButton>:
+    color: (1, 1, 1, 1)
             
 <MonoLabel@Label>:
     font_name: 'RobotoMono-Regular.ttf'
@@ -118,7 +141,7 @@
     padding_x: dp(10)
     canvas.before:
         Color:
-            rgba: 0.80, 0.85, 0.95, 0.95
+            rgba: 0.85 - self.blue_shift * 0.3, 0.85 - self.blue_shift * 0.3, 0.9 + self.blue_shift * 0.1, 0.95
         Rectangle:
             pos: self.pos
             size: self.size
@@ -126,6 +149,11 @@
             rgba: 0, 0, 0, 1
         Line:
             rectangle: [self.x, self.y, self.width, self.height]
+        Color:
+            rgba: (0.65, 0.65, 0.95, 1)
+        Rectangle:
+            pos: self.pos
+            size: dp(5), self.height
 
 <OutputLabel>:
     size_hint_y: None
