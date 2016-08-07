@@ -131,12 +131,15 @@ class InterpreterGui(BoxLayout):
         self.output_window.add_widget(b)
         self.scrollview.scroll_to(b)
 
-    def insert_previous_code(self, index):
+    def insert_previous_code(self, index, clear=False):
+        if clear:
+            self.code_input.text = ''
         code = self.interpreter.inputs[index]
         if self.code_input.text == '':
             self.code_input.text = code
         else:
             self.code_input.text += '\n' + code
+
 
 class BreakMarker(Widget):
     pass
@@ -174,7 +177,6 @@ class InterpreterWrapper(object):
 
     def end_osc_listen(self):
         Clock.unschedule(self.read_osc_queue)
-        print('not listening!')
 
     def read_osc_queue(self, *args):
         osc.readQueue(self.oscid)
