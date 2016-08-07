@@ -6,13 +6,18 @@ from kivy.uix.screenmanager import (ScreenManager, Screen,
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.properties import (StringProperty)
+from kivy import platform
 
 import argparse
 
 import sys
 
-import pyde.widgets  # noqa
-import pyde.interpreter  # noqa
+if platform == 'android':
+    import widgets
+    import interpreter
+else:
+    import pyde.widgets  # noqa
+    import pyde.interpreter  # noqa
 
 
 class Manager(ScreenManager):

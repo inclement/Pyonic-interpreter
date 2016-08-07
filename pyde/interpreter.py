@@ -4,7 +4,6 @@ from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
-from kivy.uix.codeinput import CodeInput
 from kivy.uix.behaviors import FocusBehavior
 from kivy.properties import (ObjectProperty, NumericProperty,
                              OptionProperty, BooleanProperty)
@@ -59,8 +58,18 @@ class InterpreterScreen(Screen):
     pass
 
 
-class InterpreterInput(CodeInput):
+if platform == 'android':
+    from kivy.uix.textinput import TextInput as InputWidget
+else:
+    from kivy.uix.textinput import TextInput as InputWidget
+class InterpreterInput(InputWidget):
     root = ObjectProperty()
+
+    def __init__(self, *args, **kwargs):
+        super(InterpreterInput, self).__init__(*args, **kwargs)
+        if platform != 'android':
+            from pygments.lexers import PythonLexer
+            self.lexer = PythonLexer()
 
     def insert_text(self, text, from_undo=False):
         super(InterpreterInput, self).insert_text(text, from_undo=from_undo)
@@ -179,7 +188,7 @@ class InterpreterWrapper(object):
             service = autoclass('net.inclem.pyde.ServiceInterpreter')
             mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
             argument = ''
-            service.Start(mActivity, argument)
+            service.start(mActivity, argument)
         else:
             # This may not actually work everywhere, but let's assume it does
             python_name = 'python{}'.format(sys.version_info.major)

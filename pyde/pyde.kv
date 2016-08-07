@@ -1,4 +1,3 @@
-#:import PythonLexer pygments.lexers.PythonLexer
 #:import Clock kivy.clock.Clock
 #:import FocusBehavior kivy.uix.behaviors.FocusBehavior
 
@@ -101,7 +100,6 @@
             size_hint_x: None
         InterpreterInput:
             id: input
-            lexer: PythonLexer()
             root: root
             disabled: root.lock_input
             canvas.after:
