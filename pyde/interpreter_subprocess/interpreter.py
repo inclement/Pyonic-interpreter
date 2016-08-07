@@ -13,7 +13,7 @@ send_port = 3001
 receive_port = 3000
 
 def receive_message(message, *args):
-    real_stdout.write('received' + str(message))
+    real_stdout.write('subprocess received' + str(message) + '\n')
     address = message[0]
 
     body = [s.decode('utf-8') for s in message[2:]]
@@ -54,6 +54,7 @@ class OscOut(object):
         self.buffer = lines[-1]
 
     def flush(self):
+        real_stdout.flush()
         return
 
     def send_message(self, message):

@@ -65,27 +65,33 @@
         Rectangle:
             pos: self.pos
             size: self.size
-    AnchorLayout:
-        ScrollView:
-            id: scrollview
-            size_hint_x: None
-            width: root.width - dp(40)
-            bar_width: dp(5)
-            GridLayout:
-                height: max(scrollview.height, self.minimum_height)
-                size_hint_y: None
-                cols: 1
-                id: output_window
-                canvas.before:
-                    Color:
-                        rgba: 0.55, 0.55, 0.55, 0.55
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
-                    Color:
-                        rgba: 0, 0, 0, 1
-                    Line:
-                        rectangle: [self.x, self.y, self.width, self.height]
+    ScrollView:
+        id: scrollview
+        bar_width: dp(10)
+        GridLayout:
+            height: max(scrollview.height, self.minimum_height)
+            size_hint_y: None
+            cols: 1
+            id: output_window
+            canvas.before:
+                Color:
+                    rgba: 0.55, 0.55, 0.55, 0.55
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+                Color:
+                    rgba: 0, 0, 0, 1
+                Line:
+                    rectangle: [self.x, self.y, self.width, self.height]
+    Widget:
+        size_hint_y: None
+        height: dp(2)
+        canvas:
+            Color:
+                rgba: 0.3, 0.3, 0.3, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
     BoxLayout:
         size_hint_y: None
         height: sp(100)

@@ -9,12 +9,15 @@ from kivy.uix.behaviors import FocusBehavior
 from kivy.properties import (ObjectProperty, NumericProperty,
                              OptionProperty, BooleanProperty)
 from kivy.animation import Animation
+from kivy import platform
 
 from kivy.clock import Clock
 
 from kivy.lib import osc
 
-import subprocess
+if platform != 'android':
+    import subprocess
+import sys
 
 from os.path import realpath, join, dirname
 
@@ -83,6 +86,10 @@ class InterpreterInput(CodeInput):
         super(InterpreterInput, self).keyboard_on_key_down(
             window, keycode, text, modifiers)
 
+    def on_disabled(self, instance, value):
+        if not value:
+            self.focus = True
+
 
 class InterpreterGui(BoxLayout):
     output_window = ObjectProperty()
@@ -150,12 +157,9 @@ class BreakMarker(Widget):
 class InterpreterWrapper(object):
 
     def __init__(self, gui):
-        interpreter_script_path = join(dirname(realpath(__file__)),
-                                       'interpreter_subprocess',
-                                       'interpreter.py')
-        subprocess.Popen(['python3', '{}'.format(interpreter_script_path)])
-
         self.gui = gui
+
+        self.start_interpreter()
 
         self.input_index = 0  # The current input number
         self.inputs = {}  # All the inputs so far
@@ -164,6 +168,22 @@ class InterpreterWrapper(object):
         self.receive_port = 3001
 
         self.init_osc()
+
+    def start_interpreter(self):
+        interpreter_script_path = join(dirname(realpath(__file__)),
+                                       'interpreter_subprocess',
+                                       'interpreter.py')
+
+        if platform == 'android':
+            from jnius import autoclass
+            service = autoclass('net.inclem.pyde.ServiceInterpreter')
+            mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
+            argument = ''
+            service.Start(mActivity, argument)
+        else:
+            # This may not actually work everywhere, but let's assume it does
+            python_name = 'python{}'.format(sys.version_info.major)
+            subprocess.Popen([python_name, '{}'.format(interpreter_script_path)])
 
     def init_osc(self):
         from kivy.lib import osc
@@ -184,7 +204,7 @@ class InterpreterWrapper(object):
         osc.readQueue(self.oscid)
 
     def receive_osc_message(self, message, *args):
-        print('received message', message)
+        print('received message', message, args)
         address = message[0]
         body = [s.decode('utf-8') for s in message[2:]]
 
