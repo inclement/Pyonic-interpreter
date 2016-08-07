@@ -2,16 +2,16 @@ PyDE
 ====
 
 An experimental Python IDE for mobile devices. PyDE currently consists
-of a single interpreter window. I hope to add support for multiple
-interpreters, different kinds of Python tasks (app threads, background
-services), and editing files instead of interpreted lines.
+of a single interpreter window. Future targets include support for
+multiple interpreters, different kinds of Python tasks (app threads,
+background services), and editing/running Python files.
 
 PyDE uses `Kivy <https://kivy.org/#home>`__ for its gui, and runs on
 Android using `python-for-android
 <https://github.com/kivy/python-for-android>`__.
 
 This is experimental software, with currently fairly limited
-functionality and probably many bugs. Bug reports are welcome.
+functionality and probably many bugs. Issue reports are welcome.
 
 .. image:: pyde_android_small.png
     :width: 300px
@@ -30,6 +30,6 @@ improvement will be to check how other similar projects do the same
 thing.
 
 It's currently very easy to break the app, e.g. with infinite loops or
-by causing the second process to halt. I expect to fix some of this
+by causing the second process to halt. Some of this can be fixed
 (e.g. interrupt support for loops), but ultimately that's fine...it's
 your interpreter to crash if you want!
