@@ -16,7 +16,7 @@ from kivy.lib import osc
 
 import subprocess
 
-from os.path import realpath, curdir, join, dirname
+from os.path import realpath, join, dirname
 
 
 class OutputLabel(Label):
@@ -50,7 +50,7 @@ class NonDefocusingButton(Button):
         if self.collide_point(*touch.pos):
             FocusBehavior.ignored_touch.append(touch)
         return super(NonDefocusingButton, self).on_touch_down(touch)
-        
+
 
 class InterpreterScreen(Screen):
     pass
@@ -58,11 +58,12 @@ class InterpreterScreen(Screen):
 
 class InterpreterInput(CodeInput):
     root = ObjectProperty()
-    
+
     def insert_text(self, text, from_undo=False):
         super(InterpreterInput, self).insert_text(text, from_undo=from_undo)
         try:
-            if text == '\n' and self.text.split('\n')[-2][-1].strip()[-1] == ':':
+            if (text == '\n' and
+                self.text.split('\n')[-2][-1].strip()[-1] == ':'):
                 previous_line = self.text.split('\n')[-2]
                 num_spaces = len(previous_line) - len(previous_line.lstrip())
                 for i in range(num_spaces + 4):
@@ -81,6 +82,7 @@ class InterpreterInput(CodeInput):
             return
         super(InterpreterInput, self).keyboard_on_key_down(
             window, keycode, text, modifiers)
+
 
 class InterpreterGui(BoxLayout):
     output_window = ObjectProperty()
@@ -185,7 +187,7 @@ class InterpreterWrapper(object):
         print('received message', message)
         address = message[0]
         body = [s.decode('utf-8') for s in message[2:]]
-        
+
         if address == b'/interpreter':
             if body[0] == 'completed_exec':
                 self.gui.add_break()

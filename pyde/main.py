@@ -3,20 +3,16 @@
 from kivy.app import App
 from kivy.uix.screenmanager import (ScreenManager, Screen,
                                     SlideTransition)
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
-from kivy.properties import (StringProperty, ObjectProperty,
-                             NumericProperty)
-from kivy.animation import Animation
 from kivy.clock import Clock
 from kivy.core.window import Window
+from kivy.properties import (StringProperty)
 
 import argparse
 
 import sys
 
 import pyde.widgets  # noqa
-from pyde.interpreter import InterpreterScreen
+import pyde.interpreter  # noqa
 
 
 class Manager(ScreenManager):
@@ -44,15 +40,14 @@ class Manager(ScreenManager):
     #         self.current = 'Home'
     #     self.transition = SlideTransition(direction='left')
 
-    # def open_interpreter(self):
-    #     if not self.has_screen('interpreter'):
-    #         self.add_widget(InterpreterScreen())
-    #     self.switch('interpreter')
+    def open_interpreter(self):
+        if not self.has_screen('interpreter'):
+            self.add_widget(InterpreterScreen())
+        self.switch('interpreter')
 
 
 class HomeScreen(Screen):
     pass
-
 
 
 class PydeApp(App):
