@@ -117,7 +117,7 @@
             on_release: root.interpret_line_from_code_input()
     BoxLayout:
         size_hint_y: None
-        height: sp(30)
+        height: sp(40)
         orientation: 'horizontal'
         # NonDefocusingButton:
         #     size_hint_x: 4
@@ -125,9 +125,24 @@
         #     disabled: True if root.browsing_previous_lines == 'no' else False
         #     on_press: root.insert_previous_line()
         NonDefocusingButton:
+            text: '='
+            font_name: 'RobotoMono-Regular.ttf'
+            on_press: input.insert_text('=')
+        NonDefocusingButton:
+            text: '('
+            font_name: 'RobotoMono-Regular.ttf'
+            on_press: input.insert_text('(')
+        NonDefocusingButton:
+            text: ')'
+            font_name: 'RobotoMono-Regular.ttf'
+            on_press: input.insert_text(')')
+        NonDefocusingButton:
+            text: ':'
+            font_name: 'RobotoMono-Regular.ttf'
+            on_press: input.insert_text(':')
+        NonDefocusingButton:
             text: 'h'
             font_name: 'assets/fontello.ttf'
-            on_press: print(args[0])
             on_press: input.do_cursor_movement('cursor_left')
         NonDefocusingButton:
             text: 'n'
