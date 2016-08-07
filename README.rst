@@ -1,10 +1,11 @@
 PyDE
 ====
 
-An experimental Python IDE for mobile devices. PyDE currently consists
-of a single interpreter window. Future targets include support for
-multiple interpreters, different kinds of Python tasks (app threads,
-background services), and editing/running Python files.
+An experimental Python IDE for mobile devices, written in Python. PyDE
+currently consists of a single interpreter window. Future targets
+include support for multiple interpreters, different kinds of Python
+tasks (app threads, background services), and editing/running Python
+files.
 
 PyDE uses `Kivy <https://kivy.org/#home>`__ for its gui, and runs on
 Android using `python-for-android
