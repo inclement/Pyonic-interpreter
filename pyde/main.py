@@ -56,6 +56,9 @@ class HomeScreen(Screen):
 
 
 class PydeApp(App):
+
+    subprocesses = []
+    
     def build(self):
         Window.clearcolor = (1, 1, 1, 1)
         Window.softinput_mode = 'resize'
@@ -74,6 +77,13 @@ class PydeApp(App):
 
     def test_interpreter(self, *args):
         self.root.open_interpreter()
+
+    def on_pause(self):
+        return True
+
+    def on_stop(self):
+        for subprocess in self.subprocesses:
+            subprocess.kill()
 
 
 if __name__ == "__main__":

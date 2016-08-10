@@ -8,6 +8,7 @@ from kivy.uix.behaviors import FocusBehavior
 from kivy.properties import (ObjectProperty, NumericProperty,
                              OptionProperty, BooleanProperty)
 from kivy.animation import Animation
+from kivy.app import App
 from kivy import platform
 
 from kivy.clock import Clock
@@ -192,7 +193,8 @@ class InterpreterWrapper(object):
         else:
             # This may not actually work everywhere, but let's assume it does
             python_name = 'python{}'.format(sys.version_info.major)
-            subprocess.Popen([python_name, '{}'.format(interpreter_script_path)])
+            s = subprocess.Popen([python_name, '{}'.format(interpreter_script_path)])
+            App.get_running_app().subprocesses.append(s)
 
     def init_osc(self):
         from kivy.lib import osc
