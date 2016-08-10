@@ -9,8 +9,10 @@ from kivy.properties import (StringProperty)
 from kivy import platform
 
 import argparse
-
 import sys
+
+from jnius import autoclass
+
 
 if platform == 'android':
     import widgets
@@ -63,7 +65,15 @@ class PydeApp(App):
         Window.clearcolor = (1, 1, 1, 1)
         Window.softinput_mode = 'resize'
         self.parse_args()
+        Clock.schedule_once(self.remove_loading_screen, 0)
         return Manager()
+
+    def remove_loading_screen(self, *args):
+        if platform != 'android':
+            return
+
+        activity = autoclass('org.kivy.android.PythonActivity').mActivity
+        activity.removeLoadingScreen()
 
     def parse_args(self):
         print('args are', sys.argv[1:])
