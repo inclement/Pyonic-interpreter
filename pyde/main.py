@@ -11,8 +11,6 @@ from kivy import platform
 import argparse
 import sys
 
-from jnius import autoclass
-
 
 if platform == 'android':
     import widgets
@@ -65,13 +63,13 @@ class PydeApp(App):
         Window.clearcolor = (1, 1, 1, 1)
         Window.softinput_mode = 'resize'
         self.parse_args()
-        Clock.schedule_once(self.remove_loading_screen, 0)
+        Clock.schedule_once(self.remove_android_splash, 0)
         return Manager()
 
-    def remove_loading_screen(self, *args):
+    def remove_android_splash(self, *args):
         if platform != 'android':
             return
-
+        from jnius import autoclass
         activity = autoclass('org.kivy.android.PythonActivity').mActivity
         activity.removeLoadingScreen()
 
