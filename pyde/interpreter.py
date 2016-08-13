@@ -238,7 +238,7 @@ class InterpreterWrapper(object):
             self.subprocess = s
 
     def send_sigint(self):
-        self.subprocess.send_signal(signal.SIGINT)
+        self.send_osc_message(b'sigint', address=b'/sigint')
 
     def init_osc(self):
         from kivy.lib import osc

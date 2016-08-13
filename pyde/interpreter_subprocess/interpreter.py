@@ -4,6 +4,9 @@ import sys
 
 import traceback
 
+import threading
+import ctypes
+
 from kivy.lib import osc
 
 with open('testfile.txt', 'a') as fileh:
@@ -12,20 +15,44 @@ with open('testfile.txt', 'a') as fileh:
 send_port = 3001
 receive_port = 3000
 
+thread = None
+
 def receive_message(message, *args):
-    real_stdout.write('subprocess received' + str(message) + '\n')
+    real_stdout.write('- subprocess received' + str(message) + '\n')
+    real_stdout.flush()
     address = message[0]
 
     osc.sendMsg(b'/interpreter', [b'received_command'], port=send_port,
                 typehint='b')
 
-    body = [s.decode('utf-8') for s in message[2:]]
-
     if address == b'/interpret':
-        interpret_code(body[0])
+        global thread
+        if thread is not None:
+            print('COMPUTATION FAILED: something is already running (this shouldn\'t happen)')
+            complete_execution()
+            return
+        body = [s.decode('utf-8') for s in message[2:]]
+        t = threading.Thread(target=lambda *args: interpret_code(body[0]))
+        # t.daemon = True
+        thread = t
+        t.start()
+        # interpret_code(body[0])
 
-    real_print('left interpret_code')
+    elif address == b'/ping':
+        osc.sendMsg(b'/pong', [b'pong'], port=send_port,
+                    typehint='b')
 
+    elif address == b'/sigint':
+        pass
+
+    else:
+        raise ValueError('Received unrecognised address {}'.format(address))
+
+    real_print('started execution thread')
+
+def complete_execution():
+    global thread
+    thread = None
     osc.sendMsg(b'/interpreter', [b'completed_exec'], port=send_port,
                 typehint='b')
     
@@ -39,6 +66,8 @@ def interpret_code(code):
                     typehint='b')
     except Exception as e:
         traceback.print_exc()
+
+    complete_execution()
 
     # instructions = ast.parse(code)
     # if isinstance(instructions.body[-1], ast.Expr):
@@ -54,7 +83,6 @@ class OscOut(object):
         self.target_port = target_port
 
     def write(self, s):
-        real_stdout.write(s)
         s = self.buffer + s
         lines = s.split('\n')
         for l in lines[:-1]:
@@ -72,6 +100,8 @@ class OscOut(object):
 osc.init()
 oscid = osc.listen(ipAddr='127.0.0.1', port=receive_port)
 osc.bind(oscid, receive_message, b'/interpret')
+osc.bind(oscid, receive_message, b'/ping')
+osc.bind(oscid, receive_message, b'/sigint')
 
 real_stdout = sys.stdout
 real_stderr = sys.stderr

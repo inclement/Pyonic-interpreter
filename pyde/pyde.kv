@@ -64,53 +64,66 @@
         Rectangle:
             pos: self.pos
             size: self.size
-    BoxLayout:
-        orientation: 'horizontal'
-        size_hint_y: None
-        height: dp(40)
-        pos_hint: {'top': 1}
-        canvas:
-            Color:
-                rgba: 0.5, 0.5, 0.5, 0.5
-            Rectangle:
-                pos: self.pos
-                size: self.size
-        Label:
-            size_hint_x: None
-            width: self.texture_size[0]
-            padding_x: dp(10)
-            pos_hint: {'top': 1}
-            markup: True
-            text: 'status: [b][color=#{}]{}[/color][/b]'.format(root.status_label_colour, root.interpreter_state.replace('_', ' '))
-        Widget:
-        Button:
-            text: 'restart'
-            size_hint_x: None
-            width: 1.8 * self.texture_size[0]
-            background_color: 1, 0, 0, 1
-            on_release: root.restart_interpreter()
-            color: 1, 1, 1, 1
-            disabled: True if root.interpreter_state == 'not_responding' else False
-            opacity: 0.2 if root.interpreter_state != 'not_responding' else 1
-    ScrollView:
-        id: scrollview
-        bar_width: dp(10)
-        on_touch_down: print(self.pos, self.size, self.parent.pos, self.parent.size)
-        GridLayout:
-            height: max(scrollview.height, self.minimum_height)
+    FloatLayout:
+        ScrollView:
+            pos_hint: {'x': 0, 'y': 0}
+            id: scrollview
+            bar_width: dp(10)
+            GridLayout:
+                height: max(scrollview.height, self.minimum_height)
+                size_hint_y: None
+                cols: 1
+                id: output_window
+                canvas.before:
+                    Color:
+                        rgba: 0.55, 0.55, 0.55, 0.55
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                    Color:
+                        rgba: 0, 0, 0, 1
+                    Line:
+                        rectangle: [self.x, self.y, self.width, self.height]
+                Widget:
+                    size_hint_y: None
+                    height: dp(40)
+        BoxLayout:
+            orientation: 'horizontal'
             size_hint_y: None
-            cols: 1
-            id: output_window
-            canvas.before:
+            height: dp(40)
+            pos_hint: {'top': 1}
+            canvas:
                 Color:
-                    rgba: 0.55, 0.55, 0.55, 0.55
+                    rgba: 0.5, 0.5, 0.5, 0.8
                 Rectangle:
                     pos: self.pos
                     size: self.size
-                Color:
-                    rgba: 0, 0, 0, 1
-                Line:
-                    rectangle: [self.x, self.y, self.width, self.height]
+            Label:
+                size_hint_x: None
+                width: self.texture_size[0]
+                padding_x: dp(10)
+                pos_hint: {'top': 1}
+                markup: True
+                text: 'status: [b][color=#{}]{}[/color][/b]'.format(root.status_label_colour, root.interpreter_state.replace('_', ' '))
+            Widget:
+            Button:
+                text: 'CTRL + C'
+                size_hint_x: None
+                width: 1.8 * self.texture_size[0]
+                background_color: 1, 0.5, 0.5, 1
+                on_release: root.send_sigint()
+                color: 1, 1, 1, 1
+                disabled: True if root.interpreter_state == 'waiting' else False
+                opacity: 0.2 if root.interpreter_state == 'waiting' else 1
+            Button:
+                text: 'restart'
+                size_hint_x: None
+                width: 1.8 * self.texture_size[0]
+                background_color: 1, 0, 0, 1
+                on_release: root.restart_interpreter()
+                color: 1, 1, 1, 1
+                disabled: True if root.interpreter_state == 'not_responding' else False
+                opacity: 0.2 if root.interpreter_state != 'not_responding' else 1
     Widget:
         size_hint_y: None
         height: dp(2)
