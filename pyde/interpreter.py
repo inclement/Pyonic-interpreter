@@ -6,7 +6,8 @@ from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.behaviors import FocusBehavior
 from kivy.properties import (ObjectProperty, NumericProperty,
-                             OptionProperty, BooleanProperty)
+                             OptionProperty, BooleanProperty,
+                             StringProperty)
 from kivy.animation import Animation
 from kivy.app import App
 from kivy import platform
@@ -17,7 +18,10 @@ from kivy.lib import osc
 
 if platform != 'android':
     import subprocess
+
 import sys
+
+import signal
 
 from os.path import realpath, join, dirname
 
@@ -110,12 +114,25 @@ class InterpreterGui(BoxLayout):
 
     lock_input = BooleanProperty(False)
 
+    interpreter_state = OptionProperty('waiting', options=['waiting',
+                                                           'interpreting',
+                                                           'not_responding'])
+    status_label_colour = StringProperty('0000ff')
+
     def __init__(self, *args, **kwargs):
         super(InterpreterGui, self).__init__(*args, **kwargs)
         self.animation = Animation(input_fail_alpha=0., t='out_expo',
                                    duration=0.5)
 
         self.interpreter = InterpreterWrapper(self)
+
+    def on_interpreter_state(self, instance, value):
+        if value == 'waiting':
+            self.status_label_colour = '0000ff'
+        elif value == 'interpreting':
+            self.status_label_colour = '00ff00'
+        elif value == 'not_responding':
+            self.status_label_colour = 'ff0000'
 
     def interpret_line_from_code_input(self):
         text = self.code_input.text
@@ -159,6 +176,12 @@ class InterpreterGui(BoxLayout):
         else:
             self.code_input.text += '\n' + code
 
+    def send_sigint(self):
+        self.interpreter.send_sigint()
+
+    def restart_interpreter(self):
+        self.interpreter.restart()
+
 
 class BreakMarker(Widget):
     pass
@@ -169,6 +192,8 @@ class InterpreterWrapper(object):
     def __init__(self, gui):
         self.gui = gui
 
+        self.subprocess = None
+
         self.start_interpreter()
 
         self.input_index = 0  # The current input number
@@ -177,7 +202,21 @@ class InterpreterWrapper(object):
         self.interpreter_port = 3000
         self.receive_port = 3001
 
+        Clock.schedule_interval(self.read_osc_queue, 0.1)
+
         self.init_osc()
+
+        self._interpreter_state = 'waiting'
+
+    @property
+    def interpreter_state(self):
+        return self._interpreter_state
+
+    @interpreter_state.setter
+    def interpreter_state(self, value):
+        self._interpreter_state = value
+        if self.gui is not None:
+            self.gui.interpreter_state = self.interpreter_state
 
     def start_interpreter(self):
         interpreter_script_path = join(dirname(realpath(__file__)),
@@ -192,9 +231,14 @@ class InterpreterWrapper(object):
             service.start(mActivity, argument)
         else:
             # This may not actually work everywhere, but let's assume it does
+            print('starting subprocess')
             python_name = 'python{}'.format(sys.version_info.major)
             s = subprocess.Popen([python_name, '{}'.format(interpreter_script_path)])
             App.get_running_app().subprocesses.append(s)
+            self.subprocess = s
+
+    def send_sigint(self):
+        self.subprocess.send_signal(signal.SIGINT)
 
     def init_osc(self):
         from kivy.lib import osc
@@ -205,11 +249,11 @@ class InterpreterWrapper(object):
         osc.bind(self.oscid, self.receive_osc_message, b'/stderr')
         osc.bind(self.oscid, self.receive_osc_message, b'/interpreter')
 
-    def begin_osc_listen(self):
-        Clock.schedule_interval(self.read_osc_queue, 0.1)
+    # def begin_osc_listen(self):
+    #     Clock.schedule_interval(self.read_osc_queue, 0.1)
 
-    def end_osc_listen(self):
-        Clock.unschedule(self.read_osc_queue)
+    # def end_osc_listen(self):
+    #     Clock.unschedule(self.read_osc_queue)
 
     def read_osc_queue(self, *args):
         osc.readQueue(self.oscid)
@@ -223,7 +267,11 @@ class InterpreterWrapper(object):
             if body[0] == 'completed_exec':
                 self.gui.add_break()
                 self.gui.lock_input = False
-                self.end_osc_listen()
+                self.interpreter_state = 'waiting'
+                # self.end_osc_listen()
+
+            elif body[0] == 'received_command':
+                Clock.unschedule(self.command_not_received)
 
         elif address == b'/stdout':
             self.gui.add_output_label(body[0], 'stdout')
@@ -232,15 +280,26 @@ class InterpreterWrapper(object):
             self.gui.add_output_label(body[0], 'stderr')
 
     def interpret_line(self, text):
-        self.send_osc_message(text.encode('utf-8'))
+        self.send_python_command(text.encode('utf-8'))
         self.gui.lock_input = True
+        self.interpreter_state = 'interpreting'
         input_index = self.input_index
         self.inputs[input_index] = text
         self.input_index += 1
-        self.begin_osc_listen()
+        # self.begin_osc_listen()
         return input_index
 
-    def send_osc_message(self, message):
-        osc.sendMsg(b'/interpret', [message], port=self.interpreter_port,
+    def send_python_command(self, message):
+        Clock.schedule_once(self.command_not_received, 1)
+        self.send_osc_message(message, address=b'/interpret')
+
+    def send_osc_message(self, message, address=b'/interpret'):
+        osc.sendMsg(address, [message], port=self.interpreter_port,
                     typehint='b')
         print('sent', message)
+
+    def command_not_received(self, *args):
+        print('command not received? something is wrong!?')
+
+    def restart(self):
+        print('Asked to restart, but this isn\'t implemented yet')

@@ -16,10 +16,15 @@ def receive_message(message, *args):
     real_stdout.write('subprocess received' + str(message) + '\n')
     address = message[0]
 
+    osc.sendMsg(b'/interpreter', [b'received_command'], port=send_port,
+                typehint='b')
+
     body = [s.decode('utf-8') for s in message[2:]]
 
     if address == b'/interpret':
         interpret_code(body[0])
+
+    real_print('left interpret_code')
 
     osc.sendMsg(b'/interpreter', [b'completed_exec'], port=send_port,
                 typehint='b')
@@ -28,9 +33,12 @@ def receive_message(message, *args):
 def interpret_code(code):
     try:
         exec(code, locals(), globals())
+    except KeyboardInterrupt as e:
+        traceback.print_exc()
+        osc.sendMsg(b'/interpreter', [b'keyboard_interrupted'], port=send_port,
+                    typehint='b')
     except Exception as e:
         traceback.print_exc()
-        return
 
     # instructions = ast.parse(code)
     # if isinstance(instructions.body[-1], ast.Expr):
@@ -75,7 +83,10 @@ def real_print(s):
     real_stdout.flush()
 
 while True:
-    osc.readQueue(oscid)
-    time.sleep(.2)
+    try:
+        osc.readQueue(oscid)
+        time.sleep(.2)
+    except KeyboardInterrupt:
+        traceback.print_exc()
 
 
