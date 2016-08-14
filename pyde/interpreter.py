@@ -76,6 +76,11 @@ class InterpreterInput(InputWidget):
             from pygments.lexers import PythonLexer
             self.lexer = PythonLexer()
 
+        self.text = '''for i in range(5):
+    print(i)
+    time.sleep(1)
+'''
+
     def insert_text(self, text, from_undo=False):
         super(InterpreterInput, self).insert_text(text, from_undo=from_undo)
         try:
@@ -208,6 +213,8 @@ class InterpreterWrapper(object):
 
         self._interpreter_state = 'waiting'
 
+        # Clock.schedule_interval(self.ping, 5)
+
     @property
     def interpreter_state(self):
         return self._interpreter_state
@@ -236,6 +243,7 @@ class InterpreterWrapper(object):
             s = subprocess.Popen([python_name, '{}'.format(interpreter_script_path)])
             App.get_running_app().subprocesses.append(s)
             self.subprocess = s
+            pass
 
     def send_sigint(self):
         self.send_osc_message(b'sigint', address=b'/sigint')
@@ -248,6 +256,7 @@ class InterpreterWrapper(object):
         osc.bind(self.oscid, self.receive_osc_message, b'/stdout')
         osc.bind(self.oscid, self.receive_osc_message, b'/stderr')
         osc.bind(self.oscid, self.receive_osc_message, b'/interpreter')
+        osc.bind(self.oscid, self.receive_osc_message, b'/pong')
 
     # def begin_osc_listen(self):
     #     Clock.schedule_interval(self.read_osc_queue, 0.1)
@@ -272,6 +281,9 @@ class InterpreterWrapper(object):
 
             elif body[0] == 'received_command':
                 Clock.unschedule(self.command_not_received)
+
+        elif address == b'/pong':
+            self.pong()
 
         elif address == b'/stdout':
             self.gui.add_output_label(body[0], 'stdout')
@@ -303,3 +315,14 @@ class InterpreterWrapper(object):
 
     def restart(self):
         print('Asked to restart, but this isn\'t implemented yet')
+
+    def ping(self, *args):
+        self.send_osc_message('ping', address=b'/ping')
+        Clock.schedule_once(self.ping_failed, 2)
+
+    def ping_failed(self, *args):
+        self.interpreter_state = 'not_responding'
+
+    def pong(self):
+        print('Received pong')
+        Clock.unschedule(self.ping_failed)
