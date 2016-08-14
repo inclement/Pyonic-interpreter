@@ -8,6 +8,8 @@ from kivy.core.window import Window
 from kivy.properties import (StringProperty)
 from kivy import platform
 
+from android_runnable import run_on_ui_thread
+
 import argparse
 import sys
 
@@ -63,12 +65,29 @@ class PydeApp(App):
         Window.clearcolor = (1, 1, 1, 1)
         Window.softinput_mode = 'resize'
         self.parse_args()
-        Clock.schedule_once(self.remove_android_splash, 0)
+        Clock.schedule_once(self.android_setup, 0)
         return Manager()
 
-    def remove_android_splash(self, *args):
+    def android_setup(self, *args):
         if platform != 'android':
             return
+
+        self.remove_android_splash()
+        self.set_softinput_mode()
+
+    @run_on_ui_thread
+    def set_softinput_mode(self):
+        return
+        # from jnius import autoclass
+        # PythonActivity = autoclass('org.kivy.android.PythonActivity')
+        # WindowManager = autoclass('android.view.WindowManager')
+        # LayoutParams = autoclass('android.view.WindowManager$LayoutParams')
+        # activity = PythonActivity.mActivity
+
+        # activity.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        
+
+    def remove_android_splash(self, *args):
         from jnius import autoclass
         activity = autoclass('org.kivy.android.PythonActivity').mActivity
         activity.removeLoadingScreen()
