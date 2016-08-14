@@ -7,7 +7,7 @@ from kivy.uix.button import Button
 from kivy.uix.behaviors import FocusBehavior
 from kivy.properties import (ObjectProperty, NumericProperty,
                              OptionProperty, BooleanProperty,
-                             StringProperty)
+                             StringProperty, ListProperty)
 from kivy.animation import Animation
 from kivy.app import App
 from kivy import platform
@@ -50,6 +50,10 @@ class InputLabel(Label):
         self.flash()
         self.root.insert_previous_code(self.index)
         return True
+
+
+class NotificationLabel(Label):
+    background_colour = ListProperty([1, 0, 0, 0.5])
 
 
 class NonDefocusingButton(Button):
@@ -121,7 +125,8 @@ class InterpreterGui(BoxLayout):
 
     interpreter_state = OptionProperty('waiting', options=['waiting',
                                                            'interpreting',
-                                                           'not_responding'])
+                                                           'not_responding',
+                                                           'restarting'])
     status_label_colour = StringProperty('0000ff')
 
     def __init__(self, *args, **kwargs):
@@ -138,6 +143,8 @@ class InterpreterGui(BoxLayout):
             self.status_label_colour = '00ff00'
         elif value == 'not_responding':
             self.status_label_colour = 'ff0000'
+        elif value == 'restarting':
+            self.status_label_colour = 'ffA500'
 
     def interpret_line_from_code_input(self):
         text = self.code_input.text
@@ -166,6 +173,13 @@ class InterpreterGui(BoxLayout):
         l = OutputLabel(text=text, stream=stream)
         self.output_window.add_widget(l)
         self.scrollview.scroll_to(l)
+
+    def add_notification_label(self, text):
+        self.add_break()
+        l = NotificationLabel(text=text)
+        self.output_window.add_widget(l)
+        self.scrollview.scroll_to(l)
+        self.add_break()
 
     def add_break(self):
         b = BreakMarker()
@@ -314,15 +328,40 @@ class InterpreterWrapper(object):
         print('command not received? something is wrong!?')
 
     def restart(self):
-        print('Asked to restart, but this isn\'t implemented yet')
+        if platform == 'android':
+            from jnius import autoclass
+            service = autoclass('net.inclem.pyde.ServiceInterpreter')
+            mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
+            service.stop(mActivity)
+            self.start_interpreter()
+        else:
+            self.subprocess.kill()
+            self.start_interpreter()
 
-    def ping(self, *args):
+        self.gui.lock_input = True
+        self.interpreter_state = 'restarting'
+        Clock.unschedule
+        Clock.schedule_interval(self.ping, 0.5)
+
+    def finish_restart(self):
+        if self.interpreter_state != 'restarting':
+            raise ValueError('Tried to finish restarting, but was not restarting')
+        self.interpreter_state = 'waiting'
+        self.gui.lock_input = False
+        self.gui.add_notification_label('[b]interpreter restarted: variable context lost[/b]')
+
+    def ping(self, *args, **kwargs):
+        timeout = kwargs.get('timeout', 2)
         self.send_osc_message('ping', address=b'/ping')
-        Clock.schedule_once(self.ping_failed, 2)
+        Clock.schedule_once(self.ping_failed, timeout)
 
     def ping_failed(self, *args):
-        self.interpreter_state = 'not_responding'
+        if self.interpreter_state != 'restarting':
+            self.interpreter_state = 'not_responding'
 
     def pong(self):
         print('Received pong')
         Clock.unschedule(self.ping_failed)
+        if self.interpreter_state == 'restarting':
+            self.finish_restart()
+            Clock.unschedule(self.ping)

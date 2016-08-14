@@ -113,8 +113,8 @@
                 background_color: 1, 0.5, 0.5, 1
                 on_release: root.send_sigint()
                 color: 1, 1, 1, 1
-                disabled: True if root.interpreter_state == 'waiting' else False
-                opacity: 0.2 if root.interpreter_state == 'waiting' else 1
+                disabled: True if root.interpreter_state in ('waiting', 'restarting') else False
+                opacity: 0.2 if root.interpreter_state in ('waiting', 'restarting') else 1
             Button:
                 text: 'restart'
                 size_hint_x: None
@@ -207,6 +207,9 @@
             text: 'test sigint'
             on_release: root.interpreter.send_sigint()
         Button:
+            text: 'test restart'
+            on_release: root.interpreter.restart()
+        Button:
             text: 'ping'
             on_release: root.interpreter.ping()
         
@@ -256,6 +259,19 @@
         Rectangle:
             pos: self.pos
             size: dp(5), self.height
+
+<NotificationLabel>:
+    size_hint_y: None
+    height: self.texture_size[1] + dp(8)
+    markup: True
+    color: 1, 1, 1, 1
+    canvas.before:
+        Color:
+            rgba: root.background_colour
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        
 
 <BreakMarker>:
     size_hint_y: None
