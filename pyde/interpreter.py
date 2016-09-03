@@ -123,6 +123,7 @@ class InterpreterGui(BoxLayout):
     input_fail_alpha = NumericProperty(0.)
 
     lock_input = BooleanProperty(False)
+    _lock_input = BooleanProperty(False)
 
     interpreter_state = OptionProperty('waiting', options=['waiting',
                                                            'interpreting',
@@ -136,6 +137,14 @@ class InterpreterGui(BoxLayout):
                                    duration=0.5)
 
         self.interpreter = InterpreterWrapper(self)
+
+    def on_lock_input(self, instance, value):
+        if value:
+            self.input_focus_on_disable = self.code_input.focus
+            self.lock_input = True
+        else:
+            self.lock_input = False
+            self.code_input.focus = self.input_focus_on_disable
 
     def on_interpreter_state(self, instance, value):
         if value == 'waiting':
@@ -154,7 +163,6 @@ class InterpreterGui(BoxLayout):
             return
         self.code_input.text = ''
         self.interpret_line(text)
-        self.code_input.focus = True
 
     def flash_input_fail(self):
         self.animation.stop(self)
