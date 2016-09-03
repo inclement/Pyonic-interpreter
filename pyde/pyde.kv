@@ -108,15 +108,6 @@
                 text: 'status: [b][color=#{}]{}[/color][/b]'.format(root.status_label_colour, root.interpreter_state.replace('_', ' '))
             Widget:
             Button:
-                text: 'CTRL + C'
-                size_hint_x: None
-                width: 1.8 * self.texture_size[0]
-                background_color: 1, 0.5, 0.5, 1
-                on_release: root.send_sigint()
-                color: 1, 1, 1, 1
-                disabled: True if root.interpreter_state in ('waiting', 'restarting') else False
-                opacity: 0.2 if root.interpreter_state in ('waiting', 'restarting') else 1
-            Button:
                 text: 'restart'
                 size_hint_x: None
                 width: 1.8 * self.texture_size[0]
@@ -126,6 +117,18 @@
                 color: 1, 1, 1, 1
                 # disabled: True if root.interpreter_state != 'not_responding' else False
                 # opacity: 0.2 if root.interpreter_state != 'not_responding' else 1
+            Widget:
+                size_hint_x: None
+                width: dp(30)
+            Button:
+                text: 'CTRL + C'
+                size_hint_x: None
+                width: 1.8 * self.texture_size[0]
+                background_color: 1, 0.5, 0.5, 1
+                on_release: root.send_sigint()
+                color: 1, 1, 1, 1
+                disabled: True if root.interpreter_state in ('waiting', 'restarting') else False
+                opacity: 0.2 if root.interpreter_state in ('waiting', 'restarting') else 1
     Widget:
         size_hint_y: None
         height: dp(2)
@@ -145,7 +148,7 @@
         InterpreterInput:
             id: input
             root: root
-            disabled: root.lock_input
+            disabled: root._lock_input
             font_name: 'RobotoMono-Regular.ttf'
             canvas.after:
                 Color:
