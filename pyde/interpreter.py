@@ -83,25 +83,26 @@ class InterpreterInput(InputWidget):
 
         self.text = '''for i in range(5):
     print(i)
-    time.sleep(1)
-'''
+    time.sleep(1)'''
 
     def insert_text(self, text, from_undo=False):
-        super(InterpreterInput, self).insert_text(text, from_undo=from_undo)
-        try:
-            if (text == '\n' and
-                self.text.split('\n')[-2][-1].strip()[-1] == ':'):
-                previous_line = self.text.split('\n')[-2]
-                num_spaces = len(previous_line) - len(previous_line.lstrip())
-                for i in range(num_spaces + 4):
-                    self.insert_text(' ')
-            elif text == '\n':
-                previous_line = self.text.split('\n')[-2]
-                num_spaces = len(previous_line) - len(previous_line.lstrip())
-                for i in range(num_spaces):
-                    self.insert_text(' ')
-        except IndexError:
-            pass
+        if text != '\n' or self.text == '':
+            return super(InterpreterInput, self).insert_text(text,
+                                                             from_undo=from_undo)
+
+        print(self.text.split('\n'))
+        last_line = self.text.split('\n')[-1].rstrip()
+        if len(last_line) == 0:
+            return super(InterpreterInput, self).insert_text(text,
+                                                             from_undo=from_undo)
+
+        num_spaces = len(last_line) - len(last_line.lstrip())
+        if last_line[-1] == ':':
+            return super(InterpreterInput, self).insert_text(text + (num_spaces + 4) * ' ',
+                                                             from_undo=from_undo)
+        else:
+            return super(InterpreterInput, self).insert_text(text + 4 * ' ',
+                                                             from_undo=from_undo)
 
     def keyboard_on_key_down(self, window, keycode, text, modifiers):
         if keycode[1] == 'enter' and 'shift' in modifiers:
