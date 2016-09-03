@@ -5,6 +5,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.behaviors import FocusBehavior
+from kivy.uix.modalview import ModalView
 from kivy.properties import (ObjectProperty, NumericProperty,
                              OptionProperty, BooleanProperty,
                              StringProperty, ListProperty)
@@ -70,7 +71,7 @@ class InterpreterScreen(Screen):
 if platform == 'android':
     from kivy.uix.textinput import TextInput as InputWidget
 else:
-    from kivy.uix.textinput import TextInput as InputWidget
+    from kivy.uix.codeinput import CodeInput as InputWidget
 class InterpreterInput(InputWidget):
     root = ObjectProperty()
 
@@ -200,6 +201,13 @@ class InterpreterGui(BoxLayout):
 
     def restart_interpreter(self):
         self.interpreter.restart()
+
+    def query_restart(self):
+        popup = RestartPopup(interpreter_gui=self)
+        popup.open()
+
+class RestartPopup(ModalView):
+    interpreter_gui = ObjectProperty()
 
 
 class BreakMarker(Widget):

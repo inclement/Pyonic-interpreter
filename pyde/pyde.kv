@@ -1,5 +1,6 @@
 #:import Clock kivy.clock.Clock
 #:import FocusBehavior kivy.uix.behaviors.FocusBehavior
+#:import Window kivy.core.window.Window
 
 <Label>:
     color: 0, 0, 0, 1
@@ -120,10 +121,11 @@
                 size_hint_x: None
                 width: 1.8 * self.texture_size[0]
                 background_color: 1, 0, 0, 1
-                on_release: root.restart_interpreter()
+                # on_release: root.restart_interpreter()
+                on_release: root.query_restart()
                 color: 1, 1, 1, 1
-                disabled: True if root.interpreter_state == 'not_responding' else False
-                opacity: 0.2 if root.interpreter_state != 'not_responding' else 1
+                # disabled: True if root.interpreter_state != 'not_responding' else False
+                # opacity: 0.2 if root.interpreter_state != 'not_responding' else 1
     Widget:
         size_hint_y: None
         height: dp(2)
@@ -208,7 +210,8 @@
             on_release: root.interpreter.send_sigint()
         Button:
             text: 'test restart'
-            on_release: root.interpreter.restart()
+            # on_release: root.interpreter.restart()
+            on_release: root.query_restart()
         Button:
             text: 'ping'
             on_release: root.interpreter.ping()
@@ -282,3 +285,52 @@
         Rectangle:
             pos: self.pos
             size: self.size
+
+<RestartPopup>:
+    size_hint_x: None
+    size_hint_y: None
+    width: min(0.8*Window.width, dp(350))
+    vertical_padding: dp(20)
+    height: gridlayout.height
+    GridLayout:
+        id: gridlayout
+        height: self.minimum_height
+        cols: 1
+        Widget:
+            size_hint_y: None
+            height: root.vertical_padding
+        Label:
+            text: 'Are you sure you want to restart the interpreter? Your variable context will be lost.'
+            text_size: self.width, None
+            halign: 'center'
+            color: 1, 1, 1, 1
+            size_hint_y: None
+            height: self.texture_size[1]
+            padding_x: dp(20)
+            padding_y: dp(20)
+        Widget:
+            size_hint_y: None
+            height: root.vertical_padding
+        BoxLayout:
+            size_hint_y: None
+            height: dp(40)
+            Widget:
+                size_hint_x: 0.2
+            Button:
+                text: 'cancel'
+                color: 1, 1, 1, 1
+                on_release: root.dismiss()
+                background_color: 1, 0, 0, 1
+            Widget:
+                size_hint_x: 0.2
+            Button:
+                text: 'restart'
+                color: 1, 1, 1, 1
+                on_release: root.interpreter_gui.restart_interpreter(); root.dismiss()
+                background_color: 0, 0.8, 0, 1
+            Widget:
+                size_hint_x: 0.2
+        Widget:
+            size_hint_y: None
+            height: root.vertical_padding
+            
