@@ -101,7 +101,7 @@ class InterpreterInput(InputWidget):
             return super(InterpreterInput, self).insert_text(text + (num_spaces + 4) * ' ',
                                                              from_undo=from_undo)
         else:
-            return super(InterpreterInput, self).insert_text(text + 4 * ' ',
+            return super(InterpreterInput, self).insert_text(text + num_spaces * ' ',
                                                              from_undo=from_undo)
 
     def keyboard_on_key_down(self, window, keycode, text, modifiers):
