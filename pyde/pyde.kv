@@ -204,20 +204,6 @@
             text: 'i'
             font_name: 'assets/fontello.ttf'
             on_press: input.do_cursor_movement('cursor_right')
-    BoxLayout:
-        size_hint_y: None
-        height: sp(40)
-        orientation: 'horizontal'
-        Button:
-            text: 'test sigint'
-            on_release: root.interpreter.send_sigint()
-        Button:
-            text: 'test restart'
-            # on_release: root.interpreter.restart()
-            on_release: root.query_restart()
-        Button:
-            text: 'ping'
-            on_release: root.interpreter.ping()
         
 
 <NonDefocusingButton>:
