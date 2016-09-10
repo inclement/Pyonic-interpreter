@@ -5,7 +5,8 @@ from Cython.Distutils import build_ext
 packages = find_packages()
 
 options = {'apk': {'debug': None,
-                   'requirements': 'sdl2,kivy,python2',
+                   'window': None,
+                   'requirements': 'sdl2,kivy,python2,pygments',
                    'android-api': 19,
                    'ndk-dir': '/home/asandy/android/crystax-ndk-10.3.2',
                    # 'dist-name': 'pyde',

@@ -68,10 +68,7 @@ class InterpreterScreen(Screen):
     pass
 
 
-if platform == 'android':
-    from kivy.uix.textinput import TextInput as InputWidget
-else:
-    from kivy.uix.codeinput import CodeInput as InputWidget
+from kivy.uix.codeinput import CodeInput as InputWidget
 class InterpreterInput(InputWidget):
     root = ObjectProperty()
 

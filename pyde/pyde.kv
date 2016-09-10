@@ -117,9 +117,6 @@
                 color: 1, 1, 1, 1
                 # disabled: True if root.interpreter_state != 'not_responding' else False
                 # opacity: 0.2 if root.interpreter_state != 'not_responding' else 1
-            Widget:
-                size_hint_x: None
-                width: dp(30)
             Button:
                 text: 'CTRL + C'
                 size_hint_x: None
@@ -140,7 +137,7 @@
                 size: self.size
     BoxLayout:
         size_hint_y: None
-        height: sp(100)
+        height: sp(80)
         MonoLabel:
             text: '>>>'
             width: self.texture_size[0] * 1.5
