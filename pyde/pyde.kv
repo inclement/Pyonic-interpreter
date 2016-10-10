@@ -187,6 +187,10 @@
             font_name: 'RobotoMono-Regular.ttf'
             on_release: input.insert_text(':')
         KeyboardButton:
+            text: '*'
+            font_name: 'RobotoMono-Regular.ttf'
+            on_release: input.insert_text('*')
+        KeyboardButton:
             text: 'h'
             font_name: 'assets/fontello.ttf'
             on_release: input.do_cursor_movement('cursor_left')
@@ -212,7 +216,7 @@
     padding: 0.025 * min(self.size)
     canvas.before:
         Color:
-            rgba: (0.5, 0.5, 0.5, 0.8) if self.state == 'normal' else (0.2, 0.6431, 0.8078, 1.)
+            rgba: (0.6, 0.6, 0.6, 0.8) if self.state == 'normal' else (0.2, 0.6431, 0.8078, 1.)
         Rectangle:
             pos: self.x + self.padding, self.y + self.padding
             size: self.width - 2*self.padding, self.height - 2*self.padding
