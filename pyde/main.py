@@ -1,5 +1,4 @@
 
-
 from kivy.app import App
 from kivy.uix.screenmanager import (ScreenManager, Screen,
                                     SlideTransition)
@@ -63,7 +62,7 @@ class PydeApp(App):
     
     def build(self):
         Window.clearcolor = (1, 1, 1, 1)
-        Window.softinput_mode = 'resize'
+        Window.softinput_mode = 'pan'
         self.parse_args()
         Clock.schedule_once(self.android_setup, 0)
         return Manager()

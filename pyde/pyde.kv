@@ -66,6 +66,7 @@
             pos: self.pos
             size: self.size
     FloatLayout:
+        id: floatlayout
         ScrollView:
             pos_hint: {'x': 0, 'y': 0}
             id: scrollview
@@ -87,7 +88,7 @@
                         rectangle: [self.x, self.y, self.width, self.height]
                 Widget:
                     size_hint_y: None
-                    height: dp(40)
+                    height: floatlayout.height
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: None
@@ -169,42 +170,53 @@
         #     text: 'previous line'
         #     disabled: True if root.browsing_previous_lines == 'no' else False
         #     on_press: root.insert_previous_line()
-        NonDefocusingButton:
+        KeyboardButton:
             text: '='
             font_name: 'RobotoMono-Regular.ttf'
-            on_press: input.insert_text('=')
-        NonDefocusingButton:
+            on_release: input.insert_text('=')
+        KeyboardButton:
             text: '('
             font_name: 'RobotoMono-Regular.ttf'
-            on_press: input.insert_text('(')
-        NonDefocusingButton:
+            on_release: input.insert_text('(')
+        KeyboardButton:
             text: ')'
             font_name: 'RobotoMono-Regular.ttf'
-            on_press: input.insert_text(')')
-        NonDefocusingButton:
+            on_release: input.insert_text(')')
+        KeyboardButton:
             text: ':'
             font_name: 'RobotoMono-Regular.ttf'
-            on_press: input.insert_text(':')
-        NonDefocusingButton:
+            on_release: input.insert_text(':')
+        KeyboardButton:
             text: 'h'
             font_name: 'assets/fontello.ttf'
-            on_press: input.do_cursor_movement('cursor_left')
-        NonDefocusingButton:
+            on_release: input.do_cursor_movement('cursor_left')
+        KeyboardButton:
             text: 'n'
             font_name: 'assets/fontello.ttf'
-            on_press: input.do_cursor_movement('cursor_down')
-        NonDefocusingButton:
+            on_release: input.do_cursor_movement('cursor_down')
+        KeyboardButton:
             text: 'e'
             font_name: 'assets/fontello.ttf'
-            on_press: input.do_cursor_movement('cursor_up')
-        NonDefocusingButton:
+            on_release: input.do_cursor_movement('cursor_up')
+        KeyboardButton:
             text: 'i'
             font_name: 'assets/fontello.ttf'
-            on_press: input.do_cursor_movement('cursor_right')
+            on_release: input.do_cursor_movement('cursor_right')
         
 
 <NonDefocusingButton>:
     color: (1, 1, 1, 1)
+
+<KeyboardButton>:
+    color: (0, 0, 0, 1) if self.state == 'normal' else (1, 1, 1, 1)
+    padding: 0.025 * min(self.size)
+    canvas.before:
+        Color:
+            rgba: (0.5, 0.5, 0.5, 0.8) if self.state == 'normal' else (0.2, 0.6431, 0.8078, 1.)
+        Rectangle:
+            pos: self.x + self.padding, self.y + self.padding
+            size: self.width - 2*self.padding, self.height - 2*self.padding
+                
             
 <MonoLabel@Label>:
     font_name: 'RobotoMono-Regular.ttf'
