@@ -73,6 +73,12 @@ class PydeApp(App):
 
         self.remove_android_splash()
         self.set_softinput_mode()
+        Window.bind(on_keyboard=self.android_key_input)
+
+    def android_key_input(self, window, key, scancode, codepoint, modifier):
+        if scancode == 270:
+            return True  # back button now does nothing on Android
+        return False
 
     @run_on_ui_thread
     def set_softinput_mode(self):

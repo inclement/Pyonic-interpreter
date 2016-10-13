@@ -39,7 +39,6 @@ your interpreter to crash if you want!
 TODO before release
 -------------------
 
-- fix back button on Android (shouldn't crash)
 - fix textinput not being disabled
 - add ctrl+c button on top of enter button during execution
 - change input buttons (use RoundedRectangle)
