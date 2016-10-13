@@ -41,5 +41,4 @@ TODO before release
 
 - fix textinput not being disabled
 - add ctrl+c button on top of enter button during execution
-- change input buttons (use RoundedRectangle)
 - fix message overloading with a queue

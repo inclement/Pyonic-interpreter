@@ -212,14 +212,15 @@
     color: (1, 1, 1, 1)
 
 <KeyboardButton>:
-    color: (0, 0, 0, 1) if self.state == 'normal' else (1, 1, 1, 1)
+    color: (1, 1, 1, 1)
     padding: 0.025 * min(self.size)
     canvas.before:
         Color:
             rgba: (0.6, 0.6, 0.6, 0.8) if self.state == 'normal' else (0.2, 0.6431, 0.8078, 1.)
-        Rectangle:
+        RoundedRectangle:
             pos: self.x + self.padding, self.y + self.padding
             size: self.width - 2*self.padding, self.height - 2*self.padding
+            radius: [(dp(5), dp(5)) for _ in range(4)]
                 
             
 <MonoLabel@Label>:
