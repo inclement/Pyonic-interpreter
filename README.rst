@@ -34,3 +34,13 @@ It's currently very easy to break the app, e.g. with infinite loops or
 by causing the second process to halt. Some of this can be fixed
 (e.g. interrupt support for loops), but ultimately that's fine...it's
 your interpreter to crash if you want!
+
+
+TODO before release
+-------------------
+
+- fix back button on Android (shouldn't crash)
+- fix textinput not being disabled
+- add ctrl+c button on top of enter button during execution
+- change input buttons (use RoundedRectangle)
+- fix message overloading with a queue
