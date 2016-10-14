@@ -139,9 +139,9 @@ class InterpreterGui(BoxLayout):
     def on_lock_input(self, instance, value):
         if value:
             self.input_focus_on_disable = self.code_input.focus
-            self.lock_input = True
+            self._lock_input = True
         else:
-            self.lock_input = False
+            self._lock_input = False
             self.code_input.focus = self.input_focus_on_disable
 
     def on_interpreter_state(self, instance, value):
