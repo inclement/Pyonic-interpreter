@@ -4,6 +4,7 @@ from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
+from kivy.uix.carousel import Carousel
 from kivy.uix.behaviors import FocusBehavior
 from kivy.uix.modalview import ModalView
 from kivy.properties import (ObjectProperty, NumericProperty,
@@ -26,6 +27,62 @@ import signal
 
 from os.path import realpath, join, dirname
 
+
+class NoTouchCarousel(Carousel):
+    '''A carousel that doesn't let the user scroll with touch.'''
+    def on_touch_down(self, touch):
+        for child in self.children[:]:
+            if child.dispatch('on_touch_down', touch):
+                return True
+
+    def _start_animation(self, *args, **kwargs):
+        # compute target offset for ease back, next or prev
+        new_offset = 0
+        direction = kwargs.get('direction', self.direction)
+        is_horizontal = direction[0] in ['r', 'l']
+        extent = self.width if is_horizontal else self.height
+        min_move = kwargs.get('min_move', self.min_move)
+        _offset = kwargs.get('offset', self._offset)
+
+        if _offset < min_move * -extent:
+            new_offset = -extent
+        elif _offset > min_move * extent:
+            new_offset = extent
+
+        if 'new_offset' in kwargs:
+            new_offset = kwargs['new_offset']
+            print('yay')
+
+        # if new_offset is 0, it wasnt enough to go next/prev
+        dur = self.anim_move_duration
+        if new_offset == 0:
+            dur = self.anim_cancel_duration
+
+        # detect edge cases if not looping
+        len_slides = len(self.slides)
+        index = self.index
+        if not self.loop or len_slides == 1:
+            is_first = (index == 0)
+            is_last = (index == len_slides - 1)
+            if direction[0] in ['r', 't']:
+                towards_prev = (new_offset > 0)
+                towards_next = (new_offset < 0)
+            else:
+                towards_prev = (new_offset < 0)
+                towards_next = (new_offset > 0)
+            if (is_first and towards_prev) or (is_last and towards_next):
+                new_offset = 0
+
+        anim = Animation(_offset=new_offset, d=dur, t=self.anim_type)
+        anim.cancel_all(self)
+
+        def _cmp(*l):
+            if self._skip_slide is not None:
+                self.index = self._skip_slide
+                self._skip_slide = None
+
+        anim.bind(on_complete=_cmp)
+        anim.start(self)
 
 class OutputLabel(Label):
     stream = OptionProperty('stdout', options=['stdout', 'stderr'])
@@ -63,6 +120,13 @@ class NonDefocusingButton(Button):
             FocusBehavior.ignored_touch.append(touch)
         return super(NonDefocusingButton, self).on_touch_down(touch)
 
+
+class KeyboardButton(ButtonBehavior, Label):
+    padding = NumericProperty()
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            FocusBehavior.ignored_touch.append(touch)
+        return super(KeyboardButton, self).on_touch_down(touch)
 
 class InterpreterScreen(Screen):
     pass
@@ -143,6 +207,23 @@ class InterpreterGui(BoxLayout):
         else:
             self._lock_input = False
             self.code_input.focus = self.input_focus_on_disable
+
+    def ensure_ctrl_c_button(self):
+        Clock.schedule_once(self._switch_to_ctrl_c_button, 0.4)
+
+    def _switch_to_ctrl_c_button(self, *args):
+        c = self.ids.carousel
+        if c.index == 0:
+            c.load_next()
+
+    def ensure_no_ctrl_c_button(self):
+        Clock.unschedule(self._switch_to_ctrl_c_button)
+        c = self.ids.carousel
+        if c.index == 1:
+            c.load_previous()
+        else:
+            Animation.cancel_all(c)
+            c._start_animation(new_offset=0)
 
     def on_interpreter_state(self, instance, value):
         if value == 'waiting':
@@ -304,6 +385,7 @@ class InterpreterWrapper(object):
             if body[0] == 'completed_exec':
                 self.gui.add_break()
                 self.gui.lock_input = False
+                self.gui.ensure_no_ctrl_c_button()
                 self.interpreter_state = 'waiting'
                 # self.end_osc_listen()
 
@@ -322,6 +404,7 @@ class InterpreterWrapper(object):
     def interpret_line(self, text):
         self.send_python_command(text.encode('utf-8'))
         self.gui.lock_input = True
+        self.gui.ensure_ctrl_c_button()
         self.interpreter_state = 'interpreting'
         input_index = self.input_index
         self.inputs[input_index] = text
