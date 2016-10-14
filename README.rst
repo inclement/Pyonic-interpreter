@@ -39,6 +39,5 @@ your interpreter to crash if you want!
 TODO before release
 -------------------
 
-- add ctrl+c button on top of enter button during execution
 - fix message overloading with a queue
 - disallow scrolling until screen full
