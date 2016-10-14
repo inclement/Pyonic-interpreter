@@ -1,4 +1,3 @@
-
 from kivy.app import App
 from kivy.uix.screenmanager import (ScreenManager, Screen,
                                     SlideTransition)
@@ -77,6 +76,9 @@ class PydeApp(App):
 
     def android_key_input(self, window, key, scancode, codepoint, modifier):
         if scancode == 270:
+            from jnius import autoclass
+            activity = autoclass('org.kivy.android.PythonActivity')
+            activity.moveTaskToBack(True)
             return True  # back button now does nothing on Android
         return False
 
