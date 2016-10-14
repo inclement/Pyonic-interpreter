@@ -187,6 +187,10 @@ class InterpreterGui(BoxLayout):
     lock_input = BooleanProperty(False)
     _lock_input = BooleanProperty(False)
 
+    halting = BooleanProperty(False)
+    '''True when the interpreter has been asked to stop but has not yet
+    done so.'''
+
     interpreter_state = OptionProperty('waiting', options=['waiting',
                                                            'interpreting',
                                                            'not_responding',
@@ -207,6 +211,7 @@ class InterpreterGui(BoxLayout):
         else:
             self._lock_input = False
             self.code_input.focus = self.input_focus_on_disable
+            self.ensure_no_ctrl_c_button()
 
     def ensure_ctrl_c_button(self):
         Clock.schedule_once(self._switch_to_ctrl_c_button, 0.4)
@@ -284,6 +289,7 @@ class InterpreterGui(BoxLayout):
             self.code_input.text += '\n' + code
 
     def send_sigint(self):
+        self.halting = True
         self.interpreter.send_sigint()
 
     def restart_interpreter(self):
@@ -385,6 +391,7 @@ class InterpreterWrapper(object):
             if body[0] == 'completed_exec':
                 self.gui.add_break()
                 self.gui.lock_input = False
+                self.gui.halting = False
                 self.gui.ensure_no_ctrl_c_button()
                 self.interpreter_state = 'waiting'
                 # self.end_osc_listen()

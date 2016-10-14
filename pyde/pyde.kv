@@ -123,7 +123,7 @@
                 size_hint_x: None
                 width: 1.8 * self.texture_size[0]
                 background_color: 0.2, 0.7, 1, 1
-                on_release: root.send_sigint()
+                on_release: if not root.halting: root.send_sigint()
                 color: 1, 1, 1, 1
                 disabled: True if root.interpreter_state in ('waiting', 'restarting') else False
                 opacity: 0.2 if root.interpreter_state in ('waiting', 'restarting') else 1
@@ -154,22 +154,27 @@
                 Rectangle:
                     pos: self.pos
                     size: self.size
-        NonDefocusingButton:
-            text: 'N'
-            font_name: 'assets/fontello.ttf'
-            font_size: sp(20)
-            width: self.texture_size[0] * 3
+        NoTouchCarousel:
+            id: carousel
+            width: enter_button.texture_size[0] * 3
             size_hint_x: None
-            on_release: root.interpret_line_from_code_input()
+            loop: True
+            NonDefocusingButton:
+                id: enter_button
+                text: 'N'
+                font_name: 'assets/fontello.ttf'
+                font_size: sp(20)
+                on_release: root.interpret_line_from_code_input()
+            NonDefocusingButton:
+                text: 'c'
+                font_name: 'assets/fontello.ttf'
+                background_color: (1, 0, 0, 1)
+                font_size: sp(20)
+                on_release: if not root.halting: root.send_sigint()
     BoxLayout:
         size_hint_y: None
-        height: sp(40)
+        height: sp(35)
         orientation: 'horizontal'
-        # NonDefocusingButton:
-        #     size_hint_x: 4
-        #     text: 'previous line'
-        #     disabled: True if root.browsing_previous_lines == 'no' else False
-        #     on_press: root.insert_previous_line()
         KeyboardButton:
             text: '='
             font_name: 'RobotoMono-Regular.ttf'
