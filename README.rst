@@ -40,4 +40,5 @@ TODO before release
 -------------------
 
 - fix message overloading with a queue
-- disallow scrolling until screen full
+- make interpreter print last element of statements
+- try with python3
