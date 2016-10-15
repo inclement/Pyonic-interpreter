@@ -86,9 +86,6 @@
                         rgba: 0, 0, 0, 1
                     Line:
                         rectangle: [self.x, self.y, self.width, self.height]
-                Widget:
-                    size_hint_y: None
-                    height: output_window.filling_widget_height
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: None
@@ -341,4 +338,8 @@
         Widget:
             size_hint_y: None
             height: root.vertical_padding
-            
+
+<InitiallyFullGridLayout>:
+    Widget:
+        size_hint_y: None
+        height: root.filling_widget_height
