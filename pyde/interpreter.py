@@ -1,10 +1,12 @@
 
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.carousel import Carousel
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.behaviors import FocusBehavior
 from kivy.uix.modalview import ModalView
 from kivy.properties import (ObjectProperty, NumericProperty,
@@ -26,6 +28,28 @@ import sys
 import signal
 
 from os.path import realpath, join, dirname
+
+class InitiallyFullGridLayout(GridLayout):
+    '''A GridLayout that initially fills itself with a Widget.
+    '''
+    filling_widget_height = NumericProperty()
+
+    def on_parent(self, instance, value):
+        self.parent.bind(height=self.calculate_filling_widget_height)
+
+    def on_height(self, instance, value):
+        if self.filling_widget_height > 1.5:
+            self.calculate_filling_widget_height()
+
+    def calculate_filling_widget_height(self, *args):
+        print('calculating')
+        child_sum = sum([c.height for c in self.children[:-1]])
+        self.filling_widget_height = max(0, self.parent.height - child_sum) + 1.
+        print('result', self.filling_widget_height, self.parent.height, child_sum)
+
+    def on_filling_widget_height(self, instance, value):
+        print('filling height', self.filling_widget_height)
+
 
 
 class NoTouchCarousel(Carousel):
