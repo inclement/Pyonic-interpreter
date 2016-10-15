@@ -236,6 +236,7 @@ class InterpreterGui(BoxLayout):
             self._lock_input = False
             self.code_input.focus = self.input_focus_on_disable
             self.ensure_no_ctrl_c_button()
+            self.halting = False
 
     def ensure_ctrl_c_button(self):
         Clock.schedule_once(self._switch_to_ctrl_c_button, 0.4)
