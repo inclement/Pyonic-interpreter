@@ -83,7 +83,20 @@ def complete_execution():
 
 def interpret_code(code):
     try:
-        exec(code, locals(), globals())
+        components = ast.parse(code).body
+
+        # exec all but the last ast component in exec mode
+        if len(components) > 1:
+            c = compile(ast.Module([components[:-1]]), '<stdin>', mode='exec')
+            exec(c, locals(), globals())
+
+        # if the last ast component is an Expr, compile in single mode to print it
+        if isinstance(components[-1], ast.Expr):
+            c = compile(ast.Interactive([components[-1]]), '<stdin>', mode='single')
+        else:
+            c = compile(ast.Module([components[-1]]), '<stdin>', mode='exec')
+        exec(c, locals(), globals())
+
     except KeyboardInterrupt as e:
         print('')
         traceback.print_exc()
