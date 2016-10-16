@@ -374,7 +374,7 @@ class InterpreterGui(BoxLayout):
         labels = self._output_label_queue
         self._output_label_queue = []
         if labels:
-            self.add_missing_labels_marker(labels)
+            self.add_missing_labels_marker(labels=labels)
 
         if self.dequeue_scheduled:
             self.dequeue_scheduled.cancel()
@@ -399,9 +399,11 @@ class InterpreterGui(BoxLayout):
             self.clear_scheduled = Clock.schedule_once(
                 self._clear_output_label_queue, 1)
 
-    def add_missing_labels_marker(self, labels):
+    def add_missing_labels_marker(self, num_labels=None, labels=None):
+        if labels is not None:
+            num_labels = len(labels)
         l = UserMessageLabel(
-            text='{} lines omitted (too many to render)'.format(len(labels)),
+            text='{} lines omitted (too many to render)'.format(num_labels),
             background_colour=(1, 0.6, 0, 1))
         l.labels = labels
         self.output_window.add_widget(l)
@@ -551,6 +553,11 @@ class InterpreterWrapper(object):
 
             elif body[0] == 'received_command':
                 Clock.unschedule(self.command_not_received)
+
+            elif body[0].startswith('omitted'):
+                number = body[0].split(' ')[-1]
+                print('number is', number)
+                self.gui.add_missing_labels_marker(num_labels=number)
 
         elif address == b'/pong':
             self.pong()
