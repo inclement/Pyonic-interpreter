@@ -40,5 +40,4 @@ TODO before release
 -------------------
 
 - fix message overloading with a queue
-- make interpreter print last element of statements
 - try with python3
