@@ -10,9 +10,6 @@ import inspect
 
 from kivy.lib import osc
 
-with open('testfile.txt', 'a') as fileh:
-    fileh.write('subprocess working ({})\n'.format(time.asctime()))
-
 send_port = 3001
 receive_port = 3000
 
@@ -132,19 +129,37 @@ class OscOut(object):
 
         self.target_port = target_port
 
+        self.messages_this_second = 0
+        self.last_time = time.time()
+
     def write(self, s):
-        s = self.buffer + s
-        lines = s.split('\n')
-        for l in lines[:-1]:
-            self.send_message(l)
-        self.buffer = lines[-1]
+        if time.time() - self.last_time > 1.2:
+            self.last_time = time.time()
+        try:
+            self.messages_this_second += 1
+            if time.time() - self.last_time > 1.:
+                self.messages_this_second = 0
+                self.last_time = time.time()
+            if self.messages_this_second > 500:
+                return
+
+            s = self.buffer + s
+            lines = s.split('\n')
+            for l in lines[:-1]:
+                self.send_message(l)
+            self.buffer = lines[-1]
+        except KeyboardInterrupt:
+            raise KeyboardInterrupt('interrupted while printing')
 
     def flush(self):
         return
 
     def send_message(self, message):
-        osc.sendMsg(self.address, [message.encode('utf-8')],
-                    port=self.target_port, typehint='b')
+        try:
+            osc.sendMsg(self.address, [message.encode('utf-8')],
+                        port=self.target_port, typehint='b')
+        except KeyboardInterrupt:
+            raise KeyboardInterrupt('interrupted while printing')
 
 osc.init()
 oscid = osc.listen(ipAddr='127.0.0.1', port=receive_port)

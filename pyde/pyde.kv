@@ -207,18 +207,24 @@
             text: 'h'
             font_name: 'assets/fontello.ttf'
             on_release: input.do_cursor_movement('cursor_left')
+            background_normal: 0.4, 0.4, 0.4, 0.8
         KeyboardButton:
             text: 'n'
             font_name: 'assets/fontello.ttf'
             on_release: input.do_cursor_movement('cursor_down')
+            background_normal: 0.4, 0.4, 0.4, 0.8
         KeyboardButton:
             text: 'e'
             font_name: 'assets/fontello.ttf'
             on_release: input.do_cursor_movement('cursor_up')
+            background_normal: 0.4, 0.4, 0.4, 0.8
         KeyboardButton:
             text: 'i'
             font_name: 'assets/fontello.ttf'
             on_release: input.do_cursor_movement('cursor_right')
+            background_normal: 0.4, 0.4, 0.4, 0.8
+
+# also: + - ; < > [ ] 
         
 
 <NonDefocusingButton>:
@@ -279,6 +285,24 @@
             size: self.size
         Color:
             rgba: (0.65, 0.95, 0.65, 1) if self.stream == 'stdout' else (0.95, 0.65, 0.65, 1)
+        Rectangle:
+            pos: self.pos
+            size: dp(5), self.height
+
+<UserMessageLabel>:
+    size_hint_y: None
+    height: self.texture_size[1] + dp(2)
+    text_size: self.width, None
+    font_name: 'RobotoMono-Regular.ttf'
+    padding_x: dp(10)
+    canvas.before:
+        Color:
+            rgba: 0.976, 0.9, 0.776, 1.
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: 1., 0.6706, 0.176, 1.
         Rectangle:
             pos: self.pos
             size: dp(5), self.height

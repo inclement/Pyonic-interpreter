@@ -20,6 +20,8 @@ from kivy.clock import Clock
 
 from kivy.lib import osc
 
+from time import time
+
 if platform != 'android':
     import subprocess
 
@@ -139,6 +141,10 @@ class InputLabel(Label):
         return True
 
 
+class UserMessageLabel(Label):
+    pass
+
+
 class NotificationLabel(Label):
     background_colour = ListProperty([1, 0, 0, 0.5])
 
@@ -244,12 +250,20 @@ class InterpreterGui(BoxLayout):
                                                            'restarting'])
     status_label_colour = StringProperty('0000ff')
 
+    _output_label_queue = ListProperty([])
+
+    dequeue_scheduled = None
+    clear_scheduled = None
+
     def __init__(self, *args, **kwargs):
         super(InterpreterGui, self).__init__(*args, **kwargs)
         self.animation = Animation(input_fail_alpha=0., t='out_expo',
                                    duration=0.5)
 
         self.interpreter = InterpreterWrapper(self)
+
+        # Clock.schedule_interval(self._dequeue_output_label, 0.05)
+        # Clock.schedule_interval(self._clear_output_label_queue, 1)
 
     def on_lock_input(self, instance, value):
         if value:
@@ -311,7 +325,75 @@ class InterpreterGui(BoxLayout):
         self.scrollview.scroll_to(l)
 
     def add_output_label(self, text, stream='stdout'):
+        self._output_label_queue.append((text, stream))
+        # self._dequeue_output_label(0)
+
+    def _add_output_label(self, text, stream='stdout', scroll_to=True):
         l = OutputLabel(text=text, stream=stream)
+        self.output_window.add_widget(l)
+        if scroll_to:
+            self.scrollview.scroll_to(l)
+        return l
+
+    def _dequeue_output_label(self, dt):
+        if not self._output_label_queue:
+            return
+
+        # print('dequeueing', self._output_label_queue)
+
+        t = time()
+        i = 0
+        while (time() - t) < 0.005:
+            i += 1
+            if not self._output_label_queue:
+                break
+            label_text = self._output_label_queue.pop(0)
+            label = self._add_output_label(*label_text, scroll_to=False)
+        print('did {} labels in {}'.format(i, time() - t))
+        Animation.stop_all(self.scrollview, 'scroll_x', 'scroll_y')
+        self.scrollview.scroll_to(label)
+
+        self.dequeue_scheduled.cancel()
+        self.dequeue_scheduled = None
+
+        if len(self._output_label_queue) == 0 and self.clear_scheduled:
+            self.clear_scheduled.cancel()
+            self.clear_scheduled = None
+        elif len(self._output_label_queue) > 0:
+            self.dequeue_scheduled = Clock.schedule_once(
+                self._dequeue_output_label, 0.05)
+
+    def _clear_output_label_queue(self, dt):
+        print('CLEARING')
+        labels = self._output_label_queue
+        self._output_label_queue = []
+        if labels:
+            self.add_missing_labels_marker(labels)
+
+        if self.dequeue_scheduled:
+            self.dequeue_scheduled.cancel()
+            self.dequeue_scheduled = None
+
+        if self.clear_scheduled:
+            self.clear_scheduled.cancel()
+            self.clear_scheduled = None
+
+    def on__output_label_queue(self, instance, values):
+        # print('olq', self.dequeue_scheduled, self.clear_scheduled)
+        if self.dequeue_scheduled:
+            return
+
+        if not self.dequeue_scheduled:
+            self.dequeue_scheduled = Clock.schedule_once(self._dequeue_output_label, 0)
+        if not self.clear_scheduled:
+            self.clear_scheduled = Clock.schedule_once(
+                self._clear_output_label_queue, 1)
+
+    def add_missing_labels_marker(self, labels):
+        l = UserMessageLabel(
+            text='{} lines omitted (too many to render)'.format(len(labels)),
+            background_colour=(1, 0.6, 0, 1))
+        l.labels = labels
         self.output_window.add_widget(l)
         self.scrollview.scroll_to(l)
 
@@ -370,7 +452,7 @@ class InterpreterWrapper(object):
         self.interpreter_port = 3000
         self.receive_port = 3001
 
-        Clock.schedule_interval(self.read_osc_queue, 0.1)
+        Clock.schedule_interval(self.read_osc_queue, 0.05)
 
         self.init_osc()
 
