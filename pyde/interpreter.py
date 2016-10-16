@@ -371,7 +371,6 @@ class InterpreterGui(BoxLayout):
             self._execution_complete()
 
     def _clear_output_label_queue(self, dt):
-        print('CLEARING')
         labels = self._output_label_queue
         self._output_label_queue = []
         if labels:
