@@ -105,25 +105,28 @@
                 markup: True
                 text: 'status: [b][color=#{}]{}[/color][/b]'.format(root.status_label_colour, root.interpreter_state.replace('_', ' '))
             Widget:
-            Button:
+            ColouredButton:
                 text: 'RESTART'
                 size_hint_x: None
                 width: 1.8 * self.texture_size[0]
-                background_color: 0, 0, 0, 1
-                # on_release: root.restart_interpreter()
+                background_normal: 0.2, 0.2, 0.2, 1
+                background_down: 0, 0, 0, 1
                 on_release: root.query_restart()
                 color: 1, 1, 1, 1
-                # disabled: True if root.interpreter_state != 'not_responding' else False
-                # opacity: 0.2 if root.interpreter_state != 'not_responding' else 1
-            Button:
+                radius: dp(5)
+                padding: 0.025 * min(self.size)
+            ColouredButton:
                 text: 'CTRL + C'
                 size_hint_x: None
                 width: 1.8 * self.texture_size[0]
-                background_color: 1, 0, 0, 1
+                background_normal: 0.5, 0, 0, 1
+                background_down: 0.2, 0, 0, 1
+                radius: dp(5)
+                padding: 0.025 * min(self.size)
                 on_release: if not root.halting: root.send_sigint()
                 color: 1, 1, 1, 1
                 disabled: True if root.interpreter_state in ('waiting', 'restarting') else False
-                opacity: 0.2 if root.interpreter_state in ('waiting', 'restarting') else 1
+                opacity: 0.05 if root.interpreter_state in ('waiting', 'restarting') else 1
     Widget:
         size_hint_y: None
         height: dp(2)
@@ -162,12 +165,20 @@
                 font_name: 'assets/fontello.ttf'
                 font_size: sp(20)
                 on_release: root.interpret_line_from_code_input()
+                background_normal: 0.3, 0.3, 0.3, 1
+                background_down: 0.1, 0.1, 0.1, 1
+                radius: 0
+                padding: 0
             NonDefocusingButton:
                 text: 'c'
                 font_name: 'assets/fontello.ttf'
                 background_color: (1, 0, 0, 1)
                 font_size: sp(20)
                 on_release: if not root.halting: root.send_sigint()
+                background_normal: 0.5, 0, 0, 1
+                background_down: 0.2, 0, 0, 1
+                radius: 0
+                padding: 0
     BoxLayout:
         size_hint_y: None
         height: sp(35)
@@ -216,15 +227,19 @@
 <KeyboardButton>:
     color: (1, 1, 1, 1)
     padding: 0.025 * min(self.size)
+    background_down: (0.2, 0.6431, 0.8078, 1.)
+    background_normal: (0.6, 0.6, 0.6, 0.8)
+
+<ColouredButton>:
     canvas.before:
         Color:
-            rgba: (0.6, 0.6, 0.6, 0.8) if self.state == 'normal' else (0.2, 0.6431, 0.8078, 1.)
+            rgba: self.background_normal if self.state == 'normal' else self.background_down
         RoundedRectangle:
             pos: self.x + self.padding, self.y + self.padding
             size: self.width - 2*self.padding, self.height - 2*self.padding
-            radius: [(dp(5), dp(5)) for _ in range(4)]
-                
-            
+            radius: [(self.radius, self.radius) for _ in range(4)]
+    
+
 <MonoLabel@Label>:
     font_name: 'RobotoMono-Regular.ttf'
 
@@ -343,3 +358,21 @@
     Widget:
         size_hint_y: None
         height: root.filling_widget_height
+
+<-InterpreterInput>:
+    canvas.before:
+        Color:
+            rgba: self.background_color
+        BorderImage:
+            border: self.border
+            pos: self.pos
+            size: self.size
+            source: self.background_disabled_normal if self.disabled else (self.background_active if self.focus else self.background_normal)
+            # source: self.background_active if self.focus else (self.background_disabled_normal if self.disabled else self.background_normal)
+        Color:
+            rgba: (self.cursor_color if (self.focus and not self.disabled and not self.cursor_blink) else (0, 0, 0, 0))
+        Rectangle:
+            pos: [int(x) for x in self.cursor_pos]
+            size: 1, -self.line_height
+        Color:
+            rgba: self.disabled_foreground_color if self.disabled else (self.hint_text_color if not self.text else self.foreground_color)

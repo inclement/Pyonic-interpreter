@@ -143,19 +143,25 @@ class NotificationLabel(Label):
     background_colour = ListProperty([1, 0, 0, 0.5])
 
 
-class NonDefocusingButton(Button):
+
+class ColouredButton(ButtonBehavior, Label):
+    background_normal = ListProperty([1, 1, 1, 1])
+    background_down = ListProperty([0.5, 0.5, 0.5, 1])
+    padding = NumericProperty(0)
+    radius = NumericProperty(0)
+
+class NonDefocusingButton(ColouredButton):
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
             FocusBehavior.ignored_touch.append(touch)
         return super(NonDefocusingButton, self).on_touch_down(touch)
 
-
-class KeyboardButton(ButtonBehavior, Label):
-    padding = NumericProperty()
+class KeyboardButton(ColouredButton):
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
             FocusBehavior.ignored_touch.append(touch)
         return super(KeyboardButton, self).on_touch_down(touch)
+
 
 class InterpreterScreen(Screen):
     pass
