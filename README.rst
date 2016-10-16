@@ -7,8 +7,8 @@ written in Python.
 The PyDE interpreter user interface is created in Python using `Kivy
 <https://github.com/kivy/python-for-android>`__. User input is passed
 to a second interpreter, run as a separate process via an Android
-service. Android packaging uses `python-for-android
-<https://github.com/kivy/python-for-android>`__.
+service. The interpreter is packaged for Android using
+`python-for-android <https://github.com/kivy/python-for-android>`__.
 
 PyDE interpreter is built and tested with Python 2. Python 3 also
 works, but requires some fixes in Kivy's osc library. A Python 3
@@ -17,6 +17,11 @@ release will be a main target following the initial Python 2 release.
 Future targets include support for multiple interpreters,
 different kinds of Python tasks (app threads, background services),
 and editing/running Python files.
+
+This app should in principle run on iOS with the addition of backend
+code to start the interpreter subprocess (although I don't know what
+the appropriate iOS mechanism would be). If anyone would like to try
+this, feel free to ask any questions about the process.
 
 .. image:: pyde_android_small.png
     :width: 300px
