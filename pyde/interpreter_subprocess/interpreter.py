@@ -77,8 +77,11 @@ def receive_message(message, *args):
 def complete_execution():
     global thread
     thread = None
-    osc.sendMsg(b'/interpreter', [b'completed_exec'], port=send_port,
-                typehint='b')
+    try:
+        osc.sendMsg(b'/interpreter', [b'completed_exec'], port=send_port,
+                    typehint='b')
+    except KeyboardInterrupt:
+        complete_execution()
     
 
 def interpret_code(code):
