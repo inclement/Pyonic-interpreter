@@ -252,8 +252,10 @@ class InterpreterGui(BoxLayout):
 
     _output_label_queue = ListProperty([])
 
-    dequeue_scheduled = None
-    clear_scheduled = None
+    dequeue_scheduled = ObjectProperty(None, allownone=True)
+    clear_scheduled = ObjectProperty(None, allownone=True)
+
+    awaiting_label_display_completion = BooleanProperty(False)
 
     def __init__(self, *args, **kwargs):
         super(InterpreterGui, self).__init__(*args, **kwargs)
@@ -363,6 +365,11 @@ class InterpreterGui(BoxLayout):
             self.dequeue_scheduled = Clock.schedule_once(
                 self._dequeue_output_label, 0.05)
 
+        if (self.awaiting_label_display_completion and
+            len(self._output_label_queue) == 0):
+            self.awaiting_label_display_completion = False
+            self._execution_complete()
+
     def _clear_output_label_queue(self, dt):
         print('CLEARING')
         labels = self._output_label_queue
@@ -377,6 +384,10 @@ class InterpreterGui(BoxLayout):
         if self.clear_scheduled:
             self.clear_scheduled.cancel()
             self.clear_scheduled = None
+
+        if self.awaiting_label_display_completion:
+            self.awaiting_label_display_completion = False
+            self._execution_complete()
 
     def on__output_label_queue(self, instance, values):
         # print('olq', self.dequeue_scheduled, self.clear_scheduled)
@@ -428,6 +439,22 @@ class InterpreterGui(BoxLayout):
     def query_restart(self):
         popup = RestartPopup(interpreter_gui=self)
         popup.open()
+
+    def execution_complete(self):
+        '''Called when execution is complete so the TextInput should be
+        unlocked etc., but first this is delayed until messages finish
+        printing.
+        '''
+        if len(self._output_label_queue) == 0:
+            self._execution_complete()
+        else:
+            self.awaiting_label_display_completion = True
+
+    def _execution_complete(self):
+        self.add_break()
+        self.lock_input = False
+        self.halting = False
+        self.ensure_no_ctrl_c_button()
 
 class RestartPopup(ModalView):
     interpreter_gui = ObjectProperty()
@@ -519,10 +546,7 @@ class InterpreterWrapper(object):
 
         if address == b'/interpreter':
             if body[0] == 'completed_exec':
-                self.gui.add_break()
-                self.gui.lock_input = False
-                self.gui.halting = False
-                self.gui.ensure_no_ctrl_c_button()
+                self.gui.execution_complete()
                 self.interpreter_state = 'waiting'
                 # self.end_osc_listen()
 
