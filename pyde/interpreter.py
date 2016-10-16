@@ -54,11 +54,6 @@ class InitiallyFullGridLayout(GridLayout):
         child_sum = sum([c.height for c in self.children[:-1]])
         self.filling_widget_height = max(0, self.parent.height - child_sum) + 1.
 
-    def on_filling_widget_height(self, instance, value):
-        print('filling height', self.filling_widget_height)
-
-
-
 class NoTouchCarousel(Carousel):
     '''A carousel that doesn't let the user scroll with touch.'''
     def on_touch_down(self, touch):
@@ -82,7 +77,6 @@ class NoTouchCarousel(Carousel):
 
         if 'new_offset' in kwargs:
             new_offset = kwargs['new_offset']
-            print('yay')
 
         # if new_offset is 0, it wasnt enough to go next/prev
         dur = self.anim_move_duration
@@ -351,7 +345,7 @@ class InterpreterGui(BoxLayout):
                 break
             label_text = self._output_label_queue.pop(0)
             label = self._add_output_label(*label_text, scroll_to=False)
-        print('did {} labels in {}'.format(i, time() - t))
+        print('Rendered {} labels in {}'.format(i, time() - t))
         Animation.stop_all(self.scrollview, 'scroll_x', 'scroll_y')
         self.scrollview.scroll_to(label)
 
