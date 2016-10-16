@@ -1,43 +1,60 @@
-PyDE
-====
+PyDE interpreter
+================
 
-An experimental Python IDE for mobile devices, written in Python. PyDE
-currently consists of a single interpreter window. Future targets
-include support for multiple interpreters, different kinds of Python
-tasks (app threads, background services), and editing/running Python
-files.
+An experimental Python interpreter interface for mobile devices,
+written in Python.
 
-PyDE uses `Kivy <https://kivy.org/#home>`__ for its gui, and runs on
-Android using `python-for-android
+The PyDE interpreter user interface is created in Python using `Kivy
+<https://github.com/kivy/python-for-android>`__. User input is passed
+to a second interpreter, run as a separate process via an Android
+service. Android packaging uses `python-for-android
 <https://github.com/kivy/python-for-android>`__.
 
-This is experimental software, with currently fairly limited
-functionality and probably many bugs. Issue reports are welcome.
+PyDE interpreter is built and tested with Python 2. Python 3 also
+works, but requires some fixes in Kivy's osc library. A Python 3
+release will be a main target following the initial Python 2 release.
+
+Future targets include support for multiple interpreters,
+different kinds of Python tasks (app threads, background services),
+and editing/running Python files.
 
 .. image:: pyde_android_small.png
     :width: 300px
-    :alt: Example PyDE app use
+    :alt: Example PyDE interpreter use
+
+Building
+--------
+
+To run on a desktop, simply clone from github and run :code:`python
+pyde/main.py` from the cloned dir. You will need Kivy and argparse
+installed, but other dependencies are fairly minimal.
+
+Installing with setup.py may work, but this hasn't been tested and
+this doesn't yet install a command line shortcut.
+
+To build for Android, install python-for-android, modify the hardcoded
+ndk-dir in ``setup.py``, and run::
+
+  python setup.py apk
+
+You may need to install python-for-android from the github master
+branch for this to work.
 
 Technical details
 -----------------
 
-PyDE runs as a Kivy application, starting a second process in the
-background (a subprocess on desktop, a service on Android) to run the
-Python code input. The output streams of this second process are
-redirected to be formatted in Kivy labels in the main app.
+PyDE interpreter runs as a Kivy application, starting a second process
+in the background (a subprocess on desktop, a service on Android) to
+run the Python code input. The output streams of this second process
+are redirected to be formatted in Kivy labels in the main app.
 
 This method seems quite crude, although it works well. An immediate
 improvement will be to check how other similar projects do the same
 thing.
 
-It's currently very easy to break the app, e.g. with infinite loops or
-by causing the second process to halt. Some of this can be fixed
-(e.g. interrupt support for loops), but ultimately that's fine...it's
-your interpreter to crash if you want!
+Communication between processes is achieved using osc (specifically,
+the implementation shipped with Kivy). There are probably much better
+ways to do this nowadays, such as zeromq. These will be investigated
+in the future.
 
 
-TODO before release
--------------------
-
-- fix message overloading with a queue
-- try with python3
