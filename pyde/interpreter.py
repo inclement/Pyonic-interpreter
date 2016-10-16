@@ -29,8 +29,12 @@ import signal
 
 from os.path import realpath, join, dirname
 
+
 class InitiallyFullGridLayout(GridLayout):
-    '''A GridLayout that initially fills itself with a Widget.
+    '''A GridLayout that always contains at least one Widget, then makes
+    that Widget as small as possible for self.minimum_height to exceed
+    self.height by 1 pixel.
+
     '''
     filling_widget_height = NumericProperty()
 
@@ -159,6 +163,11 @@ class InterpreterScreen(Screen):
 
 from kivy.uix.codeinput import CodeInput as InputWidget
 class InterpreterInput(InputWidget):
+    '''TextInput styled for the app. This also overrides normal disabled
+    behaviour to allow the widget to retain focus even when disabled,
+    although input is still disabled.
+
+    '''
     root = ObjectProperty()
 
     def __init__(self, *args, **kwargs):
@@ -171,7 +180,18 @@ class InterpreterInput(InputWidget):
     print(i)
     time.sleep(1)'''
 
+    def on_disabled(self, instance, value):
+        if value:
+            from kivy.base import EventLoop
+            self._hide_handles(EventLoop.window)
+
+    def _on_focusable(self, instance, value):
+        if not self.is_focusable:
+            self.focus = False
+
     def insert_text(self, text, from_undo=False):
+        if self.disabled:
+            return
         if text != '\n' or self.text == '':
             return super(InterpreterInput, self).insert_text(text,
                                                              from_undo=from_undo)
@@ -196,10 +216,6 @@ class InterpreterInput(InputWidget):
             return
         super(InterpreterInput, self).keyboard_on_key_down(
             window, keycode, text, modifiers)
-
-    def on_disabled(self, instance, value):
-        if not value:
-            self.focus = True
 
 
 class InterpreterGui(BoxLayout):
