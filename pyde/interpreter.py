@@ -182,9 +182,9 @@ class InterpreterInput(InputWidget):
             from pygments.lexers import PythonLexer
             self.lexer = PythonLexer()
 
-        self.text = '''for i in range(5):
-    print(i)
-    time.sleep(1)'''
+    #     self.text = '''for i in range(5):
+    # print(i)
+    # time.sleep(1)'''
 
     def on_disabled(self, instance, value):
         if value:
