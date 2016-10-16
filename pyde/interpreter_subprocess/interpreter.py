@@ -83,12 +83,20 @@ def complete_execution():
 
 def interpret_code(code):
     try:
+        # The input is first parsed as ast, then if the last statement
+        # is an Expr compiled partially in single mode. This means
+        # that the last statement output is printed, as in the normal
+        # Python interpreter
+
         components = ast.parse(code).body
+
+        # print('components are', components)
 
         # exec all but the last ast component in exec mode
         if len(components) > 1:
-            c = compile(ast.Module([components[:-1]]), '<stdin>', mode='exec')
-            exec(c, locals(), globals())
+            for component in components[:-1]:
+                c = compile(ast.Module([component]), '<stdin>', mode='exec')
+                exec(c, locals(), globals())
 
         # if the last ast component is an Expr, compile in single mode to print it
         if isinstance(components[-1], ast.Expr):
