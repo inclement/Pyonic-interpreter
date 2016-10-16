@@ -22,7 +22,7 @@ options = {'apk': {'window': None,
                    }}
 setup(
     name='PyDE Python 2 interpreter',
-    version='0.3',
+    version='0.4',
     description='A Python mobile IDE experiment',
     author='Alexander Taylor',
     author_email='alexanderjohntaylor@gmail.com',
