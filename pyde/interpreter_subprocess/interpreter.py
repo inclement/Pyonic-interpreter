@@ -83,6 +83,8 @@ def complete_execution():
 
 def interpret_code(code):
     try:
+        sys.stdout.can_omit = True
+        sys.stderr.can_omit = True
         # The input is first parsed as ast, then if the last statement
         # is an Expr compiled partially in single mode. This means
         # that the last statement output is printed, as in the normal
@@ -113,6 +115,9 @@ def interpret_code(code):
     except Exception as e:
         real_print('another exception occurred')
         traceback.print_exc()
+    finally:
+        sys.stdout.can_omit = False
+        sys.stderr.can_omit = False
 
     complete_execution()
 
@@ -132,6 +137,8 @@ class OscOut(object):
         self.messages_this_second = 0
         self.last_time = time.time()
 
+        self.can_omit = False
+
     def write(self, s):
         if time.time() - self.last_time > 1.2:
             self.last_time = time.time()
@@ -140,7 +147,7 @@ class OscOut(object):
             if time.time() - self.last_time > 1.:
                 self.messages_this_second = 0
                 self.last_time = time.time()
-            if self.messages_this_second > 500:
+            if self.messages_this_second > 500 and self.can_omit:
                 return
 
             s = self.buffer + s
