@@ -144,7 +144,7 @@ class OscOut(object):
             self.messages_this_second += 1
             if time.time() - self.last_time > 1.:
                 if self.messages_this_second > 500:
-                    message = 'omitted {}'.format(self.messages_this_second - j0)
+                    message = 'omitted {}'.format(self.messages_this_second - 500)
                     osc.sendMsg(b'/interpreter', [message.encode('utf-8')],
                                 port=self.target_port, typehint='b')
                 self.messages_this_second = 0
