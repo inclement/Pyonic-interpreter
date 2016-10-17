@@ -165,7 +165,9 @@ class OscOut(object):
 
     def send_message(self, message):
         try:
-            osc.sendMsg(self.address, [message.encode('utf-8')],
+            osc.sendMsg(self.address, [
+                message.encode('utf-8') if isinstance(message, unicode)
+                else message],
                         port=self.target_port, typehint='b')
         except KeyboardInterrupt:
             raise KeyboardInterrupt('interrupted while printing')
