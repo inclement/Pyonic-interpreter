@@ -23,7 +23,7 @@ code to start the interpreter subprocess (although I don't know what
 the appropriate iOS mechanism would be). If anyone would like to try
 this, feel free to ask any questions about the process.
 
-.. image:: pyde_android_small.png
+.. image:: screenshots/pyde_android_small.png
     :width: 300px
     :alt: Example PyDE interpreter use
 
