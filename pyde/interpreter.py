@@ -1,4 +1,4 @@
-
+from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.label import Label
@@ -182,9 +182,14 @@ class InterpreterInput(InputWidget):
             from pygments.lexers import PythonLexer
             self.lexer = PythonLexer()
 
+        App.get_running_app().bind(on_pause=self.on_pause)
+
     #     self.text = '''for i in range(5):
     # print(i)
     # time.sleep(1)'''
+
+    def on_pause(self, *args):
+        self.focus = False
 
     def on_disabled(self, instance, value):
         if value:
