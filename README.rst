@@ -67,12 +67,10 @@ in the future.
 Todo
 ----
 
-- Fix total crash on unicode input decoding
-- defocus textinput on pause
-- hide icon bar when textinput not focused
+Features to consider:
 
-
+- Hide icon bar when textinput not focused (tried this, has animation problems)
 - Allow swiping to remove old entries
-
-- Improve EOF related error when expecting indent
 - Could add linting (fix bugs before running code)
+- Improve EOF related error when expecting indent (i.e. errors don't
+  match those from the normal interpreter)
