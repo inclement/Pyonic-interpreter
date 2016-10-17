@@ -63,3 +63,16 @@ ways to do this nowadays, such as zeromq. These will be investigated
 in the future.
 
 
+
+Todo
+----
+
+- Fix total crash on unicode input decoding
+- defocus textinput on pause
+- hide icon bar when textinput not focused
+
+
+- Allow swiping to remove old entries
+
+- Improve EOF related error when expecting indent
+- Could add linting (fix bugs before running code)
