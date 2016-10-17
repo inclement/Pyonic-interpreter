@@ -182,6 +182,8 @@
     BoxLayout:
         size_hint_y: None
         height: sp(35)
+        # height: sp(35) if input.focus else 0
+        # opacity: 1 if input.focus else 0
         orientation: 'horizontal'
         KeyboardButton:
             text: '='
