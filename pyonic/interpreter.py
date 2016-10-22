@@ -529,7 +529,7 @@ class InterpreterWrapper(object):
 
         if platform == 'android':
             from jnius import autoclass
-            service = autoclass('net.inclem.pyde.ServiceInterpreter')
+            service = autoclass('net.inclem.pyonicinterpreter.ServiceInterpreter')
             mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
             argument = ''
             service.start(mActivity, argument)
@@ -618,7 +618,7 @@ class InterpreterWrapper(object):
     def restart(self):
         if platform == 'android':
             from jnius import autoclass
-            service = autoclass('net.inclem.pyde.ServiceInterpreter')
+            service = autoclass('net.inclem.pyonicinterpreter.ServiceInterpreter')
             mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
             service.stop(mActivity)
             self.start_interpreter()
@@ -629,7 +629,7 @@ class InterpreterWrapper(object):
         self.gui.lock_input = True
         self.interpreter_state = 'restarting'
         Clock.unschedule
-        Clock.schedule_interval(self.ping, 0.5)
+        Clock.schedule_interval(self.ping, 0.3)
 
     def finish_restart(self):
         if self.interpreter_state != 'restarting':

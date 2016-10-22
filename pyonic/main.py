@@ -16,8 +16,8 @@ if platform == 'android':
     import widgets
     import interpreter
 else:
-    import pyde.widgets  # noqa
-    import pyde.interpreter  # noqa
+    import pyonic.widgets  # noqa
+    import pyonic.interpreter  # noqa
 
 
 class Manager(ScreenManager):
@@ -55,7 +55,7 @@ class HomeScreen(Screen):
     pass
 
 
-class PydeApp(App):
+class PyonicApp(App):
 
     subprocesses = []
 
@@ -129,4 +129,4 @@ class PydeApp(App):
 
 
 if __name__ == "__main__":
-    PydeApp().run()
+    PyonicApp().run()
