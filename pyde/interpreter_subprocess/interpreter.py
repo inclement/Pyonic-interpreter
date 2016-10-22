@@ -189,6 +189,6 @@ def real_print(*s):
 
 while True:
     osc.readQueue(oscid)
-    time.sleep(.2)
+    time.sleep(.1)
 
 
