@@ -3,7 +3,7 @@ from kivy.uix.screenmanager import (ScreenManager, Screen,
                                     SlideTransition)
 from kivy.clock import Clock
 from kivy.core.window import Window
-from kivy.properties import (StringProperty)
+from kivy.properties import (StringProperty, BooleanProperty)
 from kivy import platform
 
 from android_runnable import run_on_ui_thread
@@ -58,6 +58,8 @@ class HomeScreen(Screen):
 class PydeApp(App):
 
     subprocesses = []
+
+    ctypes_working = BooleanProperty(True)
     
     def build(self):
         Window.clearcolor = (1, 1, 1, 1)
@@ -73,6 +75,12 @@ class PydeApp(App):
         self.remove_android_splash()
         self.set_softinput_mode()
         Window.bind(on_keyboard=self.android_key_input)
+
+        import ctypes
+        try:
+            setasyncexc = ctypes.pythonapi.PyThreadState_SetAsyncExc
+        except AttributeError:
+            self.ctypes_working = False
 
     def android_key_input(self, window, key, scancode, codepoint, modifier):
         if scancode == 270:

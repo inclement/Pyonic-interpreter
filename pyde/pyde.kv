@@ -125,8 +125,8 @@
                 padding: 0.025 * min(self.size)
                 on_release: if not root.halting: root.send_sigint()
                 color: 1, 1, 1, 1
-                disabled: True if root.interpreter_state in ('waiting', 'restarting') else False
-                opacity: 0.05 if root.interpreter_state in ('waiting', 'restarting') else 1
+                disabled: True if (not app.ctypes_working or root.interpreter_state in ('waiting', 'restarting')) else False
+                opacity: 0.05 if self.disabled else 1
     Widget:
         size_hint_y: None
         height: dp(2)
