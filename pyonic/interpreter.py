@@ -40,6 +40,8 @@ class InitiallyFullGridLayout(GridLayout):
     '''
     filling_widget_height = NumericProperty()
 
+    filling_widget_minimum_height = NumericProperty(0)
+
     def on_parent(self, instance, value):
         self.parent.bind(height=self.calculate_filling_widget_height)
 
@@ -52,7 +54,8 @@ class InitiallyFullGridLayout(GridLayout):
 
     def calculate_filling_widget_height(self, *args):
         child_sum = sum([c.height for c in self.children[:-1]])
-        self.filling_widget_height = max(0, self.parent.height - child_sum) + 1.
+        self.filling_widget_height = max(self.filling_widget_minimum_height,
+                                         self.parent.height - child_sum) + 1.
 
 class NoTouchCarousel(Carousel):
     '''A carousel that doesn't let the user scroll with touch.'''

@@ -76,6 +76,7 @@
                 size_hint_y: None
                 cols: 1
                 id: output_window
+                filling_widget_minimum_height: top_bar.height
                 canvas.before:
                     Color:
                         rgba: 0.55, 0.55, 0.55, 0.55
@@ -87,6 +88,7 @@
                     Line:
                         rectangle: [self.x, self.y, self.width, self.height]
         BoxLayout:
+            id: top_bar
             orientation: 'horizontal'
             size_hint_y: None
             height: dp(40)
