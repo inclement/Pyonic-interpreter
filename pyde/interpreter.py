@@ -184,9 +184,9 @@ class InterpreterInput(InputWidget):
 
         App.get_running_app().bind(on_pause=self.on_pause)
 
-    #     self.text = '''for i in range(5):
-    # print(i)
-    # time.sleep(1)'''
+        self.text = '''for i in range(5):
+    print(i)
+    time.sleep(1)'''
 
     def on_pause(self, *args):
         self.focus = False
@@ -256,6 +256,15 @@ class InterpreterGui(BoxLayout):
 
     awaiting_label_display_completion = BooleanProperty(False)
 
+    throttle_label_output = BooleanProperty(True)
+    '''Whether to clear the output label queue regularly. If False, labels
+    will always be displayed, but this *will* cause problems with
+    e.g. a constantly printing while loop.
+
+    This currently doesn't ever change, but is ready for a feature to be
+    added toggling it.
+    '''
+
     def __init__(self, *args, **kwargs):
         super(InterpreterGui, self).__init__(*args, **kwargs)
         self.animation = Animation(input_fail_alpha=0., t='out_expo',
@@ -265,6 +274,18 @@ class InterpreterGui(BoxLayout):
 
         # Clock.schedule_interval(self._dequeue_output_label, 0.05)
         # Clock.schedule_interval(self._clear_output_label_queue, 1)
+
+        Clock.schedule_once(self.post_init_check, 0)
+
+    def post_init_check(self, *args):
+        if App.get_running_app().ctypes_working:
+            return
+        l = UserMessageLabel(
+            text=('Could not load ctypes on this device. Keyboard interrupt '
+                  'will not be available.'),
+            background_colour=(1, 0.6, 0, 1))
+        self.output_window.add_widget(l)
+        self.scrollview.scroll_to(l)
 
     def on_lock_input(self, instance, value):
         if value:
@@ -277,6 +298,8 @@ class InterpreterGui(BoxLayout):
             self.halting = False
 
     def ensure_ctrl_c_button(self):
+        if not App.get_running_app().ctypes_working:
+            return
         Clock.schedule_once(self._switch_to_ctrl_c_button, 0.4)
 
     def _switch_to_ctrl_c_button(self, *args):
@@ -370,6 +393,8 @@ class InterpreterGui(BoxLayout):
             self._execution_complete()
 
     def _clear_output_label_queue(self, dt):
+        if not self.throttle_label_output:
+            return
         labels = self._output_label_queue
         self._output_label_queue = []
         if labels:
