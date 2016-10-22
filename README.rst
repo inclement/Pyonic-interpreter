@@ -71,6 +71,20 @@ Features to consider:
 
 - Hide icon bar when textinput not focused (tried this, has animation problems)
 - Allow swiping to remove old entries
+  - or other input clearing options
 - Could add linting (fix bugs before running code)
 - Improve EOF related error when expecting indent (i.e. errors don't
   match those from the normal interpreter)
+
+
+ctypes problem
+--------------
+
+Works on:
+
+- LG G4
+
+Fails on:
+- Nexus 4
+- Galaxy Note 2
+- Sony xperia z1 compact
