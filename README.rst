@@ -85,6 +85,7 @@ Works on:
 - LG G4
 
 Fails on:
+
 - Nexus 4
 - Galaxy Note 2
 - Sony xperia z1 compact
