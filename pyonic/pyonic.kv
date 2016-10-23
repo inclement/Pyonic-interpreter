@@ -109,16 +109,6 @@
                 text: 'status: [b][color=#{}]{}[/color][/b]'.format(root.status_label_colour, root.interpreter_state.replace('_', ' '))
             Widget:
             ColouredButton:
-                text: 'RESTART'
-                size_hint_x: None
-                width: 1.8 * self.texture_size[0]
-                background_normal: 0.2, 0.2, 0.2, 1
-                background_down: 0, 0, 0, 1
-                on_release: root.query_restart()
-                color: 1, 1, 1, 1
-                radius: dp(5)
-                padding: 0.025 * min(self.size)
-            ColouredButton:
                 text: 'CTRL + C'
                 size_hint_x: None
                 width: 1.8 * self.texture_size[0]
@@ -129,7 +119,10 @@
                 on_release: if not root.halting: root.send_sigint()
                 color: 1, 1, 1, 1
                 disabled: True if (not app.ctypes_working or root.interpreter_state in ('waiting', 'restarting')) else False
-                opacity: 0.05 if self.disabled else 1
+                opacity: 0.3 if self.disabled else 1
+            Widget:
+                size_hint_x: None
+                width: dp(10)
             MenuButton:
                 text: 'E'
                 size_hint_x: None
@@ -450,13 +443,24 @@
         size_hint_y: None
         height: dp(2)
     DropDownButton:
+        text: 'restart interpreter'
+        padding_x: dp(10)
+        size_hint_y: None
+        height: dp(40)
+        text_size: self.size
+        valign: 'middle'
+        on_release: root.parent_obj.root.query_restart(); root.dismiss(immediate=False)
+    Widget:
+        size_hint_y: None
+        height: dp(2)
+    DropDownButton:
         text: 'settings'
         size_hint_y: None
         height: dp(40)
-        on_release: app.manager.switch_to('settings'); root.dismiss()
         text_size: self.size
         padding_x: dp(10)
         valign: 'middle'
+        on_release: app.manager.switch_to('settings'); root.dismiss(immediate=True)
                 
 
 <DropDownButton>:

@@ -21,7 +21,8 @@ class MenuDropDown(DropDown):
         self.animate_open()
 
     def dismiss(self, *args, **kwargs):
-        if kwargs.get('immediate', True):
+        if kwargs.get('immediate', False):
+            kwargs.pop('immediate')
             super(MenuDropDown, self).dismiss(*args, **kwargs)
         else:
             self.animate_dismiss()
@@ -35,13 +36,13 @@ class MenuDropDown(DropDown):
     def animate_dismiss(self):
         Animation.cancel_all(self)
         self.anim_progress = 0
-        anim = Animation(anim_progress=1, d=0.4, t='out_cubic')
+        anim = Animation(anim_progress=1, d=0.3, t='out_cubic')
         anim.bind(on_complete=self.immediate_dismiss)
         anim.start(self)
 
 
     def immediate_dismiss(self, *args, **kwargs):
-        self.dismiss()
+        self.dismiss(immediate=True)
 
 class MenuButton(ColouredButton):
 
