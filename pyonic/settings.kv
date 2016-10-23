@@ -1,0 +1,212 @@
+
+<InterpreterSettingsScreen>:
+    container: container
+    canvas:
+        Color: 
+            rgba: 0.9, 0.9, 0.9, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(40)
+            canvas:
+                Color:
+                    rgba: 0.2, 0.2, 0.2, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            Widget:
+                size_hint_x: None
+                width: dp(3)
+            Label:
+                size_hint_x: None
+                width: self.height
+                bold: True
+                font_name: 'assets/fontello.ttf'
+                text: 'B'
+                font_size: dp(20)
+                color: 1, 1, 1, 1
+            Label:
+                text_size: self.size
+                text: 'Settings'
+                font_size: dp(18)
+                padding_x: dp(10)
+                color: 1, 1, 1, 1
+                valign: 'middle'
+            Widget:
+            Button:
+                
+                    
+                        
+        ScrollView:
+            do_scroll_x: False
+            scroll_distance: 3
+            scroll_timeout: 0 if container.height < self.height else 3
+            GridLayout:
+                size_hint_y: None
+                height: self.minimum_height
+                id: container
+                cols: 1
+                Widget:
+                    size_hint_y: None
+                    height: dp(5)
+                SettingsTitle:
+                    text: 'INTERPRETER'
+                    font_size: dp(16)
+                BooleanSetting:
+                    name: 'Output throttling'
+                    description: 'Limit rate of output printing. If disabled, the app will not be responsive when printing large volumes of text.'
+                Spacer:
+                BooleanSetting:
+                    name: 'Show input buttons on focus only'
+                    description: 'Hides the extra input buttons when text is not being entered.'
+                Spacer:
+                SmallIntSetting:
+                    name: 'Text input height'
+                    description: 'The number of lines visible in the input box.'
+                    min: 1
+                    max: 9
+
+            
+<SmallIntSetting>:
+    orientation: 'horizontal'
+    value: 
+    size_hint_y: None
+    height: l1.height + l2.height 
+    value: int(number_label.text) if number_label.text else 3
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint_x: 0.7
+        Label:
+            id: l1
+            text: root.name
+            size_hint_y: None
+            height: self.texture_size[1]
+            text_size: self.width, None
+            padding_x: dp(10)
+        Label:
+            id: l2
+            text: root.description
+            text_size: self.width, None
+            size_hint_y: None
+            height: self.texture_size[1]
+            padding_x: dp(10)
+            padding_y: dp(2)
+            color: 0.2, 0.2, 0.2, 1
+            font_size: l1.font_size * 0.95
+    AnchorLayout:
+        size_hint_x: None
+        width: bl.width + dp(20)
+        BoxLayout:
+            id: bl
+            size_hint: None, None
+            width: b1.width + b2.width + number_label.width + dp(20)
+            height: 1.2 * number_label.texture_size[1]
+            orientation: 'horizontal'
+            KeyboardButton:
+                id: b1
+                text: '-'
+                bold: True
+                font_size: dp(20)
+                on_release: root.decrement()
+                size_hint_x: None
+                width: self.height * 1.05
+                radius: dp(5)
+                background_normal: 0.4, 0.4, 0.4, 0.8
+            Label:
+                id: number_label
+                text: '3'
+                font_size: dp(20)
+                size_hint_x: None
+                width: 3 * self.texture_size[0]
+            KeyboardButton:
+                id: b2
+                text: '+'
+                bold: True
+                font_size: dp(20)
+                on_release: root.increment()
+                size_hint_x: None
+                width: self.height * 1.05
+                radius: dp(5)
+                background_normal: 0.4, 0.4, 0.4, 0.8
+
+            
+<BooleanSetting>:
+    orientation: 'horizontal'
+    active: cb.active
+    size_hint_y: None
+    height: l1.height + l2.height 
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint_x: 0.9
+        Label:
+            id: l1
+            text: root.name
+            size_hint_y: None
+            height: self.texture_size[1]
+            text_size: self.width, None
+            padding_x: dp(10)
+        Label:
+            id: l2
+            text: root.description
+            text_size: self.width, None
+            size_hint_y: None
+            height: self.texture_size[1]
+            padding_x: dp(10)
+            padding_y: dp(2)
+            color: 0.2, 0.2, 0.2, 1
+            font_size: l1.font_size * 0.95
+    ButtonCheckbox:
+        size_hint_x: 0.19
+        # width: 1.5 * self.height
+        id: cb
+        
+
+<ButtonCheckbox>:
+    on_release: self.active = not self.active
+    font_name: 'assets/fontello.ttf'
+    text: 't'
+    # color: (1, 1, 1, 1) if self.active else (0, 0, 0, 0)
+    color: 0, 0, 0, (1 if self.active else 0)
+    font_size: dp(20)
+    box_size: dp(22)
+    canvas:
+        Color:
+            rgba: 0.2, 0.2, 0.2, (1 if self.state == 'down' else 0)
+        Rectangle: 
+            pos: self.center_x - 0.5*self.box_size, self.center_y - 0.5*self.box_size
+            size: self.box_size, self.box_size
+        Color:
+            rgba: 0.2, 0.2, 0.2, 1
+        Line:
+            rectangle: self.center_x - 0.5*self.box_size, self.center_y - 0.5*self.box_size, self.box_size, self.box_size
+            width: 1.1
+
+<SettingsTitle>:
+    text_size: self.width, None
+    padding_x: dp(10)
+    color: 0.2, 0.2, 0.2, 1
+    size_hint_y: None
+    height: self.texture_size[1] + dp(30)
+    canvas.before:
+        Color:
+            rgba: 0.8, 0.8, 0.8, 1
+        Rectangle:
+            pos: self.x, self.y + dp(5)
+            size: self.width, self.height - dp(10)
+                
+
+<Spacer@Widget>:
+    size_hint_y: None
+    height: dp(19)
+    canvas:
+        Color:
+            rgba: 0.8, 0.8, 0.8, 1
+        Rectangle:
+            pos: self.x, self.y + dp(9)
+            size: self.width, dp(1)
+

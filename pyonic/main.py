@@ -15,9 +15,11 @@ import sys
 if platform == 'android':
     import widgets
     import interpreter
+    import settings
 else:
     import pyonic.widgets  # noqa
     import pyonic.interpreter  # noqa
+    import pyonic.settings  # noqa
 
 
 class Manager(ScreenManager):
