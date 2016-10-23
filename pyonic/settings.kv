@@ -82,12 +82,13 @@
     orientation: 'horizontal'
     value: 
     size_hint_y: None
-    height: l1.height + l2.height 
+    height: max(l1.height + l2.height, bl.height)
     value: int(number_label.text) if number_label.text else 3
     input_column_width: al.width 
     BoxLayout:
         orientation: 'vertical'
         size_hint_x: 0.7
+        Widget:
         Label:
             id: l1
             text: root.name
@@ -105,6 +106,7 @@
             padding_y: dp(2)
             color: 0.2, 0.2, 0.2, 1
             font_size: l1.font_size * 0.95
+        Widget:
     AnchorLayout:
         id: al
         size_hint_x: None
@@ -112,35 +114,40 @@
         BoxLayout:
             id: bl
             size_hint: None, None
-            width: b1.width + b2.width + number_label.width
-            height: 1.2 * number_label.texture_size[1]
+            width: button_bl.width + number_label.width
+            height: 2.4 * number_label.texture_size[1]
             orientation: 'horizontal'
-            KeyboardButton:
-                id: b1
-                text: '-'
-                bold: True
-                font_size: dp(20)
-                on_release: root.decrement()
-                size_hint_x: None
-                width: self.height * 1.05
-                radius: dp(5)
-                background_normal: 0.4, 0.4, 0.4, 0.8
             Label:
                 id: number_label
                 text: '3'
                 font_size: dp(20)
                 size_hint_x: None
                 width: 3 * self.texture_size[0]
-            KeyboardButton:
-                id: b2
-                text: '+'
-                bold: True
-                font_size: dp(20)
-                on_release: root.increment()
-                size_hint_x: None
-                width: self.height * 1.05
-                radius: dp(5)
-                background_normal: 0.4, 0.4, 0.4, 0.8
+            BoxLayout:
+                id: button_bl
+                orientation: 'vertical'
+                width: 1.05 * 1.2 * number_label.texture_size[1]
+
+                KeyboardButton:
+                    id: b1
+                    text: '+'
+                    bold: True
+                    font_size: dp(20)
+                    on_release: root.increment()
+                    # size_hint_x: None
+                    # width: self.height * 1.05
+                    radius: dp(5)
+                    background_normal: 0.4, 0.4, 0.4, 0.8
+                KeyboardButton:
+                    id: b2
+                    text: '-'
+                    bold: True
+                    font_size: dp(20)
+                    on_release: root.decrement()
+                    # size_hint_x: None
+                    # width: self.height * 1.05
+                    radius: dp(5)
+                    background_normal: 0.4, 0.4, 0.4, 0.8
 
             
 <BooleanSetting>:
