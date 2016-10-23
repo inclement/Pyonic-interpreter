@@ -35,8 +35,7 @@ class MenuDropDown(DropDown):
 
     def animate_dismiss(self):
         Animation.cancel_all(self)
-        self.anim_progress = 0
-        anim = Animation(anim_progress=1, d=0.3, t='out_cubic')
+        anim = Animation(anim_progress=1, d=0.2, t='out_cubic')
         anim.bind(on_complete=self.immediate_dismiss)
         anim.start(self)
 
@@ -55,7 +54,8 @@ class MenuButton(ColouredButton):
         self.dropdown = MenuDropDown(parent_obj=self)
 
     def on_release(self):
-        self.dropdown.open(self)
+        if self.dropdown.parent is None:
+            self.dropdown.open(self)
 
 class DropDownButton(ColouredButton):
     pass

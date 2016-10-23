@@ -245,7 +245,7 @@ class InterpreterGui(BoxLayout):
                                                            'interpreting',
                                                            'not_responding',
                                                            'restarting'])
-    status_label_colour = StringProperty('0000ff')
+    status_label_colour = StringProperty('b2ade6')
 
     _output_label_queue = ListProperty([])
 
@@ -320,13 +320,13 @@ class InterpreterGui(BoxLayout):
 
     def on_interpreter_state(self, instance, value):
         if value == 'waiting':
-            self.status_label_colour = '0000ff'
+            self.status_label_colour = 'b2ade6'
         elif value == 'interpreting':
-            self.status_label_colour = '00ff00'
+            self.status_label_colour = 'ade6b4'
         elif value == 'not_responding':
-            self.status_label_colour = 'ff0000'
+            self.status_label_colour = 'e6adad'
         elif value == 'restarting':
-            self.status_label_colour = 'ffA500'
+            self.status_label_colour = 'e6adad'
 
     def interpret_line_from_code_input(self):
         text = self.code_input.text

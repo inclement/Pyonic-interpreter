@@ -47,7 +47,7 @@
         ScrollView:
             do_scroll_x: False
             scroll_distance: 3
-            scroll_timeout: 0 if container.height < self.height else 3
+            scroll_timeout: 0 if container.height < self.height else 30
             GridLayout:
                 size_hint_y: None
                 height: self.minimum_height
@@ -75,6 +75,7 @@
                     description: 'The number of lines visible in the input box.'
                     min: 1
                     max: 9
+                Spacer:
 
             
 <SmallIntSetting>:
