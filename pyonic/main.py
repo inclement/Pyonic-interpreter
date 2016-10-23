@@ -3,7 +3,8 @@ from kivy.uix.screenmanager import (ScreenManager, Screen,
                                     SlideTransition)
 from kivy.clock import Clock
 from kivy.core.window import Window
-from kivy.properties import (StringProperty, BooleanProperty)
+from kivy.properties import (StringProperty, BooleanProperty,
+                             ObjectProperty)
 from kivy import platform
 
 from android_runnable import run_on_ui_thread
@@ -25,7 +26,7 @@ else:
 class Manager(ScreenManager):
     back_screen_name = StringProperty('')
 
-    def switch(self, target):
+    def switch_to(self, target):
         if target not in self.screen_names:
             raise ValueError('Tried to switch to {}, but screen is not '
                              'already added')
@@ -33,19 +34,20 @@ class Manager(ScreenManager):
         self.transition = SlideTransition(direction='left')
         self.current = target
 
-    # def go_back(self):
-    #     app = App.get_running_app()
+    def go_back(self):
 
-    #     self.transition = SlideTransition(direction='right')
+        app = App.get_running_app()
 
-    #     if self.current == self.back_screen_name:
-    #         self.back_screen_name = 'home'
+        self.transition = SlideTransition(direction='right')
 
-    #     if self.back_screen_name in self.screen_names:
-    #         self.current = self.back_screen_name
-    #     else:
-    #         self.current = 'Home'
-    #     self.transition = SlideTransition(direction='left')
+        if self.current == self.back_screen_name:
+            self.back_screen_name = 'interpreter'
+
+        if self.back_screen_name in self.screen_names:
+            self.current = self.back_screen_name
+        else:
+            self.current = 'interpreter'
+        self.transition = SlideTransition(direction='left')
 
     def open_interpreter(self):
         if not self.has_screen('interpreter'):
@@ -62,13 +64,16 @@ class PyonicApp(App):
     subprocesses = []
 
     ctypes_working = BooleanProperty(True)
+
+    manager = ObjectProperty()
     
     def build(self):
         Window.clearcolor = (1, 1, 1, 1)
         Window.softinput_mode = 'pan'
         self.parse_args()
         Clock.schedule_once(self.android_setup, 0)
-        return Manager()
+        self.manager = Manager()
+        return self.manager
 
     def android_setup(self, *args):
         if platform != 'android':

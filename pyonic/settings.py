@@ -25,11 +25,14 @@ class BooleanSetting(BoxLayout):
     name = StringProperty()
     description = StringProperty()
     active = BooleanProperty()
+    input_column_width_setter = NumericProperty()
 
 class SmallIntSetting(BoxLayout):
     name = StringProperty()
     description = StringProperty()
     value = NumericProperty()
+
+    input_column_width = NumericProperty()
 
     min = NumericProperty(0)
     max = NumericProperty(10)
@@ -57,6 +60,7 @@ class SmallIntSetting(BoxLayout):
 class InterpreterSettingsScreen(Screen):
     container = ObjectProperty()
 
+    settings_col_width = NumericProperty()
 
 class ButtonCheckbox(ButtonBehavior, Label):
     active = BooleanProperty(True)

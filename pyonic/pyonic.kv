@@ -7,8 +7,8 @@
 
 <Manager>:
     # HomeScreen:
-    InterpreterSettingsScreen:
     InterpreterScreen:
+    InterpreterSettingsScreen:
 
 
 <HomeScreen>:
@@ -130,6 +130,17 @@
                 color: 1, 1, 1, 1
                 disabled: True if (not app.ctypes_working or root.interpreter_state in ('waiting', 'restarting')) else False
                 opacity: 0.05 if self.disabled else 1
+            ColouredButton:
+                text: 'MENU'
+                size_hint_x: None
+                width: 1.2 * self.texture_size[0]
+                background_normal: 0.5, 0, 0, 1
+                background_down: 0.2, 0, 0, 1
+                radius: dp(5)
+                padding: 0.025 * min(self.size)
+                on_release: if not root.halting: root.send_sigint()
+                color: 1, 1, 1, 1
+                on_release: app.manager.switch_to('settings') 
     Widget:
         size_hint_y: None
         height: dp(2)

@@ -1,12 +1,14 @@
 
 <InterpreterSettingsScreen>:
+    name: 'settings'
     container: container
     canvas:
         Color: 
             rgba: 0.9, 0.9, 0.9, 1
         Rectangle:
-            pos: self.pos
+            pos: 0, 0
             size: self.size
+    settings_col_width: 10
     BoxLayout:
         orientation: 'vertical'
         BoxLayout:
@@ -22,7 +24,7 @@
             Widget:
                 size_hint_x: None
                 width: dp(3)
-            Label:
+            ColouredButton:
                 size_hint_x: None
                 width: self.height
                 bold: True
@@ -30,6 +32,9 @@
                 text: 'B'
                 font_size: dp(20)
                 color: 1, 1, 1, 1
+                background_down: 0.2, 0.6431, 0.8078, 1
+                background_normal: 1, 1, 1, 0
+                on_release: app.manager.go_back()
             Label:
                 text_size: self.size
                 text: 'Settings'
@@ -38,10 +43,7 @@
                 color: 1, 1, 1, 1
                 valign: 'middle'
             Widget:
-            Button:
                 
-                    
-                        
         ScrollView:
             do_scroll_x: False
             scroll_distance: 3
@@ -60,12 +62,15 @@
                 BooleanSetting:
                     name: 'Output throttling'
                     description: 'Limit rate of output printing. If disabled, the app will not be responsive when printing large volumes of text.'
+                    input_column_width_setter: textinput_height.input_column_width
                 Spacer:
                 BooleanSetting:
                     name: 'Show input buttons on focus only'
                     description: 'Hides the extra input buttons when text is not being entered.'
+                    input_column_width_setter: textinput_height.input_column_width
                 Spacer:
                 SmallIntSetting:
+                    id: textinput_height
                     name: 'Text input height'
                     description: 'The number of lines visible in the input box.'
                     min: 1
@@ -78,6 +83,7 @@
     size_hint_y: None
     height: l1.height + l2.height 
     value: int(number_label.text) if number_label.text else 3
+    input_column_width: al.width 
     BoxLayout:
         orientation: 'vertical'
         size_hint_x: 0.7
@@ -99,12 +105,13 @@
             color: 0.2, 0.2, 0.2, 1
             font_size: l1.font_size * 0.95
     AnchorLayout:
+        id: al
         size_hint_x: None
-        width: bl.width + dp(20)
+        width: bl.width + dp(40)
         BoxLayout:
             id: bl
             size_hint: None, None
-            width: b1.width + b2.width + number_label.width + dp(20)
+            width: b1.width + b2.width + number_label.width
             height: 1.2 * number_label.texture_size[1]
             orientation: 'horizontal'
             KeyboardButton:
@@ -161,7 +168,8 @@
             color: 0.2, 0.2, 0.2, 1
             font_size: l1.font_size * 0.95
     ButtonCheckbox:
-        size_hint_x: 0.19
+        size_hint_x: 0.19 if not root.input_column_width_setter else None
+        width: root.input_column_width_setter
         # width: 1.5 * self.height
         id: cb
         
