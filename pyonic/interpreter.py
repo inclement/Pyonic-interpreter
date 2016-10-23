@@ -25,6 +25,8 @@ from time import time
 if platform != 'android':
     import subprocess
 
+from widgets import ColouredButton
+
 import sys
 
 import signal
@@ -145,13 +147,6 @@ class UserMessageLabel(Label):
 class NotificationLabel(Label):
     background_colour = ListProperty([1, 0, 0, 0.5])
 
-
-
-class ColouredButton(ButtonBehavior, Label):
-    background_normal = ListProperty([1, 1, 1, 1])
-    background_down = ListProperty([0.5, 0.5, 0.5, 1])
-    padding = NumericProperty(0)
-    radius = NumericProperty(0)
 
 class NonDefocusingButton(ColouredButton):
     def on_touch_down(self, touch):

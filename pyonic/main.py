@@ -17,10 +17,12 @@ if platform == 'android':
     import widgets
     import interpreter
     import settings
+    import menu
 else:
     import pyonic.widgets  # noqa
     import pyonic.interpreter  # noqa
     import pyonic.settings  # noqa
+    import pyonic.menu  # noqa
 
 
 class Manager(ScreenManager):
@@ -93,7 +95,6 @@ class PyonicApp(App):
             self.ctypes_working = False
 
     def key_input(self, window, key, scancode, codepoint, modifier):
-        print('key is', key, scancode)
         if key == 27:
             self.manager.go_back()
             return True  # back button now does nothing on Android

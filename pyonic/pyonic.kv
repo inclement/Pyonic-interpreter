@@ -130,16 +130,17 @@
                 color: 1, 1, 1, 1
                 disabled: True if (not app.ctypes_working or root.interpreter_state in ('waiting', 'restarting')) else False
                 opacity: 0.05 if self.disabled else 1
-            ColouredButton:
-                text: 'MENU'
+            MenuButton:
+                text: 'E'
                 size_hint_x: None
-                width: 1.2 * self.texture_size[0]
-                background_normal: 0.5, 0, 0, 1
-                background_down: 0.2, 0, 0, 1
+                width: 1.5 * self.height
+                background_normal: 1.0, 1.0, 1.0, 0
+                background_down: 0, 0, 0, 1
                 radius: dp(5)
                 padding: 0.025 * min(self.size)
+                font_name: 'assets/fontello.ttf'
+                font_size: sp(34)
                 color: 1, 1, 1, 1
-                on_release: app.manager.switch_to('settings') 
     Widget:
         size_hint_y: None
         height: dp(2)
@@ -416,3 +417,58 @@
             size: 1, -self.line_height
         Color:
             rgba: self.disabled_foreground_color if self.disabled else (self.hint_text_color if not self.text else self.foreground_color)
+
+<MenuDropDown>:
+    scroll_distance: dp(2)
+    scroll_timeout: 25
+    auto_width: False
+    width: dp(150)
+    opacity: 1. - root.anim_progress
+    canvas.before:
+        PushMatrix:
+        Translate:
+            x: root.anim_progress * root.shift
+            y: root.anim_progress * 0.5 * root.shift
+    canvas:
+        Color:
+            rgba: 0.9, 0.9, 0.9, 1
+        Rectangle:
+            pos: 0, 0
+            size: self.size
+    canvas.after:
+        PopMatrix:
+    DropDownButton:
+        text: 'yay'
+        size_hint_y: None
+        height: dp(40)
+        text_size: self.size
+        padding_x: dp(10)
+        valign: 'middle'
+    DropDownButton:
+        text: 'moo'
+        size_hint_y: None
+        height: dp(40)
+        text_size: self.size
+        padding_x: dp(10)
+        valign: 'middle'
+    DropDownButton:
+        text: 'settings'
+        size_hint_y: None
+        height: dp(40)
+        on_release: app.manager.switch_to('settings'); root.dismiss()
+        text_size: self.size
+        padding_x: dp(10)
+        valign: 'middle'
+                
+
+<DropDownButton>:
+    background_normal: 0.9, 0.9, 0.9, 1
+    background_down: (0.2, 0.6431, 0.8078, 1.)
+    canvas:
+        Color:
+            rgba: 0.3, 0.3, 0.3, 1
+        Line:
+            rectangle: self.x + dp(0.55), self.y + dp(0.55), self.width - dp(1.1), self.height - dp(1.1)
+            width: dp(1.1)
+                
+            
