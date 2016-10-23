@@ -141,6 +141,7 @@
                 font_name: 'assets/fontello.ttf'
                 font_size: sp(34)
                 color: 1, 1, 1, 1
+                root: root
     Widget:
         size_hint_y: None
         height: dp(2)
@@ -438,19 +439,16 @@
     canvas.after:
         PopMatrix:
     DropDownButton:
-        text: 'yay'
+        text: 'clear output'
         size_hint_y: None
         height: dp(40)
         text_size: self.size
         padding_x: dp(10)
         valign: 'middle'
-    DropDownButton:
-        text: 'moo'
+        on_release: root.parent_obj.root.clear_output(); root.dismiss(immediate=False)
+    Widget:
         size_hint_y: None
-        height: dp(40)
-        text_size: self.size
-        padding_x: dp(10)
-        valign: 'middle'
+        height: dp(2)
     DropDownButton:
         text: 'settings'
         size_hint_y: None

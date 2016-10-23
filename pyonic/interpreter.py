@@ -305,6 +305,10 @@ class InterpreterGui(BoxLayout):
         if c.index == 0:
             c.load_next()
 
+    def clear_output(self):
+        for child in self.output_window.children[:-1]:
+            self.output_window.remove_widget(child)
+
     def ensure_no_ctrl_c_button(self):
         Clock.unschedule(self._switch_to_ctrl_c_button)
         c = self.ids.carousel
