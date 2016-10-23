@@ -138,7 +138,6 @@
                 background_down: 0.2, 0, 0, 1
                 radius: dp(5)
                 padding: 0.025 * min(self.size)
-                on_release: if not root.halting: root.send_sigint()
                 color: 1, 1, 1, 1
                 on_release: app.manager.switch_to('settings') 
     Widget:

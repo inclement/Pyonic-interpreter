@@ -35,8 +35,10 @@ class Manager(ScreenManager):
         self.current = target
 
     def go_back(self):
-
         app = App.get_running_app()
+
+        if self.current == 'interpreter':  # current top level screen
+            app.back_button_leave_app()
 
         self.transition = SlideTransition(direction='right')
 
@@ -73,15 +75,16 @@ class PyonicApp(App):
         self.parse_args()
         Clock.schedule_once(self.android_setup, 0)
         self.manager = Manager()
+
+        Window.bind(on_keyboard=self.key_input)
+
         return self.manager
 
     def android_setup(self, *args):
         if platform != 'android':
             return
-
         self.remove_android_splash()
         self.set_softinput_mode()
-        Window.bind(on_keyboard=self.android_key_input)
 
         import ctypes
         try:
@@ -89,13 +92,19 @@ class PyonicApp(App):
         except AttributeError:
             self.ctypes_working = False
 
-    def android_key_input(self, window, key, scancode, codepoint, modifier):
-        if scancode == 270:
-            from jnius import autoclass
-            activity = autoclass('org.kivy.android.PythonActivity')
-            activity.moveTaskToBack(True)
+    def key_input(self, window, key, scancode, codepoint, modifier):
+        print('key is', key, scancode)
+        if key == 27:
+            self.manager.go_back()
             return True  # back button now does nothing on Android
         return False
+
+    def back_button_leave_app(self):
+        if platform != 'android':
+            return
+        from jnius import autoclass
+        activity = autoclass('org.kivy.android.PythonActivity')
+        activity.moveTaskToBack(True)
 
     @run_on_ui_thread
     def set_softinput_mode(self):
