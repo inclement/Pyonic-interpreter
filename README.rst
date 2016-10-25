@@ -67,16 +67,11 @@ in the future.
 Todo
 ----
 
-- Hide icon bar when textinput not focused (tried this, has animation problems)
 - Allow swiping to remove old entries
   - or other input clearing options
 - Add linting
 - Improve EOF related error when expecting indent (i.e. errors don't
   match those from the normal interpreter)
-- Add settings panel
-  - hide input buttons
-  - choose input buttons
-  - enable/disable text output throttling
 
 
 ctypes problem
