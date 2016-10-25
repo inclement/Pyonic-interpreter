@@ -2,6 +2,11 @@
 <InterpreterSettingsScreen>:
     name: 'settings'
     container: container
+
+    setting__throttle_output: throttle_output.active
+    setting__show_input_buttons: show_input_buttons.active
+    setting__text_input_height: text_input_height.value
+
     canvas:
         Color: 
             rgba: 0.9, 0.9, 0.9, 1
@@ -60,21 +65,26 @@
                     text: 'INTERPRETER'
                     font_size: dp(16)
                 BooleanSetting:
-                    name: 'Output throttling'
+                    id: throttle_output
+                    name: 'Throttle output'
                     description: 'Limit rate of output printing. If disabled, the app will not be responsive when printing large volumes of text.'
-                    input_column_width_setter: textinput_height.input_column_width
+                    input_column_width_setter: text_input_height.input_column_width
+                    active: root.setting__throttle_output
                 Spacer:
                 BooleanSetting:
-                    name: 'Show input buttons on focus only'
-                    description: 'Hides the extra input buttons when text is not being entered.'
-                    input_column_width_setter: textinput_height.input_column_width
+                    id: show_input_buttons
+                    name: 'Always show input buttons'
+                    description: 'If disabled, hides the extra input buttons when text is not being entered.'
+                    input_column_width_setter: text_input_height.input_column_width
+                    active: root.setting__show_input_buttons
                 Spacer:
                 SmallIntSetting:
-                    id: textinput_height
+                    id: text_input_height
                     name: 'Text input height'
                     description: 'The number of lines visible in the input box.'
                     min: 1
                     max: 9
+                    value: root.setting__text_input_height
                 Spacer:
 
             
@@ -119,7 +129,7 @@
             orientation: 'horizontal'
             Label:
                 id: number_label
-                text: '3'
+                text: str(root.value)
                 font_size: dp(20)
                 size_hint_x: None
                 width: 3 * self.texture_size[0]
@@ -180,6 +190,7 @@
         width: root.input_column_width_setter
         # width: 1.5 * self.height
         id: cb
+        active: root.active
         
 
 <ButtonCheckbox>:

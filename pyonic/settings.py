@@ -1,14 +1,9 @@
 '''
-
-Settings:
-- control what buttons are displayed
-
 Menu items:
-- settings menu
-- clear output
 - About page
 '''
 
+from kivy.app import App
 from kivy.event import EventDispatcher
 from kivy.properties import (BooleanProperty, NumericProperty,
                              ObjectProperty, StringProperty)
@@ -18,6 +13,8 @@ from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.label import Label
 from kivy.lang import Builder
 
+from functools import partial
+
 Builder.load_file('settings.kv')
 
 
@@ -26,6 +23,7 @@ class BooleanSetting(BoxLayout):
     description = StringProperty()
     active = BooleanProperty()
     input_column_width_setter = NumericProperty()
+
 
 class SmallIntSetting(BoxLayout):
     name = StringProperty()
@@ -61,6 +59,22 @@ class InterpreterSettingsScreen(Screen):
     container = ObjectProperty()
 
     settings_col_width = NumericProperty()
+
+    # Properties relating to settings
+    setting__throttle_output = BooleanProperty()
+    setting__show_input_buttons = BooleanProperty()
+    setting__text_input_height = NumericProperty()
+
+
+    def __init__(self, *args, **kwargs):
+        super(InterpreterSettingsScreen, self).__init__(*args, **kwargs)
+
+        for attr in dir(self):
+            if attr.startswith('setting__'):
+                self.bind(**{attr: partial(self.setting_updated, attr)})
+
+    def setting_updated(self, setting, instance, value):
+        setattr(App.get_running_app(), setting, value)
 
 class ButtonCheckbox(ButtonBehavior, Label):
     active = BooleanProperty(True)
