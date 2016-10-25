@@ -37,7 +37,7 @@ from os.path import realpath, join, dirname
 class InitiallyFullGridLayout(GridLayout):
     '''A GridLayout that always contains at least one Widget, then makes
     that Widget as small as possible for self.minimum_height to exceed
-    self.height by 1 pixel.
+    self.height by at least self.filling_widget_minimum_height + 1 pixel.
 
     '''
     filling_widget_height = NumericProperty()

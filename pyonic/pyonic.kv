@@ -190,9 +190,8 @@
                 padding: 0
     BoxLayout:
         size_hint_y: None
-        height: sp(35)
-        # height: sp(35) if input.focus else 0
-        # opacity: 1 if input.focus else 0
+        height: sp(35) if (input.focus or app.setting__show_input_buttons) else 0
+        opacity: 1 if (input.focus or app.setting__show_input_buttons) else 0
         orientation: 'horizontal'
         KeyboardButton:
             text: '='
