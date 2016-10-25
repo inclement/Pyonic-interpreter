@@ -91,3 +91,4 @@ Fails on:
 - Nexus 4
 - Galaxy Note 2
 - Sony xperia z1 compact
+- Samsung Galaxy J1 (Android 5.1.1)
