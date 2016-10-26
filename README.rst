@@ -67,6 +67,15 @@ in the future.
 Todo
 ----
 
+- Pass throttling setting value to service on start
+
+- Enable rotation (with setting)
+
+
+- Setting for scrollback length
+
+- Detect if interpreter is not there on resume
+- Halt thread on service exit
 - Allow swiping to remove old entries
   - or other input clearing options
 - Add linting
