@@ -1,3 +1,6 @@
+user_locals = locals()
+user_globals = globals()
+
 import time
 import ast
 import sys
@@ -110,14 +113,14 @@ def interpret_code(code):
         if len(components) > 1:
             for component in components[:-1]:
                 c = compile(ast.Module([component]), '<stdin>', mode='exec')
-                exec(c, locals(), globals())
+                exec(c, user_locals, user_globals)
 
         # if the last ast component is an Expr, compile in single mode to print it
         if isinstance(components[-1], ast.Expr):
             c = compile(ast.Interactive([components[-1]]), '<stdin>', mode='single')
         else:
             c = compile(ast.Module([components[-1]]), '<stdin>', mode='exec')
-        exec(c, locals(), globals())
+        exec(c, user_locals, user_globals)
 
     except KeyboardInterrupt as e:
         print('')
