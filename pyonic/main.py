@@ -98,10 +98,10 @@ class PyonicApp(App):
     def build(self):
         Window.clearcolor = (1, 1, 1, 1)
         Window.softinput_mode = 'pan'
+
         self.parse_args()
         Clock.schedule_once(self.android_setup, 0)
         Clock.schedule_once(self.retrieve_settings, 0)
-        self.manager = Manager()
 
         if platform == 'android':
             settings_path = '../settings.json'
@@ -109,11 +109,19 @@ class PyonicApp(App):
             settings_path = join(abspath(dirname(__file__)), '..', 'settings.json')
         self.store = SettingsStore(settings_path)
 
+        # Retrieve the input throttling argument so that it can be
+        # passed to the service immediately
+        self.setting__throttle_output = self.store.get(
+            'setting__throttle_output',
+            {'value': self.setting__throttle_output_default})['value']
+
         Window.bind(on_keyboard=self.key_input)
 
         for attr in dir(self):
             if attr.startswith('setting__') and not attr.endswith('_default'):
                 self.bind(**{attr: partial(self.setting_updated, attr)})
+
+        self.manager = Manager()
 
         return self.manager
 

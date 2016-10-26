@@ -21,6 +21,7 @@ from kivy.clock import Clock
 from kivy.lib import osc
 
 from time import time
+import os
 
 if platform != 'android':
     import subprocess
@@ -254,13 +255,10 @@ class InterpreterGui(BoxLayout):
 
     awaiting_label_display_completion = BooleanProperty(False)
 
-    throttle_label_output = BooleanProperty(True)
+    throttle_label_output = BooleanProperty()
     '''Whether to clear the output label queue regularly. If False, labels
     will always be displayed, but this *will* cause problems with
     e.g. a constantly printing while loop.
-
-    This currently doesn't ever change, but is ready for a feature to be
-    added toggling it.
     '''
 
     def __init__(self, *args, **kwargs):
@@ -425,6 +423,9 @@ class InterpreterGui(BoxLayout):
             self.clear_scheduled = Clock.schedule_once(
                 self._clear_output_label_queue, 1)
 
+    def on_throttle_label_output(self, instance, value):
+        self.interpreter.set_service_output_throttling(value)
+
     def add_missing_labels_marker(self, num_labels=None, labels=None):
         if labels is not None:
             num_labels = len(labels)
@@ -529,16 +530,20 @@ class InterpreterWrapper(object):
                                        'interpreter_subprocess',
                                        'interpreter.py')
 
+        # prepare settings to send to interpreter
+        throttle_output = '1' if App.get_running_app().setting__throttle_output else '0'
+        argument = 'throttle_output={}'.format(throttle_output)
+
         if platform == 'android':
             from jnius import autoclass
             service = autoclass('net.inclem.pyonicinterpreter.ServiceInterpreter')
             mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
-            argument = ''
             service.start(mActivity, argument)
         else:
             # This may not actually work everywhere, but let's assume it does
             print('starting subprocess')
             python_name = 'python{}'.format(sys.version_info.major)
+            os.environ['PYTHON_SERVICE_ARGUMENT'] = argument
             s = subprocess.Popen([python_name, '{}'.format(interpreter_script_path)])
             App.get_running_app().subprocesses.append(s)
             self.subprocess = s
@@ -655,3 +660,7 @@ class InterpreterWrapper(object):
         if self.interpreter_state == 'restarting':
             self.finish_restart()
             Clock.unschedule(self.ping)
+
+    def set_service_output_throttling(self, value):
+        self.send_osc_message('1' if value else '0', b'/throttling')
+

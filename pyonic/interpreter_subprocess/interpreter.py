@@ -1,6 +1,7 @@
 import time
 import ast
 import sys
+import os
 
 import traceback
 
@@ -14,6 +15,8 @@ send_port = 3001
 receive_port = 3000
 
 thread = None
+
+throttle_output = True
 
 ##########################################
 # from http://stackoverflow.com/questions/5899692/how-to-terminate-a-python3-thread-correctly-while-its-reading-a-stream
@@ -66,6 +69,16 @@ def receive_message(message, *args):
             real_stdout.write('trying to stop thread {}\n'.format(thread))
             real_stdout.flush()
             stop_thread(thread)
+
+    elif address == b'/throttling':
+        global throttle_output
+        body = [s.decode('utf-8') for s in message[2:]]
+        if body[0] == '1':
+            throttle_output = True
+        elif body[0] == '0':
+            throttle_output = False
+        else:
+            print('Error changing output throttling: received value {}'.format(body[0]))
 
     else:
         raise ValueError('Received unrecognised address {}'.format(address))
@@ -143,13 +156,13 @@ class OscOut(object):
         try:
             self.messages_this_second += 1
             if time.time() - self.last_time > 1.:
-                if self.messages_this_second > 500:
+                if self.messages_this_second > 500 and (self.can_omit and throttle_output):
                     message = 'omitted {}'.format(self.messages_this_second - 500)
                     osc.sendMsg(b'/interpreter', [message.encode('utf-8')],
                                 port=self.target_port, typehint='b')
                 self.messages_this_second = 0
                 self.last_time = time.time()
-            if self.messages_this_second > 500 and self.can_omit:
+            if self.messages_this_second > 500 and self.can_omit and throttle_output:
                 return
 
             s = self.buffer + s
@@ -177,11 +190,17 @@ oscid = osc.listen(ipAddr='127.0.0.1', port=receive_port)
 osc.bind(oscid, receive_message, b'/interpret')
 osc.bind(oscid, receive_message, b'/ping')
 osc.bind(oscid, receive_message, b'/sigint')
+osc.bind(oscid, receive_message, b'/throttling')
 
 real_stdout = sys.stdout
 real_stderr = sys.stderr
 sys.stdout = OscOut(b'/stdout', send_port)
 sys.stderr = OscOut(b'/stderr', send_port)
+
+to = os.environ['PYTHON_SERVICE_ARGUMENT']
+for entry in to.split(':'):
+    if entry.startswith('throttle_output='):
+        throttle_output = False if entry[16:] == '0' else True
 
 def real_print(*s):
     real_stdout.write(' '.join([str(item) for item in s]) + '\n')
