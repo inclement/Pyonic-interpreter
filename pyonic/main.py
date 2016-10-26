@@ -96,6 +96,10 @@ class PyonicApp(App):
     setting__text_input_height_default = 3
     
     def build(self):
+        self.settings_retrieved = False  # used to prevent setting
+                                         # updates until they have
+                                         # been fetched from the file
+
         Window.clearcolor = (1, 1, 1, 1)
         Window.softinput_mode = 'pan'
 
@@ -141,8 +145,8 @@ class PyonicApp(App):
                 value = self.store.get(attr, default={'value': default})
                 value = value['value']
                 assert hasattr(settings_screen, attr)
-                print('current value', getattr(settings_screen, attr))
                 setattr(settings_screen, attr, value)
+        self.settings_retrieved = True
 
 
     def android_setup(self, *args):
@@ -198,8 +202,9 @@ class PyonicApp(App):
             Clock.schedule_once(self.test_interpreter, 0)
 
     def setting_updated(self, setting, instance, value):
+        if not self.settings_retrieved:
+            return
         self.store.put(setting, value=value)
-        print('updated store', setting, value)
 
     def test_interpreter(self, *args):
         self.root.open_interpreter()
