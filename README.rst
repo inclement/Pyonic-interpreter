@@ -67,8 +67,6 @@ in the future.
 Todo
 ----
 
-- Pass throttling setting value to service on start
-
 - Enable rotation (with setting)
 
 
