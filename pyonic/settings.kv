@@ -6,6 +6,7 @@
     setting__throttle_output: throttle_output.active
     setting__show_input_buttons: show_input_buttons.active
     setting__text_input_height: text_input_height.value
+    setting__rotation: rotation.value
 
     canvas:
         Color: 
@@ -70,6 +71,13 @@
                     description: 'If disabled, hides the extra input buttons when text is not being entered.'
                     input_column_width_setter: text_input_height.input_column_width
                     active: root.setting__show_input_buttons
+                Spacer:
+                RotationSetting:
+                    id: rotation
+                    name: 'Orientation'
+                    description: 'The orientation of the app. This setting follows your user preferences, so if rotation is disabled in Android settings this option may be ignored.'
+                    input_column_width_setter: text_input_height.input_column_width
+                    value: root.setting__rotation
                 Spacer:
                 SmallIntSetting:
                     id: text_input_height
@@ -197,6 +205,84 @@
         # width: 1.5 * self.height
         id: cb
         active: root.active
+
+<RotationSetting>:
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: max(l1.height + l2.height, 6 * reference_label.texture_size[1])
+    AnchorLayout:
+        orientation: 'vertical'
+        size_hint_x: 0.9
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y: None
+            height: l1.height + l2.height
+            Label:
+                id: l1
+                text: root.name
+                size_hint_y: None
+                height: self.texture_size[1]
+                text_size: self.width, None
+                padding_x: dp(10)
+            Label:
+                id: l2
+                text: root.description
+                text_size: self.width, None
+                size_hint_y: None
+                height: self.texture_size[1]
+                padding_x: dp(10)
+                padding_y: dp(2)
+                color: 0.2, 0.2, 0.2, 1
+                font_size: l1.font_size * 0.95
+    BoxLayout:
+        id: gl
+        orientation: 'vertical'
+        size_hint_x: None
+        width: root.input_column_width_setter
+        cols: 1
+        BoxLayout:
+            size_hint_y: None
+            height: 2 * reference_label.texture_size[1]
+            orientation: 'horizontal'
+            AnchorLayout:
+                anchor_x: 'right'
+                Label:
+                    id: reference_label
+                    size_hint: None, None
+                    size: self.texture_size
+                    text: 'portrait'
+                    padding_x: dp(5)
+            ButtonRadio:
+                id: portrait_button
+                on_release: root.value = 'portrait'
+        BoxLayout:
+            size_hint_y: None
+            height: 2 * reference_label.texture_size[1]
+            orientation: 'horizontal'
+            AnchorLayout:
+                anchor_x: 'right'
+                Label:
+                    size_hint: None, None
+                    size: self.texture_size
+                    text: 'landscape'
+                    padding_x: dp(5)
+            ButtonRadio:
+                id: landscape_button
+                on_release: root.value = 'landscape'
+        BoxLayout:
+            size_hint_y: None
+            height: 2 * reference_label.texture_size[1]
+            orientation: 'horizontal'
+            AnchorLayout:
+                anchor_x: 'right'
+                Label:
+                    size_hint: None, None
+                    size: self.texture_size
+                    text: 'auto'
+                    padding_x: dp(5)
+            ButtonRadio:
+                id: auto_button
+                on_release: root.value = 'auto'
         
 
 <ButtonCheckbox>:
@@ -218,6 +304,32 @@
         Line:
             rectangle: self.center_x - 0.5*self.box_size, self.center_y - 0.5*self.box_size, self.box_size, self.box_size
             width: 1.1
+
+<ButtonRadio>:
+    on_release: if not self.active: self.active = True
+    font_name: 'assets/fontello.ttf'
+    text: 't'
+    # color: (1, 1, 1, 1) if self.active else (0, 0, 0, 0)
+    color: 0, 0, 0, (1 if self.active else 0)
+    font_size: dp(20)
+    box_size: dp(22)
+    radio_offset: dp(5)
+    canvas:
+        Color:
+            rgba: 0.2, 0.2, 0.2, (1 if self.state == 'down' else 0)
+        Ellipse:
+            pos: self.center_x - 0.5*self.box_size, self.center_y - 0.5*self.box_size
+            size: self.box_size, self.box_size
+        Color:
+            rgba: 0.2, 0.2, 0.2, 1
+        Line:
+            ellipse: self.center_x - 0.5*self.box_size, self.center_y - 0.5*self.box_size, self.box_size, self.box_size
+            width: 1.1
+        Color:
+            rgba: 0.2, 0.2, 0.2, (1 if self.active else 0)
+        Ellipse:
+            pos: self.center_x - 0.5*self.box_size + self.radio_offset, self.center_y - 0.5*self.box_size + self.radio_offset
+            size: self.box_size - 2 * self.radio_offset, self.box_size - 2 * self.radio_offset
 
 <SettingsTitle>:
     text_size: self.width, None

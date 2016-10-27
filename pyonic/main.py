@@ -94,6 +94,8 @@ class PyonicApp(App):
     setting__show_input_buttons_default = True
     setting__text_input_height = NumericProperty()
     setting__text_input_height_default = 3
+    setting__rotation = StringProperty()
+    setting__rotation_default = 'portrait'
     
     def build(self):
         self.settings_retrieved = False  # used to prevent setting
@@ -205,6 +207,25 @@ class PyonicApp(App):
         if not self.settings_retrieved:
             return
         self.store.put(setting, value=value)
+
+    def on_setting__rotation(self, instance, value):
+        print('new rotation is', value)
+
+        if platform != 'android':
+            return
+
+        if value not in ('portrait', 'landscape', 'auto'):
+            print('Orientation error: invalid setting received')
+
+        from jnius import autoclass
+        ActivityInfo = autoclass('android.content.pm.ActivityInfo')
+        activity = autoclass('org.kivy.android.PythonActivity').mActivity
+        if value == 'portrait':
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT)
+        if value == 'landscape':
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE)
+        if value == 'auto':
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER)
 
     def test_interpreter(self, *args):
         self.root.open_interpreter()
