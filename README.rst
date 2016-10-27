@@ -67,18 +67,17 @@ in the future.
 Todo
 ----
 
-- Enable rotation (with setting)
-
-
-- Setting for scrollback length
-
 - Detect if interpreter is not there on resume
 - Halt thread on service exit
+- Add an 'About' page
+
+
+- Save to file button
+
+- Setting for scrollback length
 - Allow swiping to remove old entries
   - or other input clearing options
 - Add linting
-- Improve EOF related error when expecting indent (i.e. errors don't
-  match those from the normal interpreter)
 
 
 ctypes problem
