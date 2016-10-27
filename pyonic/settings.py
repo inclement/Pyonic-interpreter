@@ -1,6 +1,13 @@
-'''
-Menu items:
-- About page
+'''To add a new setting:
+- Add a widget in the kv to display the setting
+- Add a property named setting__yoursettingname to InterpreterSettingsScreen
+- Bind this property in kv to your setting: `setting_yoursettingname: yoursettingwidget.value`
+- Add a property named setting__yoursettingname to PyonicApp in main.py
+- Add a default value class attribute setting__yoursettingname_default to PyonicApp in main.py
+
+The other bindings, and automatically saving in the settings.json
+file, will be handled automatically.
+
 '''
 
 from kivy.app import App
