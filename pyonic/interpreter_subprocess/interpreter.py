@@ -1,5 +1,7 @@
-user_locals = locals()
-user_globals = globals()
+import copy
+
+user_locals = copy.copy(locals())
+user_globals = copy.copy(globals())
 
 import time
 import ast
