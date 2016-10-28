@@ -72,13 +72,6 @@
                     input_column_width_setter: text_input_height.input_column_width
                     active: root.setting__show_input_buttons
                 Spacer:
-                RotationSetting:
-                    id: rotation
-                    name: 'Orientation'
-                    description: 'The orientation of the app. This option obeys your user preferences, so if rotation is disabled in Android settings this option may be ignored.'
-                    input_column_width_setter: text_input_height.input_column_width
-                    value: root.setting__rotation
-                Spacer:
                 SmallIntSetting:
                     id: text_input_height
                     name: 'Text input height'
@@ -93,12 +86,15 @@
                     description: 'Limit rate of output printing. If disabled, the app will not be responsive when printing large volumes of text.'
                     input_column_width_setter: text_input_height.input_column_width
                     active: root.setting__throttle_output
-                Spacer:
-                Label:
-                    text: 'todo: rotation option (choice of strings)'
-                Spacer:
-                Label:
-                    text: 'todo: scrollback length option (enter a number somehow)'
+                SettingsTitle:
+                    text: 'APP'
+                    font_size: dp(16)
+                RotationSetting:
+                    id: rotation
+                    name: 'Orientation'
+                    description: 'The orientation of the app. This option obeys your user preferences, so if rotation is disabled in Android settings this option may be ignored.'
+                    input_column_width_setter: text_input_height.input_column_width
+                    value: root.setting__rotation
                 Spacer:
 
             
@@ -238,7 +234,7 @@
         id: gl
         orientation: 'vertical'
         size_hint_x: None
-        width: root.input_column_width_setter
+        width: landscape_label.texture_size[0] + dp(70)
         cols: 1
         BoxLayout:
             size_hint_y: None
@@ -255,6 +251,8 @@
             ButtonRadio:
                 id: portrait_button
                 on_release: root.value = 'portrait'
+                size_hint_x: None
+                width: dp(50)
         BoxLayout:
             size_hint_y: None
             height: 2 * reference_label.texture_size[1]
@@ -262,6 +260,7 @@
             AnchorLayout:
                 anchor_x: 'right'
                 Label:
+                    id: landscape_label
                     size_hint: None, None
                     size: self.texture_size
                     text: 'landscape'
@@ -269,6 +268,8 @@
             ButtonRadio:
                 id: landscape_button
                 on_release: root.value = 'landscape'
+                size_hint_x: None
+                width: dp(50)
         BoxLayout:
             size_hint_y: None
             height: 2 * reference_label.texture_size[1]
@@ -283,7 +284,12 @@
             ButtonRadio:
                 id: auto_button
                 on_release: root.value = 'auto'
-        
+                size_hint_x: None
+                width: dp(50)
+    Widget:
+        size_hint_x: None
+        width: dp(10)
+
 
 <ButtonCheckbox>:
     on_release: self.active = not self.active
