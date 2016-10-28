@@ -22,6 +22,7 @@ from kivy.lib import osc
 
 from time import time
 import os
+from functools import partial
 
 if platform != 'android':
     import subprocess
@@ -276,12 +277,10 @@ class InterpreterGui(BoxLayout):
     def post_init_check(self, *args):
         if App.get_running_app().ctypes_working:
             return
-        l = UserMessageLabel(
-            text=('Could not load ctypes on this device. Keyboard interrupt '
-                  'will not be available.'),
+        self.add_user_message_label(
+            ('Could not load ctypes on this device. Keyboard interrupt '
+             'will not be available.'),
             background_colour=(1, 0.6, 0, 1))
-        self.output_window.add_widget(l)
-        self.scrollview.scroll_to(l)
 
     def on_lock_input(self, instance, value):
         if value:
@@ -342,6 +341,11 @@ class InterpreterGui(BoxLayout):
     def interpret_line(self, text):
         index = self.interpreter.interpret_line(text)
         self.add_input_label(text, index)
+
+    def add_user_message_label(self, text, **kwargs):
+        l = UserMessageLabel(text=text, **kwargs)
+        self.output_window.add_widget(l)
+        self.scrollview.scroll_to(l)
 
     def add_input_label(self, text, index):
         l = InputLabel(text=text, index=index, root=self)
@@ -429,12 +433,10 @@ class InterpreterGui(BoxLayout):
     def add_missing_labels_marker(self, num_labels=None, labels=None):
         if labels is not None:
             num_labels = len(labels)
-        l = UserMessageLabel(
-            text='{} lines omitted (too many to render)'.format(num_labels),
+        self.add_user_message_label(
+            '{} lines omitted (too many to render)'.format(num_labels),
             background_colour=(1, 0.6, 0, 1))
-        l.labels = labels
-        self.output_window.add_widget(l)
-        self.scrollview.scroll_to(l)
+        # l.labels = labels
 
     def add_notification_label(self, text):
         self.add_break()
@@ -512,6 +514,8 @@ class InterpreterWrapper(object):
         self.init_osc()
 
         self._interpreter_state = 'waiting'
+
+        App.get_running_app().bind(on_resume=self.check_interpreter)
 
         # Clock.schedule_interval(self.ping, 5)
 
@@ -645,12 +649,24 @@ class InterpreterWrapper(object):
         self.gui.lock_input = False
         self.gui.add_notification_label('[b]interpreter restarted: variable context lost[/b]')
 
+    def check_interpreter(self, *args):
+        print('checking interpreter')
+        self.ping()
+
+    def restart_halted_interpreter(self):
+        print('interpreter is halted')
+        self.gui.add_user_message_label(
+            ('The interpreter is not responding, it may have been killed by the OS '
+             'while paused. Restarting.'),
+            background_colour=(1, 0.6, 0, 1))
+        self.restart()
+
     def ping(self, *args, **kwargs):
         timeout = kwargs.get('timeout', 2)
         self.send_osc_message('ping', address=b'/ping')
         Clock.schedule_once(self.ping_failed, timeout)
 
-    def ping_failed(self, *args):
+    def ping_failed(self, *args, **kwargs):
         if self.interpreter_state != 'restarting':
             self.interpreter_state = 'not_responding'
 
