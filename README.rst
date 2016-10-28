@@ -67,17 +67,16 @@ in the future.
 Todo
 ----
 
-- Detect if interpreter is not there on resume
-- Halt thread on service exit
-- Add an 'About' page
+Before next release:
+    - Detect if interpreter is not there on resume
+    - Halt thread on service exit
+    - Check out keyboard issues
 
-
-- Save to file button
-
-- Setting for scrollback length
-- Allow swiping to remove old entries
-  - or other input clearing options
-- Add linting
+Eventually:
+    - Save to file button
+    - Add an 'About' page
+    - Setting for scrollback length
+    - Add linting
 
 
 ctypes problem
