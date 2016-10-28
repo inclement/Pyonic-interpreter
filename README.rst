@@ -68,7 +68,6 @@ Todo
 ----
 
 Before next release:
-    - Detect if interpreter is not there on resume
     - Halt thread on service exit
     - Check out keyboard issues
     - Try python3
