@@ -156,7 +156,7 @@ class InputLabel(Label):
 
 
 class UserMessageLabel(Label):
-    pass
+    background_colour = ListProperty([1, 1, 0, 1])
 
 
 class NotificationLabel(Label):

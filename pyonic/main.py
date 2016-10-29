@@ -28,7 +28,6 @@ else:
     import pyonic.settings  # noqa
     import pyonic.menu  # noqa
 
-
 class Manager(ScreenManager):
     back_screen_name = StringProperty('')
 
