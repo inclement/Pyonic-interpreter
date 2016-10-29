@@ -68,10 +68,15 @@ Todo
 ----
 
 Before next release:
-    - Halt thread on service exit
+    - Add py2/py3 in top left
+    - Stop input labels removing focus
+
+Near future:
     - Check out keyboard issues
+    - Unify handling of python2/python3 differences via a module
 
 Eventually:
+    - Halt thread on service exit
     - Save to file button
     - Add an 'About' page
     - Setting for scrollback length
