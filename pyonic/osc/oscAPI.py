@@ -35,6 +35,7 @@ from threading import Lock
 from kivy.logger import Logger
 try:
     # multiprocessing support is not good on window
+    raise OSError('android does not support multiprocessing')
     if sys.platform in ('win32', 'cygwin'):
         raise
     use_multiprocessing = True

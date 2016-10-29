@@ -8,7 +8,7 @@ options = {'apk': {'window': None,
                    'requirements': 'sdl2,kivy,python3crystax,pygments',
                    'android-api': 19,
                    'ndk-dir': '/home/asandy/android/crystax-ndk-10.3.2',
-                   'dist-name': 'pyonic',
+                   'dist-name': 'pyonic_python3',
                    'ndk-version': '10.3.2',
                    'package': 'net.inclem.pyonicinterpreter3',
                    'permission': 'INTERNET',
@@ -29,5 +29,6 @@ setup(
     options=options,
     package_data={'pyonic': ['*.py', '*.kv'],
                   'pyonic/interpreter_subprocess': ['*.py'],
-                  'pyonic/assets': ['*.ttf', '*.txt']}
+                  'pyonic/assets': ['*.ttf', '*.txt'],
+                  'pyonic/osc': ['*.py']}
 )

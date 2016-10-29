@@ -17,9 +17,14 @@ import inspect
 
 from kivy import platform
 
+print('python service starting!')
+
+py_ver = sys.version_info.major
 if sys.version_info.major >= 3:
     unicode_type = str
     if platform == 'android':
+        from os.path import dirname, split, abspath
+        sys.path.append(split(dirname(abspath(__file__)))[0])
         import osc
     else:
         from pyonic import osc
@@ -27,15 +32,16 @@ else:
     unicode_type = unicode
     from kivy.lib import osc
 
+print('service got this far')
+
 real_stdout = sys.stdout
 real_stderr = sys.stderr
 def real_print(*s):
     real_stdout.write(' '.join([str(item) for item in s]) + '\n')
     real_stdout.flush()
 
-
-send_port = 3001
-receive_port = 3000
+send_port = 3001 + 10 * py_ver
+receive_port = 3000 + 10 * py_ver
 
 thread = None
 

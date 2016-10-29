@@ -40,9 +40,13 @@ if sys.version_info.major >= 3:
         import osc
     else:
         from pyonic import osc
+
+    package_name = 'net.inclem.pyonicinterpreter3'
 else:
     unicode_type = unicode
     from kivy.lib import osc
+
+    package_name = 'net.inclem.pyonicinterpreter'
 
 
 class InitiallyFullGridLayout(GridLayout):
@@ -516,8 +520,9 @@ class InterpreterWrapper(object):
         self.input_index = 0  # The current input number
         self.inputs = {}  # All the inputs so far
 
-        self.interpreter_port = 3000
-        self.receive_port = 3001
+        py_ver = sys.version_info.major
+        self.interpreter_port = 3000 + 10 * py_ver
+        self.receive_port = 3001 + 10 * py_ver
 
         Clock.schedule_interval(self.read_osc_queue, 0.05)
 
@@ -550,7 +555,7 @@ class InterpreterWrapper(object):
 
         if platform == 'android':
             from jnius import autoclass
-            service = autoclass('net.inclem.pyonicinterpreter.ServiceInterpreter')
+            service = autoclass('{}.ServiceInterpreter'.format(package_name))
             mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
             service.start(mActivity, argument)
         else:
@@ -639,7 +644,7 @@ class InterpreterWrapper(object):
     def restart(self):
         if platform == 'android':
             from jnius import autoclass
-            service = autoclass('net.inclem.pyonicinterpreter.ServiceInterpreter')
+            service = autoclass('{}.ServiceInterpreter'.format(package_name))
             mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
             service.stop(mActivity)
             self.start_interpreter()
