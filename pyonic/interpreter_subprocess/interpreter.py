@@ -1,5 +1,6 @@
 import copy
 
+
 user_locals = copy.copy(locals())
 user_globals = copy.copy(globals())
 
@@ -14,7 +15,24 @@ import threading
 import ctypes
 import inspect
 
-from kivy.lib import osc
+from kivy import platform
+
+if sys.version_info.major >= 3:
+    unicode_type = str
+    if platform == 'android':
+        import osc
+    else:
+        from pyonic import osc
+else:
+    unicode_type = unicode
+    from kivy.lib import osc
+
+real_stdout = sys.stdout
+real_stderr = sys.stderr
+def real_print(*s):
+    real_stdout.write(' '.join([str(item) for item in s]) + '\n')
+    real_stdout.flush()
+
 
 send_port = 3001
 receive_port = 3000
@@ -77,10 +95,10 @@ def receive_message(message, *args):
 
     elif address == b'/throttling':
         global throttle_output
-        body = [s.decode('utf-8') for s in message[2:]]
-        if body[0] == '1':
+        body = message[2:]
+        if body[0] == b'1':
             throttle_output = True
-        elif body[0] == '0':
+        elif body[0] == b'0':
             throttle_output = False
         else:
             print('Error changing output throttling: received value {}'.format(body[0]))
@@ -130,7 +148,7 @@ def interpret_code(code):
         osc.sendMsg(b'/interpreter', [b'keyboard_interrupted'], port=send_port,
                     typehint='b')
     except Exception as e:
-        real_print('another exception occurred')
+        print('an exception occurred')
         traceback.print_exc()
     finally:
         sys.stdout.can_omit = False
@@ -184,11 +202,13 @@ class OscOut(object):
     def send_message(self, message):
         try:
             osc.sendMsg(self.address, [
-                message.encode('utf-8') if isinstance(message, unicode)
+                message.encode('utf-8') if isinstance(message, unicode_type)
                 else message],
                         port=self.target_port, typehint='b')
         except KeyboardInterrupt:
             raise KeyboardInterrupt('interrupted while printing')
+
+print('got this far')
 
 osc.init()
 oscid = osc.listen(ipAddr='127.0.0.1', port=receive_port)
@@ -197,19 +217,15 @@ osc.bind(oscid, receive_message, b'/ping')
 osc.bind(oscid, receive_message, b'/sigint')
 osc.bind(oscid, receive_message, b'/throttling')
 
-real_stdout = sys.stdout
-real_stderr = sys.stderr
 sys.stdout = OscOut(b'/stdout', send_port)
 sys.stderr = OscOut(b'/stderr', send_port)
 
-to = os.environ['PYTHON_SERVICE_ARGUMENT']
+to = os.environ.get('PYTHON_SERVICE_ARGUMENT', '')
 for entry in to.split(':'):
     if entry.startswith('throttle_output='):
         throttle_output = False if entry[16:] == '0' else True
 
-def real_print(*s):
-    real_stdout.write(' '.join([str(item) for item in s]) + '\n')
-    real_stdout.flush()
+real_print('got this far4')
 
 while True:
     osc.readQueue(oscid)

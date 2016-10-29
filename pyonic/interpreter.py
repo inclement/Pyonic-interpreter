@@ -18,7 +18,6 @@ from kivy import platform
 
 from kivy.clock import Clock
 
-from kivy.lib import osc
 
 from time import time
 import os
@@ -34,6 +33,16 @@ import sys
 import signal
 
 from os.path import realpath, join, dirname
+
+if sys.version_info.major >= 3:
+    unicode_type = str
+    if platform == 'android':
+        import osc
+    else:
+        from pyonic import osc
+else:
+    unicode_type = unicode
+    from kivy.lib import osc
 
 
 class InitiallyFullGridLayout(GridLayout):
@@ -268,6 +277,7 @@ class InterpreterGui(BoxLayout):
                                    duration=0.5)
 
         self.interpreter = InterpreterWrapper(self)
+        # self.interpreter = DummyInterpreter()
 
         # Clock.schedule_interval(self._dequeue_output_label, 0.05)
         # Clock.schedule_interval(self._clear_output_label_queue, 1)
@@ -547,6 +557,7 @@ class InterpreterWrapper(object):
             # This may not actually work everywhere, but let's assume it does
             print('starting subprocess')
             python_name = 'python{}'.format(sys.version_info.major)
+            print('python name is', python_name)
             os.environ['PYTHON_SERVICE_ARGUMENT'] = argument
             s = subprocess.Popen([python_name, '{}'.format(interpreter_script_path)])
             App.get_running_app().subprocesses.append(s)
@@ -557,7 +568,6 @@ class InterpreterWrapper(object):
         self.send_osc_message(b'sigint', address=b'/sigint')
 
     def init_osc(self):
-        from kivy.lib import osc
         osc.init()
         self.oscid = osc.listen(ipAddr='127.0.0.1', port=self.receive_port)
 
@@ -663,7 +673,7 @@ class InterpreterWrapper(object):
 
     def ping(self, *args, **kwargs):
         timeout = kwargs.get('timeout', 2)
-        self.send_osc_message('ping', address=b'/ping')
+        self.send_osc_message(b'ping', address=b'/ping')
         Clock.schedule_once(self.ping_failed, timeout)
 
     def ping_failed(self, *args, **kwargs):
@@ -678,5 +688,9 @@ class InterpreterWrapper(object):
             Clock.unschedule(self.ping)
 
     def set_service_output_throttling(self, value):
-        self.send_osc_message('1' if value else '0', b'/throttling')
+        self.send_osc_message(b'1' if value else b'0', b'/throttling')
 
+
+class DummyInterpreter(object):
+    def __getattr__(self, *args, **kwargs):
+        return lambda *args, **kwargs: 1
