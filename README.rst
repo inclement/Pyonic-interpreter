@@ -70,7 +70,6 @@ Todo
 Before next release:
     - Halt thread on service exit
     - Check out keyboard issues
-    - Try python3
 
 Eventually:
     - Save to file button
