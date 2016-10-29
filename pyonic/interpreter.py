@@ -6,6 +6,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.carousel import Carousel
+from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.behaviors import FocusBehavior
 from kivy.uix.modalview import ModalView
@@ -47,6 +48,13 @@ else:
     from kivy.lib import osc
 
     package_name = 'net.inclem.pyonicinterpreter'
+
+    
+class NonDefocusingBehavior(object):
+    def on_touch_down(self, touch):
+        if self.collide_point(*self.to_parent(*touch.pos)):
+            FocusBehavior.ignored_touch.append(touch)
+        return super(NonDefocusingBehavior, self).on_touch_down(touch)
 
 
 class InitiallyFullGridLayout(GridLayout):
@@ -133,6 +141,10 @@ class OutputLabel(Label):
     stream = OptionProperty('stdout', options=['stdout', 'stderr'])
 
 
+class NonDefocusingScrollView(NonDefocusingBehavior, ScrollView):
+    pass
+
+
 class InputLabel(Label):
     index = NumericProperty(0)
     root = ObjectProperty()
@@ -163,17 +175,19 @@ class NotificationLabel(Label):
     background_colour = ListProperty([1, 0, 0, 0.5])
 
 
-class NonDefocusingButton(ColouredButton):
-    def on_touch_down(self, touch):
-        if self.collide_point(*touch.pos):
-            FocusBehavior.ignored_touch.append(touch)
-        return super(NonDefocusingButton, self).on_touch_down(touch)
+class NonDefocusingButton(NonDefocusingBehavior, ColouredButton):
+    pass
+    # def on_touch_down(self, touch):
+    #     if self.collide_point(*touch.pos):
+    #         FocusBehavior.ignored_touch.append(touch)
+    #     return super(NonDefocusingButton, self).on_touch_down(touch)
 
-class KeyboardButton(ColouredButton):
-    def on_touch_down(self, touch):
-        if self.collide_point(*touch.pos):
-            FocusBehavior.ignored_touch.append(touch)
-        return super(KeyboardButton, self).on_touch_down(touch)
+class KeyboardButton(NonDefocusingBehavior, ColouredButton):
+    pass
+    # def on_touch_down(self, touch):
+    #     if self.collide_point(*touch.pos):
+    #         FocusBehavior.ignored_touch.append(touch)
+    #     return super(KeyboardButton, self).on_touch_down(touch)
 
 
 class InterpreterScreen(Screen):
