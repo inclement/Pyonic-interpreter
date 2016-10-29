@@ -1,6 +1,7 @@
 #:import Clock kivy.clock.Clock
 #:import FocusBehavior kivy.uix.behaviors.FocusBehavior
 #:import Window kivy.core.window.Window
+#:import vinfo sys.version_info
 
 <Label>:
     color: 0, 0, 0, 1
@@ -69,7 +70,7 @@
             size: self.size
     FloatLayout:
         id: floatlayout
-        ScrollView:
+        NonDefocusingScrollView:
             pos_hint: {'x': 0, 'y': 0}
             id: scrollview
             bar_width: dp(10)
@@ -108,7 +109,7 @@
                 padding_x: dp(10)
                 pos_hint: {'top': 1}
                 markup: True
-                text: '[b]status:[/b] [b][color=#{}]{}[/color][/b]'.format(root.status_label_colour, root.interpreter_state.replace('_', ' '))
+                text: '[b][color=#A2A2A2](Py {}.{})[/color] status:[/b] [b][color=#{}]{}[/color][/b]'.format(vinfo.major, vinfo.minor, root.status_label_colour, root.interpreter_state.replace('_', ' '))
                 color: 1, 1, 1, 1
             Widget:
             ColouredButton:
