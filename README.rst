@@ -68,8 +68,7 @@ Todo
 ----
 
 Before next release:
-    - Add py2/py3 in top left
-    - Stop input labels removing focus
+
 
 Near future:
     - Check out keyboard issues
