@@ -544,9 +544,8 @@ class InterpreterWrapper(object):
 
         self._interpreter_state = 'waiting'
 
-        App.get_running_app().bind(on_resume=self.check_interpreter)
-
-        # Clock.schedule_interval(self.ping, 5)
+        # This check_interpreter method is not reliable enough to enable yet.
+        # App.get_running_app().bind(on_resume=self.check_interpreter)
 
     @property
     def interpreter_state(self):
@@ -680,7 +679,7 @@ class InterpreterWrapper(object):
 
     def check_interpreter(self, *args):
         print('checking interpreter')
-        self.ping()
+        Clock.schedule_once(self.ping, 2)
 
     def restart_halted_interpreter(self):
         print('interpreter is halted')

@@ -68,7 +68,10 @@ Todo
 ----
 
 Before next release:
-
+    - Make initialising logo appear before unpacking
+    - Improve message if interpreter is not responding on resume
+    - Fix 'not responding' on resume which always happens
+    - Add optional button rows (numbers, more symbols)
 
 Near future:
     - Check out keyboard issues
