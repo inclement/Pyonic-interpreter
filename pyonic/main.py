@@ -212,7 +212,6 @@ class PyonicApp(App):
 
         if platform != 'android':
             return
-
         if value not in ('portrait', 'landscape', 'auto'):
             print('Orientation error: invalid setting received')
 
@@ -230,7 +229,20 @@ class PyonicApp(App):
         self.root.open_interpreter()
 
     def on_pause(self):
+        if self.setting__rotation != 'portrait':
+            self.on_setting__rotation(self, 'portrait')
         return True
+
+    def on_resume(self):
+        if self.setting__rotation != 'portrait':
+            self.on_setting__rotation(self, self.setting__rotation)
+
+    def print_info(self, *args):
+        print('info', Window.size, Window.system_size, Window._win.window_size)
+    
+
+    def set_landscape(self, dt):
+        self.setting__rotation = 'landscape'
 
     def on_stop(self):
         for subprocess in self.subprocesses:
