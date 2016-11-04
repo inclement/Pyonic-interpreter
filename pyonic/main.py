@@ -21,11 +21,13 @@ if platform == 'android':
     import widgets
     import interpreter
     import settings
+    import editor
     import menu
 else:
     import pyonic.widgets  # noqa
     import pyonic.interpreter  # noqa
     import pyonic.settings  # noqa
+    import pyonic.editor  # noqa
     import pyonic.menu  # noqa
 
 class Manager(ScreenManager):
@@ -236,13 +238,6 @@ class PyonicApp(App):
     def on_resume(self):
         if self.setting__rotation != 'portrait':
             self.on_setting__rotation(self, self.setting__rotation)
-
-    def print_info(self, *args):
-        print('info', Window.size, Window.system_size, Window._win.window_size)
-    
-
-    def set_landscape(self, dt):
-        self.setting__rotation = 'landscape'
 
     def on_stop(self):
         for subprocess in self.subprocesses:

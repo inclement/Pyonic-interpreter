@@ -1,0 +1,58 @@
+
+<EditorScreen>:
+    EditorGui:
+
+<EditorGui>:
+    orientation: 'vertical'
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: dp(40)
+        canvas:
+            Color:
+                rgba: 0.2, 0.2, 0.2, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        Widget:
+            size_hint_x: None
+            width: dp(3)
+        ColouredButton:
+            id: back_button
+            size_hint_x: None
+            width: self.height
+            bold: True
+            font_name: 'assets/fontello.ttf'
+            text: 'B'
+            font_size: dp(20)
+            color: 1, 1, 1, 1
+            background_down: 0.2, 0.6431, 0.8078, 1
+            background_normal: 1, 1, 1, 0
+            on_release: app.manager.go_back()
+        Label:
+            size_hint_x: None
+            width: self.texture_size[0]
+            text_size: root.width - menu_button.width - back_button.width - dp(3), None
+            text: 'Editor{}'.format(': {}'.format(root.filename) if root.filename else '')
+            font_size: dp(18)
+            padding_x: dp(10)
+            color: 1, 1, 1, 1
+            valign: 'middle'
+        Widget:
+        MenuButton:
+            id: menu_button
+            text: 'E'
+            size_hint_x: None
+            width: 1.5 * self.height
+            background_normal: 1.0, 1.0, 1.0, 0
+            background_down: 0, 0, 0, 1
+            radius: dp(5)
+            padding: 0.025 * min(self.size)
+            font_name: 'assets/fontello.ttf'
+            font_size: sp(34)
+            color: 1, 1, 1, 1
+            root: root
+                
+    EditorInput:
+        font_name: 'RobotoMono-Regular.ttf'
+            
