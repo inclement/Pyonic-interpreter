@@ -67,6 +67,13 @@ in the future.
 Todo
 ----
 
+Editor:
+- code completion
+- linting?
+- run code (different screen?)
+- abstract InterpreterInput and MenuButton for both usages
+- multiple file support (navigation drawer?)
+
 Before next release:
 
 Near future:
@@ -89,7 +96,8 @@ ctypes problem
 
 Works on:
 
-- LG G4
+- LG G4 (Android 6.0)
+- Moto E (Android 6.0)
 
 Fails on:
 
@@ -97,3 +105,9 @@ Fails on:
 - Galaxy Note 2
 - Sony xperia z1 compact
 - Samsung Galaxy J1 (Android 5.1.1)
+
+crashes
+-------
+
+http://allview.ro/a4-you.html (A4 You)
+
