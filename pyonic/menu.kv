@@ -1,0 +1,61 @@
+
+<MenuDropDown>:
+    scroll_distance: dp(2)
+    scroll_timeout: 25
+    auto_width: False
+    width: dp(150)
+    opacity: 1. - root.anim_progress
+    canvas.before:
+        PushMatrix:
+        Translate:
+            x: root.anim_progress * root.shift
+            y: root.anim_progress * 0.5 * root.shift
+    canvas:
+        Color:
+            rgba: 0.9, 0.9, 0.9, 1
+        Rectangle:
+            pos: 0, 0
+            size: self.size
+    canvas.after:
+        PopMatrix:
+    DropDownButton:
+        text: 'clear output'
+        size_hint_y: None
+        height: dp(40)
+        text_size: self.size
+        padding_x: dp(10)
+        valign: 'middle'
+        on_release: root.parent_obj.root.clear_output(); root.dismiss(immediate=False)
+    Widget:
+        size_hint_y: None
+        height: dp(2)
+    DropDownButton:
+        text: 'restart interpreter'
+        padding_x: dp(10)
+        size_hint_y: None
+        height: dp(40)
+        text_size: self.size
+        valign: 'middle'
+        on_release: root.parent_obj.root.query_restart(); root.dismiss(immediate=False)
+    Widget:
+        size_hint_y: None
+        height: dp(2)
+    DropDownButton:
+        text: 'settings'
+        size_hint_y: None
+        height: dp(40)
+        text_size: self.size
+        padding_x: dp(10)
+        valign: 'middle'
+        on_release: app.manager.switch_to('settings'); root.dismiss(immediate=True)
+                
+
+<DropDownButton>:
+    background_normal: 0.9, 0.9, 0.9, 1
+    background_down: (0.2, 0.6431, 0.8078, 1.)
+    canvas:
+        Color:
+            rgba: 0.3, 0.3, 0.3, 1
+        Line:
+            rectangle: self.x + dp(0.55), self.y + dp(0.55), self.width - dp(1.1), self.height - dp(1.1)
+            width: dp(1.1)

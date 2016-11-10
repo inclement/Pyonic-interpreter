@@ -1,0 +1,16 @@
+<PipScreen>:
+    PipGui:
+
+<PipGui>:
+    orientation: 'vertical'
+    TextInput:
+        id: textinput
+        text: 'plyer'
+        size_hint_y: None
+        height: dp(30)
+    Button:
+        text: 'pip install'
+        on_release: root.do_install(textinput.text)
+    Button:
+        text: 'pip search'
+        on_release: root.do_search(textinput.text)

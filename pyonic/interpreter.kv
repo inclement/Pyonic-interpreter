@@ -1,0 +1,384 @@
+
+<InterpreterScreen>:
+    name: 'interpreter'
+    BoxLayout:
+        orientation: 'vertical'
+        # BoxLayout:
+        #     size_hint_y: None
+        #     height: sp(60)
+        #     Button:
+        #         text: 'back'
+        #         width: 2*self.texture_size[0]
+        #         size_hint_x: None
+        #         color: 1, 1, 1, 1
+        #         on_press: root.manager.go_back()
+        #     Widget:
+        InterpreterGui:
+    
+<HeightButton>:
+    size_hint_y: None
+
+<HomeScreenButton>:
+    color: 1, 1, 1, 1
+
+<InterpreterGui>:
+    output_window: output_window
+    code_input: input
+    scrollview: scrollview
+    orientation: 'vertical'
+    throttle_label_output: app.setting__throttle_output
+    canvas:
+        Color:
+            rgba: 0.9, 0.9, 0.9, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    FloatLayout:
+        id: floatlayout
+        NonDefocusingScrollView:
+            pos_hint: {'x': 0, 'y': 0}
+            id: scrollview
+            bar_width: dp(10)
+            InitiallyFullGridLayout:
+                height: max(scrollview.height, self.minimum_height)
+                size_hint_y: None
+                cols: 1
+                id: output_window
+                filling_widget_minimum_height: top_bar.height
+                canvas.before:
+                    Color:
+                        rgba: 0.55, 0.55, 0.55, 0.55
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                    Color:
+                        rgba: 0, 0, 0, 1
+                    Line:
+                        rectangle: [self.x, self.y, self.width, self.height]
+        BoxLayout:
+            id: top_bar
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(40)
+            pos_hint: {'top': 1}
+            canvas:
+                Color:
+                    rgba: 0.3, 0.3, 0.3, 0.8
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            Label:
+                id: status_label
+                size_hint_x: None
+                width: self.texture_size[0]
+                padding_x: dp(10)
+                pos_hint: {'top': 1}
+                markup: True
+                text: '[b][color=#A2A2A2](Py {}.{})[/color] status:[/b] [b][color=#{}]{}[/color][/b]'.format(vinfo.major, vinfo.minor, root.status_label_colour, root.interpreter_state.replace('_', ' '))
+                color: 1, 1, 1, 1
+            Widget:
+            ColouredButton:
+                text: 'CTRL + C'
+                size_hint_x: None
+                width: 1.8 * self.texture_size[0]
+                background_normal: 0.5, 0, 0, 1
+                background_down: 0.2, 0, 0, 1
+                radius: dp(5)
+                padding: 0.025 * min(self.size)
+                on_release: if not root.halting: root.send_sigint()
+                color: 1, 1, 1, 1
+                disabled: True if (not app.ctypes_working or root.interpreter_state in ('waiting', 'restarting')) else False
+                opacity: 0 if not app.ctypes_working else (0.3 if self.disabled else 1)
+            Widget:
+                size_hint_x: None
+                width: dp(10)
+            MenuButton:
+                text: 'E'
+                size_hint_x: None
+                width: 1.5 * self.height
+                background_normal: 1.0, 1.0, 1.0, 0
+                background_down: 0, 0, 0, 1
+                radius: dp(5)
+                padding: 0.025 * min(self.size)
+                font_name: 'assets/fontello.ttf'
+                font_size: sp(34)
+                color: 1, 1, 1, 1
+                root: root
+    Widget:
+        size_hint_y: None
+        height: dp(2)
+        canvas:
+            Color:
+                rgba: 0.3, 0.3, 0.3, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+    BoxLayout:
+        size_hint_y: None
+        height: (app.setting__text_input_height * 1.3 + 0.5) * status_label.texture_size[1]
+        MonoLabel:
+            text: '>>>'
+            width: self.texture_size[0] * 1.5
+            size_hint_x: None
+        InterpreterInput:
+            id: input
+            root: root
+            disabled: root._lock_input
+            font_name: 'RobotoMono-Regular.ttf'
+            canvas.after:
+                Color:
+                    rgba: 1, 0, 0, root.input_fail_alpha
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+        NoTouchCarousel:
+            id: carousel
+            width: enter_button.texture_size[0] * 3
+            size_hint_x: None
+            loop: True
+            NonDefocusingButton:
+                id: enter_button
+                text: 'N'
+                font_name: 'assets/fontello.ttf'
+                font_size: sp(20)
+                on_release: root.interpret_line_from_code_input()
+                background_normal: 0.3, 0.3, 0.3, 1
+                background_down: 0.1, 0.1, 0.1, 1
+                radius: 0
+                padding: 0
+            NonDefocusingButton:
+                text: 'c'
+                font_name: 'assets/fontello.ttf'
+                background_color: (1, 0, 0, 1)
+                font_size: sp(20)
+                on_release: if not root.halting: root.send_sigint()
+                background_normal: 0.5, 0, 0, 1
+                background_down: 0.2, 0, 0, 1
+                radius: 0
+                padding: 0
+    BoxLayout:
+        size_hint_y: None
+        height: sp(35) if (input.focus or app.setting__show_input_buttons) else 0
+        opacity: 1 if (input.focus or app.setting__show_input_buttons) else 0
+        orientation: 'horizontal'
+        KeyboardButton:
+            text: '='
+            font_name: 'RobotoMono-Regular.ttf'
+            on_release: input.insert_text('=')
+        KeyboardButton:
+            text: '('
+            font_name: 'RobotoMono-Regular.ttf'
+            on_release: input.insert_text('(')
+        KeyboardButton:
+            text: ')'
+            font_name: 'RobotoMono-Regular.ttf'
+            on_release: input.insert_text(')')
+        KeyboardButton:
+            text: ':'
+            font_name: 'RobotoMono-Regular.ttf'
+            on_release: input.insert_text(':')
+        KeyboardButton:
+            text: '*'
+            font_name: 'RobotoMono-Regular.ttf'
+            on_release: input.insert_text('*')
+        KeyboardButton:
+            text: 'h'
+            font_name: 'assets/fontello.ttf'
+            on_release: input.do_cursor_movement('cursor_left')
+            background_normal: 0.4, 0.4, 0.4, 0.8
+        KeyboardButton:
+            text: 'n'
+            font_name: 'assets/fontello.ttf'
+            on_release: input.do_cursor_movement('cursor_down')
+            background_normal: 0.4, 0.4, 0.4, 0.8
+        KeyboardButton:
+            text: 'e'
+            font_name: 'assets/fontello.ttf'
+            on_release: input.do_cursor_movement('cursor_up')
+            background_normal: 0.4, 0.4, 0.4, 0.8
+        KeyboardButton:
+            text: 'i'
+            font_name: 'assets/fontello.ttf'
+            on_release: input.do_cursor_movement('cursor_right')
+            background_normal: 0.4, 0.4, 0.4, 0.8
+
+# also: + - ; < > [ ] 
+        
+
+<NonDefocusingButton>:
+    color: (1, 1, 1, 1)
+
+<KeyboardButton>:
+    color: (1, 1, 1, 1)
+    padding: 0.025 * min(self.size)
+    background_down: (0.2, 0.6431, 0.8078, 1.)
+    background_normal: (0.6, 0.6, 0.6, 0.8)
+    radius: dp(5)
+
+<ColouredButton>:
+    canvas.before:
+        Color:
+            rgba: self.background_normal if self.state == 'normal' else self.background_down
+        RoundedRectangle:
+            pos: self.x + self.padding, self.y + self.padding
+            size: self.width - 2*self.padding, self.height - 2*self.padding
+            radius: [(self.radius, self.radius) for _ in range(4)]
+    
+
+<MonoLabel@Label>:
+    font_name: 'RobotoMono-Regular.ttf'
+
+<InputLabel>:
+    size_hint_y: None
+    height: self.texture_size[1] + dp(20)
+    text_size: self.width, None
+    font_name: 'RobotoMono-Regular.ttf'
+    padding_x: dp(10)
+    canvas.before:
+        Color:
+            rgba: 0.85 - self.blue_shift * 0.3, 0.85 - self.blue_shift * 0.3, 0.9 + self.blue_shift * 0.1, 0.95
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: 0, 0, 0, 1
+        Line:
+            rectangle: [self.x, self.y, self.width, self.height]
+        Color:
+            rgba: (0.65, 0.65, 0.95, 1)
+        Rectangle:
+            pos: self.pos
+            size: dp(5), self.height
+
+<OutputLabel>:
+    size_hint_y: None
+    height: self.texture_size[1] + dp(2)
+    text_size: self.width, None
+    font_name: 'RobotoMono-Regular.ttf'
+    padding_x: dp(10)
+    canvas.before:
+        Color:
+            rgba: 0.95, 0.95, 0.95, 0.95
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: (0.65, 0.95, 0.65, 1) if self.stream == 'stdout' else (0.95, 0.65, 0.65, 1)
+        Rectangle:
+            pos: self.pos
+            size: dp(5), self.height
+
+<UserMessageLabel>:
+    size_hint_y: None
+    height: self.texture_size[1] + dp(2)
+    text_size: self.width, None
+    font_name: 'RobotoMono-Regular.ttf'
+    padding_x: dp(10)
+    canvas.before:
+        Color:
+            rgba: 0.976, 0.9, 0.776, 1.
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: self.background_colour
+        Rectangle:
+            pos: self.pos
+            size: dp(5), self.height
+
+<NotificationLabel>:
+    size_hint_y: None
+    height: self.texture_size[1] + dp(8)
+    markup: True
+    color: 1, 1, 1, 1
+    canvas.before:
+        Color:
+            rgba: root.background_colour
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        
+
+<BreakMarker>:
+    size_hint_y: None
+    height: dp(2)
+    canvas:
+        Color:
+            rgba: 0.3, 0, 0, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<RestartPopup>:
+    size_hint_x: None
+    size_hint_y: None
+    width: min(0.8*Window.width, dp(350))
+    vertical_padding: dp(20)
+    height: gridlayout.height
+    GridLayout:
+        id: gridlayout
+        height: self.minimum_height
+        cols: 1
+        Widget:
+            size_hint_y: None
+            height: root.vertical_padding
+        Label:
+            text: 'Are you sure you want to restart the interpreter? Your variable context will be lost.'
+            text_size: self.width, None
+            halign: 'center'
+            color: 1, 1, 1, 1
+            size_hint_y: None
+            height: self.texture_size[1]
+            padding_x: dp(20)
+            padding_y: dp(20)
+        Widget:
+            size_hint_y: None
+            height: root.vertical_padding
+        BoxLayout:
+            size_hint_y: None
+            height: dp(40)
+            Widget:
+                size_hint_x: 0.2
+            Button:
+                text: 'cancel'
+                color: 1, 1, 1, 1
+                on_release: root.dismiss()
+                background_color: 1, 0, 0, 1
+            Widget:
+                size_hint_x: 0.2
+            Button:
+                text: 'restart'
+                color: 1, 1, 1, 1
+                on_release: root.interpreter_gui.restart_interpreter(); root.dismiss()
+                background_color: 0, 0.8, 0, 1
+            Widget:
+                size_hint_x: 0.2
+        Widget:
+            size_hint_y: None
+            height: root.vertical_padding
+
+<InitiallyFullGridLayout>:
+    Widget:
+        size_hint_y: None
+        height: root.filling_widget_height
+
+<-InterpreterInput>:
+    canvas.before:
+        Color:
+            rgba: self.background_color
+        BorderImage:
+            border: self.border
+            pos: self.pos
+            size: self.size
+            source: self.background_disabled_normal if self.disabled else (self.background_active if self.focus else self.background_normal)
+            # source: self.background_active if self.focus else (self.background_disabled_normal if self.disabled else self.background_normal)
+        Color:
+            rgba: (self.cursor_color if (self.focus and not self.disabled and not self.cursor_blink) else (0, 0, 0, 0))
+        Rectangle:
+            pos: [int(x) for x in self.cursor_pos]
+            size: 1, -self.line_height
+        Color:
+            rgba: self.disabled_foreground_color if self.disabled else (self.hint_text_color if not self.text else self.foreground_color)
+
+                
+            
