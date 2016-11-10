@@ -16,18 +16,22 @@ from functools import partial
 
 from os.path import abspath, join, dirname
 
+from kivy.lang import Builder
+Builder.load_file('main.kv')
 
 if platform == 'android':
     import widgets
+    import menu
     import interpreter
     import settings
     import editor
-    import menu
+    import pipinterface
 else:
     import pyonic.widgets  # noqa
     import pyonic.interpreter  # noqa
     import pyonic.settings  # noqa
     import pyonic.editor  # noqa
+    import pyonic.pipinterface  # noqa
     import pyonic.menu  # noqa
 
 class Manager(ScreenManager):

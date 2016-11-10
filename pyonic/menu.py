@@ -5,10 +5,11 @@ from kivy.uix.button import Button
 from kivy.metrics import dp
 from kivy.properties import (ObjectProperty, NumericProperty)
 from kivy.animation import Animation
+from kivy.lang import Builder
+
+Builder.load_file('menu.kv')
 
 from widgets import ColouredButton
-
-
 
 class MenuDropDown(DropDown):
     shift = NumericProperty(dp(30))

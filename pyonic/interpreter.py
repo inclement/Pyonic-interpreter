@@ -16,6 +16,7 @@ from kivy.properties import (ObjectProperty, NumericProperty,
 from kivy.animation import Animation
 from kivy.app import App
 from kivy import platform
+from kivy.lang import Builder
 
 from kivy.clock import Clock
 
@@ -26,6 +27,10 @@ from functools import partial
 
 if platform != 'android':
     import subprocess
+
+import menu
+
+Builder.load_file('interpreter.kv')
 
 from widgets import ColouredButton
 
