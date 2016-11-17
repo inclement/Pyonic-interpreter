@@ -17,7 +17,9 @@ from functools import partial
 from os.path import abspath, join, dirname
 
 from kivy.lang import Builder
+
 Builder.load_file('main.kv')
+Builder.load_file('menu.kv')
 
 if platform == 'android':
     import widgets
