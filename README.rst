@@ -1,18 +1,21 @@
 Pyonic interpreter
-================
+==================
 
-An experimental Python interpreter interface for mobile devices,
-written in Python.
+A Python interpreter interface for mobile devices. Pyonic interpreter
+is available for Android on Google Play, for `Python 2
+<https://play.google.com/store/apps/details?id=net.inclem.pyonicinterpreter>`
+or `Python 3
+<https://play.google.com/store/apps/details?id=net.inclem.pyonicinterpreter>`__. The
+app can also be run under Kivy on the desktop (Linux, OS X/macOS,
+Windows).
 
 The Pyonic interpreter user interface is created in Python using `Kivy
 <https://github.com/kivy/python-for-android>`__. User input is passed
 to a second interpreter, run as a separate process via an Android
 service. The interpreter is packaged for Android using
 `python-for-android <https://github.com/kivy/python-for-android>`__.
-
-Pyonic is built and tested with Python 2. Python 3 also
-works, but requires some fixes in Kivy's osc library. A Python 3
-release will be a main target following the initial Python 2 release.
+Pyonic interpreter is written for and tested with both Python 2 and
+Python 3.
 
 Future targets include support for multiple interpreters,
 different kinds of Python tasks (app threads, background services),
@@ -68,11 +71,11 @@ Todo
 ----
 
 Editor:
-- code completion
-- linting?
-- run code (different screen?)
-- abstract InterpreterInput and MenuButton for both usages
-- multiple file support (navigation drawer?)
+    - code completion
+    - linting?
+    - run code (different screen?)
+    - abstract InterpreterInput and MenuButton for both usages
+    - multiple file support (navigation drawer?)
 
 Before next release:
 
