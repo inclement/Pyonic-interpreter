@@ -10,6 +10,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.behaviors import FocusBehavior
 from kivy.uix.modalview import ModalView
+from kivy.event import EventDispatcher
 from kivy.properties import (ObjectProperty, NumericProperty,
                              OptionProperty, BooleanProperty,
                              StringProperty, ListProperty)
@@ -299,7 +300,17 @@ class InterpreterGui(BoxLayout):
         self.animation = Animation(input_fail_alpha=0., t='out_expo',
                                    duration=0.5)
 
-        self.interpreter = InterpreterWrapper(self)
+        self.interpreter = InterpreterWrapper()
+        self.interpreter.bind(interpreter_state=self.setter('interpreter_state'))
+        self.interpreter.bind(lock_input=self.setter('lock_input'))
+
+        self.interpreter.bind(on_execution_complete=self.execution_complete)
+        self.interpreter.bind(on_stdout=self.on_stdout)
+        self.interpreter.bind(on_stderr=self.on_stderr)
+        self.interpreter.bind(on_notification=self.on_notification)
+        self.interpreter.bind(on_user_message=self.on_user_message)
+        self.interpreter.bind(on_missing_labels=self.on_missing_labels)
+
         # self.interpreter = DummyInterpreter()
 
         # Clock.schedule_interval(self._dequeue_output_label, 0.05)
@@ -324,6 +335,18 @@ class InterpreterGui(BoxLayout):
             self.code_input.focus = self.input_focus_on_disable
             self.ensure_no_ctrl_c_button()
             self.halting = False
+
+    def on_stdout(self, interpreter, text):
+        self.add_output_label(text, 'stdout')
+
+    def on_stderr(self, interpreter, text):
+        self.add_output_label(text, 'stderr')
+
+    def on_notification(self, interpreter, text):
+        self.add_notification_label(text)
+
+    def on_user_message(self, interpreter, text):
+        self.add_user_message_label(text, background_colour=(1, 0.6, 0, 1))
 
     def ensure_ctrl_c_button(self):
         if not App.get_running_app().ctypes_working:
@@ -374,6 +397,7 @@ class InterpreterGui(BoxLayout):
     def interpret_line(self, text):
         index = self.interpreter.interpret_line(text)
         self.add_input_label(text, index)
+        self.ensure_ctrl_c_button()
 
     def add_user_message_label(self, text, **kwargs):
         l = UserMessageLabel(text=text, **kwargs)
@@ -463,6 +487,9 @@ class InterpreterGui(BoxLayout):
     def on_throttle_label_output(self, instance, value):
         self.interpreter.set_service_output_throttling(value)
 
+    def on_missing_labels(self, instance, number):
+        self.add_missing_labels_marker(num_labels=number)
+
     def add_missing_labels_marker(self, num_labels=None, labels=None):
         if labels is not None:
             num_labels = len(labels)
@@ -503,7 +530,7 @@ class InterpreterGui(BoxLayout):
         popup = RestartPopup(interpreter_gui=self)
         popup.open()
 
-    def execution_complete(self):
+    def execution_complete(self, *args):
         '''Called when execution is complete so the TextInput should be
         unlocked etc., but first this is delayed until messages finish
         printing.
@@ -527,10 +554,22 @@ class BreakMarker(Widget):
     pass
 
 
-class InterpreterWrapper(object):
+class InterpreterWrapper(EventDispatcher):
 
-    def __init__(self, gui):
-        self.gui = gui
+    interpreter_state = OptionProperty('waiting', options=['waiting',
+                                                           'interpreting',
+                                                           'not_responding',
+                                                           'restarting'])
+    lock_input = BooleanProperty(False)
+
+    def __init__(self):
+
+        self.register_event_type('on_execution_complete')
+        self.register_event_type('on_missing_labels')
+        self.register_event_type('on_stdout')
+        self.register_event_type('on_stderr')
+        self.register_event_type('on_notification')
+        self.register_event_type('on_user_message')
 
         self.subprocess = None
 
@@ -552,15 +591,23 @@ class InterpreterWrapper(object):
         # This check_interpreter method is not reliable enough to enable yet.
         # App.get_running_app().bind(on_resume=self.check_interpreter)
 
-    @property
-    def interpreter_state(self):
-        return self._interpreter_state
+    def on_execution_complete(self):
+        pass
 
-    @interpreter_state.setter
-    def interpreter_state(self, value):
-        self._interpreter_state = value
-        if self.gui is not None:
-            self.gui.interpreter_state = self.interpreter_state
+    def on_missing_labels(self, num_labels):
+        pass
+
+    def on_stdout(self, text):
+        pass
+
+    def on_stderr(self, text):
+        pass
+
+    def on_notification(self, text):
+        pass
+
+    def on_user_message(self, text):
+        pass
 
     def start_interpreter(self):
         interpreter_script_path = join(dirname(realpath(__file__)),
@@ -615,7 +662,7 @@ class InterpreterWrapper(object):
 
         if address == b'/interpreter':
             if body[0] == 'completed_exec':
-                self.gui.execution_complete()
+                self.dispatch('on_execution_complete')
                 self.interpreter_state = 'waiting'
                 # self.end_osc_listen()
 
@@ -624,22 +671,20 @@ class InterpreterWrapper(object):
 
             elif body[0].startswith('omitted'):
                 number = body[0].split(' ')[-1]
-                print('number is', number)
-                self.gui.add_missing_labels_marker(num_labels=number)
+                self.dispatch('on_missing_labels', number)
 
         elif address == b'/pong':
             self.pong()
 
         elif address == b'/stdout':
-            self.gui.add_output_label(body[0], 'stdout')
+            self.dispatch('on_stdout', body[0])
 
         elif address == b'/stderr':
-            self.gui.add_output_label(body[0], 'stderr')
+            self.dispatch('on_stderr', body[0])
 
     def interpret_line(self, text):
         self.send_python_command(text.encode('utf-8'))
-        self.gui.lock_input = True
-        self.gui.ensure_ctrl_c_button()
+        self.lock_input = True
         self.interpreter_state = 'interpreting'
         input_index = self.input_index
         self.inputs[input_index] = text
@@ -670,7 +715,7 @@ class InterpreterWrapper(object):
             self.subprocess.kill()
             self.start_interpreter()
 
-        self.gui.lock_input = True
+        self.lock_input = True
         self.interpreter_state = 'restarting'
         Clock.unschedule
         Clock.schedule_interval(self.ping, 0.3)
@@ -679,8 +724,8 @@ class InterpreterWrapper(object):
         if self.interpreter_state != 'restarting':
             raise ValueError('Tried to finish restarting, but was not restarting')
         self.interpreter_state = 'waiting'
-        self.gui.lock_input = False
-        self.gui.add_notification_label('[b]interpreter restarted: variable context lost[/b]')
+        self.lock_input = False
+        self.dispatch('on_notification', '[b]interpreter restarted: variable context lost[/b]')
 
     def check_interpreter(self, *args):
         print('checking interpreter')
@@ -688,10 +733,9 @@ class InterpreterWrapper(object):
 
     def restart_halted_interpreter(self):
         print('interpreter is halted')
-        self.gui.add_user_message_label(
+        self.dispatch('on_user_message', 
             ('The interpreter is not responding, it may have been killed by the OS '
-             'while paused. Restarting.'),
-            background_colour=(1, 0.6, 0, 1))
+             'while paused. Restarting.'))
         self.restart()
 
     def ping(self, *args, **kwargs):
