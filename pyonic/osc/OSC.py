@@ -32,7 +32,14 @@ import math
 import sys
 import string
 import pprint
-from kivy.compat import string_types
+
+PY2 = sys.version_info[0] == 2
+text_type = None
+if PY2:
+    string_types = basestring
+    text_type = unicode
+else:
+    string_types = text_type = str
 
 class impulse(object):
     def __nonzero__(self):

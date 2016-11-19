@@ -32,7 +32,9 @@
 from . import OSC
 import socket, os, time, errno, sys
 from threading import Lock
-from kivy.logger import Logger
+# from kivy.logger import Logger
+import logging
+Logger = logging.getLogger()
 try:
     # multiprocessing support is not good on window
     raise OSError('android does not support multiprocessing')
