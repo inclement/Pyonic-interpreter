@@ -300,7 +300,7 @@ class InterpreterGui(BoxLayout):
         self.animation = Animation(input_fail_alpha=0., t='out_expo',
                                    duration=0.5)
 
-        self.interpreter = InterpreterWrapper()
+        self.interpreter = InterpreterWrapper(use_thread=True)
         self.interpreter.bind(interpreter_state=self.setter('interpreter_state'))
         self.interpreter.bind(lock_input=self.setter('lock_input'))
 
@@ -562,7 +562,9 @@ class InterpreterWrapper(EventDispatcher):
                                                            'restarting'])
     lock_input = BooleanProperty(False)
 
-    def __init__(self):
+    interpreter_number = 0
+
+    def __init__(self, use_thread=True):
 
         self.register_event_type('on_execution_complete')
         self.register_event_type('on_missing_labels')
@@ -572,6 +574,8 @@ class InterpreterWrapper(EventDispatcher):
         self.register_event_type('on_user_message')
 
         self.subprocess = None
+
+        self.use_thread = use_thread
 
         self.start_interpreter()
 
@@ -616,7 +620,10 @@ class InterpreterWrapper(EventDispatcher):
 
         # prepare settings to send to interpreter
         throttle_output = '1' if App.get_running_app().setting__throttle_output else '0'
-        argument = 'throttle_output={}'.format(throttle_output)
+
+        use_thread = '1' if self.use_thread else '0'
+
+        argument = 'throttle_output={}:use_thread={}'.format(throttle_output, use_thread)
 
         if platform == 'android':
             from jnius import autoclass

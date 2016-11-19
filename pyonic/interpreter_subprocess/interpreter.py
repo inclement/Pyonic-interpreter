@@ -15,7 +15,8 @@ import threading
 import ctypes
 import inspect
 
-from kivy import platform
+# from kivy import platform
+platform = 'linux'
 
 print('python service starting!')
 
@@ -43,6 +44,7 @@ def real_print(*s):
 send_port = 3001 + 10 * py_ver
 receive_port = 3000 + 10 * py_ver
 
+use_thread = True
 thread = None
 
 throttle_output = True
@@ -82,10 +84,13 @@ def receive_message(message, *args):
             complete_execution()
             return
         body = [s.decode('utf-8') for s in message[2:]]
-        t = threading.Thread(target=lambda *args: interpret_code(body[0]))
-        # t.daemon = True
-        thread = t
-        t.start()
+
+        if use_thread:
+            t = threading.Thread(target=lambda *args: interpret_code(body[0]))
+            thread = t
+            t.start()
+        else:
+            interpret_code(body[0])
 
     elif address == b'/ping':
         osc.sendMsg(b'/pong', [b'pong'], port=send_port,
@@ -124,6 +129,13 @@ def complete_execution():
     
 
 def interpret_code(code):
+
+    # # Setting this var lets pip be used from a thread other than its original import
+    # import threading
+    # _log_state = threading.local()
+    # if not hasattr(_log_state, 'indentation'):
+    #     _log_state.indentation = 0
+
     try:
         sys.stdout.can_omit = True
         # The input is first parsed as ast, then if the last statement
@@ -194,11 +206,14 @@ class OscOut(object):
             if self.messages_this_second > 500 and self.can_omit and throttle_output:
                 return
 
-            s = self.buffer + s
+            # s = self.buffer + s
+            if s and s[-1] == '\n':
+                s = s[:-1]
             lines = s.split('\n')
-            for l in lines[:-1]:
+            # for l in lines[:-1]:
+            for l in lines:
                 self.send_message(l)
-            self.buffer = lines[-1]
+            # self.buffer = lines[-1]
         except KeyboardInterrupt:
             raise KeyboardInterrupt('interrupted while printing')
 
@@ -213,6 +228,9 @@ class OscOut(object):
                         port=self.target_port, typehint='b')
         except KeyboardInterrupt:
             raise KeyboardInterrupt('interrupted while printing')
+
+    def isatty(self, *args):
+        return False
 
 print('got this far')
 
@@ -230,6 +248,8 @@ to = os.environ.get('PYTHON_SERVICE_ARGUMENT', '')
 for entry in to.split(':'):
     if entry.startswith('throttle_output='):
         throttle_output = False if entry[16:] == '0' else True
+    if entry.startswith('use_thread='):
+        use_thread = False if entry[11:] == '0' else True
 
 real_print('got this far4')
 
