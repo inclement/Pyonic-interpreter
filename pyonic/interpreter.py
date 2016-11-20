@@ -288,7 +288,9 @@ class InterpreterGui(BoxLayout):
         self.animation = Animation(input_fail_alpha=0., t='out_expo',
                                    duration=0.5)
 
-        self.interpreter = InterpreterWrapper(use_thread=True)
+        self.interpreter = InterpreterWrapper(
+            use_thread=True,
+            throttle_output=App.get_running_app().setting__throttle_output)
         self.interpreter.bind(interpreter_state=self.setter('interpreter_state'))
         self.interpreter.bind(lock_input=self.setter('lock_input'))
 

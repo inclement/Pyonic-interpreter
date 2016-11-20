@@ -3,14 +3,57 @@
 
 <PipGui>:
     orientation: 'vertical'
+    output_window: output_window
+    scrollview: scrollview
     TextInput:
         id: textinput
-        text: 'plyer'
+        text: 'android'
         size_hint_y: None
         height: dp(30)
-    Button:
-        text: 'pip install'
-        on_release: root.do_install(textinput.text)
-    Button:
-        text: 'pip search'
-        on_release: root.do_search(textinput.text)
+    BoxLayout:
+        size_hint_y: None
+        height: dp(40)
+        Button:
+            text: 'pip install'
+            on_release: root.do_install(textinput.text)
+        Button:
+            text: 'pip search'
+            on_release: root.do_search(textinput.text)
+    ScrollView:
+        pos_hint: {'x': 0, 'y': 0}
+        id: scrollview
+        bar_width: dp(10)
+        InitiallyFullGridLayout:
+            height: max(scrollview.height, self.minimum_height)
+            size_hint_y: None
+            cols: 1
+            id: output_window
+            filling_widget_minimum_height: 0
+            canvas.before:
+                Color:
+                    rgba: 0.55, 0.55, 0.55, 0.55
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+                Color:
+                    rgba: 0, 0, 0, 1
+                Line:
+                    rectangle: [self.x, self.y, self.width, self.height]
+
+<PipOutputLabel>:
+    size_hint_y: None
+    height: self.texture_size[1] + dp(2)
+    text_size: self.width, None
+    font_name: 'RobotoMono-Regular.ttf'
+    padding_x: dp(10)
+    canvas.before:
+        Color:
+            rgba: 0.95, 0.95, 0.95, 0.95
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: (0.65, 0.95, 0.65, 1) if self.stream == 'stdout' else (0.95, 0.65, 0.65, 1)
+        Rectangle:
+            pos: self.pos
+            size: dp(5), self.height

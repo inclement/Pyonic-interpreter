@@ -36,7 +36,7 @@ class InterpreterWrapper(EventDispatcher):
 
     interpreter_number = 0
 
-    def __init__(self, use_thread=True):
+    def __init__(self, use_thread=True, throttle_output=True):
 
         self.register_event_type('on_execution_complete')
         self.register_event_type('on_missing_labels')
@@ -47,16 +47,19 @@ class InterpreterWrapper(EventDispatcher):
 
         self.subprocess = None
 
+        py_ver = sys.version_info.major
+        offset = (py_ver % 2) * 2
+        self.interpreter_port = 3000 + offset + 4 * InterpreterWrapper.interpreter_number
+        self.receive_port = 3001 + offset + 4 * InterpreterWrapper.interpreter_number
+        InterpreterWrapper.interpreter_number += 1
+
         self.use_thread = use_thread
+        self.throttle_output = throttle_output
 
         self.start_interpreter()
 
         self.input_index = 0  # The current input number
         self.inputs = {}  # All the inputs so far
-
-        py_ver = sys.version_info.major
-        self.interpreter_port = 3000 + 10 * py_ver
-        self.receive_port = 3001 + 10 * py_ver
 
         Clock.schedule_interval(self.read_osc_queue, 0.05)
 
@@ -91,11 +94,15 @@ class InterpreterWrapper(EventDispatcher):
                                        'interpreter.py')
 
         # prepare settings to send to interpreter
-        throttle_output = '1' if App.get_running_app().setting__throttle_output else '0'
+        # throttle_output = '1' if App.get_running_app().setting__throttle_output else '0'
+        throttle_output = '1' if self.throttle_output else '0'
 
         use_thread = '1' if self.use_thread else '0'
 
-        argument = 'throttle_output={}:use_thread={}'.format(throttle_output, use_thread)
+        argument = ('throttle_output={}:use_thread={}:'
+                    'send_port={}:receive_port={}').format(
+                        throttle_output, use_thread,
+                        self.receive_port, self.interpreter_port)
 
         if platform == 'android':
             from jnius import autoclass

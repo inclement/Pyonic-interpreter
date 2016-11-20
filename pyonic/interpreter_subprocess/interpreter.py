@@ -8,6 +8,7 @@ import time
 import ast
 import sys
 import os
+from os import path
 
 import traceback
 
@@ -15,8 +16,12 @@ import threading
 import ctypes
 import inspect
 
-# from kivy import platform
-platform = 'linux'
+from os.path import dirname, split, abspath
+sys.path.append(split(dirname(abspath(__file__)))[0])
+
+from utils import platform, site_packages_path
+
+sys.path.insert(0, site_packages_path)
 
 print('python service starting!')
 
@@ -24,8 +29,6 @@ py_ver = sys.version_info.major
 if sys.version_info.major >= 3:
     unicode_type = str
     if platform == 'android':
-        from os.path import dirname, split, abspath
-        sys.path.append(split(dirname(abspath(__file__)))[0])
         import osc
     else:
         from pyonic import osc
@@ -41,8 +44,11 @@ def real_print(*s):
     real_stdout.write(' '.join([str(item) for item in s]) + '\n')
     real_stdout.flush()
 
-send_port = 3001 + 10 * py_ver
-receive_port = 3000 + 10 * py_ver
+# send_port = 3001 + 10 * py_ver
+# receive_port = 3000 + 10 * py_ver
+
+send_port = 3001
+receive_port = 3000
 
 use_thread = True
 thread = None
@@ -234,6 +240,18 @@ class OscOut(object):
 
 print('got this far')
 
+to = os.environ.get('PYTHON_SERVICE_ARGUMENT', '')
+for entry in to.split(':'):
+    if entry.startswith('throttle_output='):
+        throttle_output = False if entry[16:] == '0' else True
+    if entry.startswith('use_thread='):
+        use_thread = False if entry[11:] == '0' else True
+    if entry.startswith('send_port='):
+        send_port = int(entry.split('=')[-1])
+    if entry.startswith('receive_port='):
+        receive_port = int(entry.split('=')[-1])
+
+
 osc.init()
 oscid = osc.listen(ipAddr='127.0.0.1', port=receive_port)
 osc.bind(oscid, receive_message, b'/interpret')
@@ -243,13 +261,6 @@ osc.bind(oscid, receive_message, b'/throttling')
 
 sys.stdout = OscOut(b'/stdout', send_port)
 sys.stderr = OscOut(b'/stderr', send_port)
-
-to = os.environ.get('PYTHON_SERVICE_ARGUMENT', '')
-for entry in to.split(':'):
-    if entry.startswith('throttle_output='):
-        throttle_output = False if entry[16:] == '0' else True
-    if entry.startswith('use_thread='):
-        use_thread = False if entry[11:] == '0' else True
 
 real_print('got this far4')
 
