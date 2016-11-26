@@ -21,7 +21,7 @@ options = {'apk': {'window': None,
                    }}
 setup(
     name='Pyonic Python 3 interpreter',
-    version='0.8',
+    version='0.9',
     description='A Python mobile IDE experiment',
     author='Alexander Taylor',
     author_email='alexanderjohntaylor@gmail.com',
