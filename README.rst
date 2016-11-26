@@ -3,7 +3,7 @@ Pyonic interpreter
 
 A Python interpreter interface for mobile devices. Pyonic interpreter
 is available for Android on Google Play, for `Python 2
-<https://play.google.com/store/apps/details?id=net.inclem.pyonicinterpreter>`
+<https://play.google.com/store/apps/details?id=net.inclem.pyonicinterpreter>`__
 or `Python 3
 <https://play.google.com/store/apps/details?id=net.inclem.pyonicinterpreter>`__. The
 app can also be run under Kivy on the desktop (Linux, OS X/macOS,
