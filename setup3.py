@@ -2,7 +2,12 @@ from setuptools import setup, find_packages
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
 
+from os.path import join, dirname
+
 packages = find_packages()
+
+with open(join(dirname(__file__), 'version.txt'), 'r') as fileh:
+    version = fileh.read().strip()
 
 options = {'apk': {'window': None,
                    'requirements': 'sdl2,kivy,python3crystax,pygments',
@@ -17,11 +22,11 @@ options = {'apk': {'window': None,
                    'icon': 'build_assets/icon_py3-96.png',
                    'presplash': 'build_assets/presplash.png',
                    # 'release': None,
-                   #'debug': None,
+                   # 'debug': None,
                    }}
 setup(
     name='Pyonic Python 3 interpreter',
-    version='1.0',
+    version=version,
     description='A Python mobile IDE experiment',
     author='Alexander Taylor',
     author_email='alexanderjohntaylor@gmail.com',
