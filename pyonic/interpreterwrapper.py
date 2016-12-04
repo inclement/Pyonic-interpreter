@@ -150,6 +150,7 @@ class InterpreterWrapper(EventDispatcher):
             if body[0] == 'completed_exec':
                 self.dispatch('on_execution_complete')
                 self.interpreter_state = 'waiting'
+                self.lock_input = False
                 # self.end_osc_listen()
 
             elif body[0] == 'received_command':
