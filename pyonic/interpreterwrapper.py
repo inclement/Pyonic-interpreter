@@ -36,7 +36,8 @@ class InterpreterWrapper(EventDispatcher):
 
     interpreter_number = 0
 
-    def __init__(self, use_thread=True, throttle_output=True):
+    def __init__(self, use_thread=True, throttle_output=True,
+                 thread_name='default'):
 
         self.register_event_type('on_execution_complete')
         self.register_event_type('on_missing_labels')
@@ -55,8 +56,9 @@ class InterpreterWrapper(EventDispatcher):
 
         self.use_thread = use_thread
         self.throttle_output = throttle_output
+        self.thread_name = thread_name
 
-        self.start_interpreter()
+        self.start_interpreter(thread_name)
 
         self.input_index = 0  # The current input number
         self.inputs = {}  # All the inputs so far
@@ -88,7 +90,9 @@ class InterpreterWrapper(EventDispatcher):
     def on_user_message(self, text):
         pass
 
-    def start_interpreter(self):
+    def start_interpreter(self, thread_name='default'):
+        # if thread_name == 'interpreter':
+        #     return
         interpreter_script_path = join(dirname(realpath(__file__)),
                                        'interpreter_subprocess',
                                        'interpreter.py')
@@ -108,6 +112,7 @@ class InterpreterWrapper(EventDispatcher):
             from jnius import autoclass
             service = autoclass('{}.ServiceInterpreter'.format(package_name))
             mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
+            # service.start(mActivity, argument, thread_name)
             service.start(mActivity, argument)
         else:
             # This may not actually work everywhere, but let's assume it does
@@ -197,10 +202,10 @@ class InterpreterWrapper(EventDispatcher):
             service = autoclass('{}.ServiceInterpreter'.format(package_name))
             mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
             service.stop(mActivity)
-            self.start_interpreter()
+            self.start_interpreter(self.thread_name)
         else:
             self.subprocess.kill()
-            self.start_interpreter()
+            self.start_interpreter(self.thread_name)
 
         self.lock_input = True
         self.interpreter_state = 'restarting'

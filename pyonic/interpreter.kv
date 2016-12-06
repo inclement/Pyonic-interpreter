@@ -103,6 +103,18 @@
             Rectangle:
                 pos: self.pos
                 size: self.size
+    CompletionsLabel:
+        id: completions
+        size_hint_y: None
+        height: sp(40)
+        canvas.before:
+            Color:
+                rgba: 0.1, 0.1, 0.1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        color: 1, 1, 1, 1
+                    
     BoxLayout:
         size_hint_y: None
         height: (app.setting__text_input_height * 1.3 + 0.5) * status_label.texture_size[1]

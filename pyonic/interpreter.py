@@ -28,8 +28,10 @@ from functools import partial
 
 if platform == 'android':
     from interpreterwrapper import InterpreterWrapper
+    from jediinterface import get_completions
 else:
     from pyonic.interpreterwrapper import InterpreterWrapper
+    from pyonic.jediinterface import get_completions
 
 import menu
 
@@ -225,6 +227,7 @@ class InterpreterInput(InputWidget):
         if self.disabled:
             return
         if text != '\n' or self.text == '':
+            get_completions(self.text + text, self.root.show_completions)
             return super(InterpreterInput, self).insert_text(text,
                                                              from_undo=from_undo)
 
@@ -290,7 +293,8 @@ class InterpreterGui(BoxLayout):
 
         self.interpreter = InterpreterWrapper(
             use_thread=True,
-            throttle_output=App.get_running_app().setting__throttle_output)
+            throttle_output=App.get_running_app().setting__throttle_output,
+            thread_name='interpreter')
         self.interpreter.bind(interpreter_state=self.setter('interpreter_state'))
         self.interpreter.bind(lock_input=self.setter('lock_input'))
 
@@ -535,6 +539,15 @@ class InterpreterGui(BoxLayout):
         self.lock_input = False
         self.halting = False
         self.ensure_no_ctrl_c_button()
+
+    def show_completions(self, completions):
+        self.ids.completions.text = ', '.join(completions[:5])
+        print('set text')
+
+
+class CompletionsLabel(Label):
+    pass
+
 
 class RestartPopup(ModalView):
     interpreter_gui = ObjectProperty()
