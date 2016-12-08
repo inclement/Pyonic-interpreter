@@ -200,6 +200,8 @@ class InterpreterInput(InputWidget):
     '''
     root = ObjectProperty()
 
+    trigger_completions = BooleanProperty(True)
+
     def __init__(self, *args, **kwargs):
         super(InterpreterInput, self).__init__(*args, **kwargs)
         if platform != 'android':
@@ -224,14 +226,22 @@ class InterpreterInput(InputWidget):
         if not self.is_focusable:
             self.focus = False
 
-    # def on_text(self, instance, text):
+    def on_cursor(self, instance, value):
+        super(InterpreterInput, self).on_cursor(instance, value)
+        self.get_completions()
 
-    def insert_text(self, text, from_undo=False, complete=True):
+    def get_completions(self, extra_text=''):
+        if not self.trigger_completions:
+            return
+        get_completions(self.text + extra_text,
+                        self.root.show_completions)
+    
+
+    def insert_text(self, text, from_undo=False):
         if self.disabled:
             return
         if text != '\n' or self.text == '':
-            if complete:
-                get_completions(self.text + text, self.root.show_completions)
+            # self.get_completions(text)
             return super(InterpreterInput, self).insert_text(text,
                                                              from_undo=from_undo)
 
@@ -561,16 +571,17 @@ class CompletionButton(KeyboardButton):
 
     completion = ObjectProperty()
 
-    colour_mappings = {'keyword': (0, 0.7, 0, 0.3),
-                       'instance': (0.7, 0, 0, 0.3),
-                       'function': (0, 0, 0.7, 0.3),
-                       'module': (0.7, 0.7, 0, 0.3)}
+    colour_mappings = {'keyword': (0, 0.8, 0, 0.1),
+                       'instance': (0.8, 0, 0, 0.1),
+                       'function': (0, 0, 0.8, 0.1),
+                       'module': (0.8, 0.8, 0, 0.1)}
 
     def on_release(self):
         self.interpreter_gui.ids.completions.completions = []
+        self.interpreter_gui.code_input.trigger_completions = False
         for letter in self.completion.complete:
-            self.interpreter_gui.code_input.insert_text(letter,
-                                                        complete=False)
+            self.interpreter_gui.code_input.insert_text(letter)
+        self.interpreter_gui.code_input.trigger_completions = True
 
 
 class CompletionsList(GridLayout):
@@ -583,7 +594,9 @@ class CompletionsList(GridLayout):
         self.clear_widgets()
         
         for completion in completions[:5]:
-            print('doing completion', completion)
+            print('doing completion', completion, completion.complete)
+            if not completion.complete:
+                continue
             self.add_widget(CompletionButton(
                 # text=completion.name,
                 completion=completion,
