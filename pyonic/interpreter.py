@@ -231,18 +231,14 @@ class InterpreterInput(InputWidget):
         self.get_completions()
 
     def get_completions(self, extra_text=''):
-        line, index = self.currently_edited_line()
-        print('current line', line, index)
-        if index == 0 or len(line) < 2:
+        row_index, line, col_index = self.currently_edited_line()
+        print('current line', row_index, line, col_index)
+        if col_index == 0:
             self.root.clear_completions()
             return
 
-        completion_breakers = [' ', '.', ',', '(', ')']
-        if line[index - 1] in completion_breakers:
-            self.root.clear_completions()
-            return
-
-        if index >= 2 and line[index - 2] in completion_breakers:
+        completion_breakers = [' ', '.', ',', '(', ')', ':']
+        if line[col_index - 1] in completion_breakers:
             self.root.clear_completions()
             return
 
@@ -252,13 +248,14 @@ class InterpreterInput(InputWidget):
         self.root.get_completions(extra_text)
 
     def currently_edited_line(self):
+        '''Returns the row number, line text and column number for the current cursor pos.'''
         index = self.cursor_index()
         lines = self.text.split('\n')
         cur_num = 0
-        for line in lines:
+        for i, line in enumerate(lines):
             line_length = len(line) + 1  # The +1 is for the deleted \n
             if cur_num + line_length > index:
-                return line, index - cur_num
+                return i, line, index - cur_num
             cur_num += line_length
         raise ValueError('Could not identify currently edited line')  # TODO: make not an error
 
@@ -326,6 +323,13 @@ class InterpreterGui(BoxLayout):
     will always be displayed, but this *will* cause problems with
     e.g. a constantly printing while loop.
     '''
+
+    interpreted_lines = ListProperty([])
+    '''A list of the lines of code that have been executed so far.'''
+
+    num_running_completions = 0
+    '''Counts the number of active jedi completion threads.'''
+
 
     def __init__(self, *args, **kwargs):
         super(InterpreterGui, self).__init__(*args, **kwargs)
@@ -430,6 +434,7 @@ class InterpreterGui(BoxLayout):
         self.animation.start(self)
 
     def interpret_line(self, text):
+        self.interpreted_lines.append(text)
         index = self.interpreter.interpret_line(text)
         self.add_input_label(text, index)
         self.ensure_ctrl_c_button()
@@ -582,13 +587,29 @@ class InterpreterGui(BoxLayout):
         self.ensure_no_ctrl_c_button()
 
     def get_completions(self, extra_text=''):
+
+        previous_text = '\n'.join(self.interpreted_lines)
+        num_previous_lines = len(previous_text.split('\n'))
+        print('num previous is', num_previous_lines)
+
         text = self.code_input.text
-        get_completions(text + extra_text,
-                        self.show_completions)
+        row_index, line, col_index = self.code_input.currently_edited_line()
+        if self.num_running_completions > 3:
+            return
+        self.num_running_completions += 1
+
+        print('previous text is', previous_text)
+        print('text is', text)
+        print('join is', '\n'.join([previous_text, text + extra_text]))
+
+        get_completions('\n'.join([previous_text, text + extra_text]),
+                        self.show_completions,
+                        line=row_index + num_previous_lines + 1)
 
     def show_completions(self, completions):
         print('got completions', completions)
         self.ids.completions.completions = completions
+        self.num_running_completions -= 1
         # self.ids.completions.text = ', '.join(completions[:5])
         # print('set text')
 
@@ -623,6 +644,9 @@ class CompletionsList(GridLayout):
     def on_completions(self, instance, completions):
         self.clear_widgets()
         
+        if len(completions) > 5:
+            print('too many completions, not showing options')
+
         for completion in completions[:5]:
             print('doing completion', completion, completion.complete)
             if not completion.complete:
