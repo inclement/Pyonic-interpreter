@@ -231,11 +231,36 @@ class InterpreterInput(InputWidget):
         self.get_completions()
 
     def get_completions(self, extra_text=''):
-        if not self.trigger_completions:
+        line, index = self.currently_edited_line()
+        print('current line', line, index)
+        if index == 0 or len(line) < 2:
+            self.root.clear_completions()
             return
-        get_completions(self.text + extra_text,
-                        self.root.show_completions)
-    
+
+        completion_breakers = [' ', '.', ',', '(', ')']
+        if line[index - 1] in completion_breakers:
+            self.root.clear_completions()
+            return
+
+        if index >= 2 and line[index - 2] in completion_breakers:
+            self.root.clear_completions()
+            return
+
+        if not self.trigger_completions:
+            self.root.clear_completions()
+            return
+        self.root.get_completions(extra_text)
+
+    def currently_edited_line(self):
+        index = self.cursor_index()
+        lines = self.text.split('\n')
+        cur_num = 0
+        for line in lines:
+            line_length = len(line) + 1  # The +1 is for the deleted \n
+            if cur_num + line_length > index:
+                return line, index - cur_num
+            cur_num += line_length
+        raise ValueError('Could not identify currently edited line')  # TODO: make not an error
 
     def insert_text(self, text, from_undo=False):
         if self.disabled:
@@ -556,13 +581,18 @@ class InterpreterGui(BoxLayout):
         self.halting = False
         self.ensure_no_ctrl_c_button()
 
+    def get_completions(self, extra_text=''):
+        text = self.code_input.text
+        get_completions(text + extra_text,
+                        self.show_completions)
+
     def show_completions(self, completions):
         print('got completions', completions)
         self.ids.completions.completions = completions
         # self.ids.completions.text = ', '.join(completions[:5])
         # print('set text')
 
-    def clear_completions(self, completion):
+    def clear_completions(self):
         self.ids.completions.completions = []
 
 
