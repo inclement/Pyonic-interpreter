@@ -28,6 +28,7 @@ from functools import partial
 
 if platform == 'android':
     from interpreterwrapper import InterpreterWrapper
+    import pydoc_data
     from jediinterface import get_completions
 else:
     from pyonic.interpreterwrapper import InterpreterWrapper
@@ -223,13 +224,18 @@ class InterpreterInput(InputWidget):
         if not self.is_focusable:
             self.focus = False
 
-    def insert_text(self, text, from_undo=False):
+    # def on_text(self, instance, text):
+
+    def insert_text(self, text, from_undo=False, complete=True):
         if self.disabled:
             return
         if text != '\n' or self.text == '':
-            get_completions(self.text + text, self.root.show_completions)
+            if complete:
+                get_completions(self.text + text, self.root.show_completions)
             return super(InterpreterInput, self).insert_text(text,
                                                              from_undo=from_undo)
+
+        self.root.ids.completions.completions = []
 
         print(self.text.split('\n'))
         last_line = self.text.split('\n')[-1].rstrip()
@@ -541,12 +547,49 @@ class InterpreterGui(BoxLayout):
         self.ensure_no_ctrl_c_button()
 
     def show_completions(self, completions):
-        self.ids.completions.text = ', '.join(completions[:5])
-        print('set text')
+        print('got completions', completions)
+        self.ids.completions.completions = completions
+        # self.ids.completions.text = ', '.join(completions[:5])
+        # print('set text')
+
+    def clear_completions(self, completion):
+        self.ids.completions.completions = []
 
 
-class CompletionsLabel(Label):
-    pass
+class CompletionButton(KeyboardButton):
+    interpreter_gui = ObjectProperty()
+
+    completion = ObjectProperty()
+
+    colour_mappings = {'keyword': (0, 0.7, 0, 0.3),
+                       'instance': (0.7, 0, 0, 0.3),
+                       'function': (0, 0, 0.7, 0.3),
+                       'module': (0.7, 0.7, 0, 0.3)}
+
+    def on_release(self):
+        self.interpreter_gui.ids.completions.completions = []
+        for letter in self.completion.complete:
+            self.interpreter_gui.code_input.insert_text(letter,
+                                                        complete=False)
+
+
+class CompletionsList(GridLayout):
+    completions = ListProperty([])
+    completion_type = StringProperty()
+    completion_completion = StringProperty()
+
+    interpreter_gui = ObjectProperty()
+    def on_completions(self, instance, completions):
+        self.clear_widgets()
+        
+        for completion in completions[:5]:
+            print('doing completion', completion)
+            self.add_widget(CompletionButton(
+                # text=completion.name,
+                completion=completion,
+                interpreter_gui=self.interpreter_gui))
+
+
 
 
 class RestartPopup(ModalView):
