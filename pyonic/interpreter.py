@@ -242,6 +242,9 @@ class InterpreterInput(InputWidget):
         if line[col_index - 1] in completion_breakers:
             self.root.clear_completions()
             return
+        if col_index + 1 < len(line) and line[col_index] not in completion_breakers:
+            self.root.clear_completions()
+            return
 
         if not self.trigger_completions:
             self.root.clear_completions()
@@ -605,7 +608,8 @@ class InterpreterGui(BoxLayout):
 
         get_completions('\n'.join([previous_text, text + extra_text]),
                         self.show_completions,
-                        line=row_index + num_previous_lines + 1)
+                        line=row_index + num_previous_lines + 1,
+                        col=col_index)
 
     def show_completions(self, completions):
         print('got completions', completions)
@@ -621,6 +625,10 @@ class InterpreterGui(BoxLayout):
 class CompletionButton(KeyboardButton):
     interpreter_gui = ObjectProperty()
 
+    completion_type = StringProperty()
+    completion_name = StringProperty()
+    completion_complete = StringProperty()
+
     completion = ObjectProperty()
 
     colour_mappings = {'keyword': (0, 0.8, 0, 0.1),
@@ -635,6 +643,11 @@ class CompletionButton(KeyboardButton):
             self.interpreter_gui.code_input.insert_text(letter)
         self.interpreter_gui.code_input.trigger_completions = True
 
+    def on_completion(self, instance, completion):
+        self.completion_type = completion.type
+        self.completion_name = completion.name
+        self.completion_complete = completion.complete
+
 
 class CompletionsList(StackLayout):
     completions = ListProperty([])
@@ -643,19 +656,30 @@ class CompletionsList(StackLayout):
 
     interpreter_gui = ObjectProperty()
     def on_completions(self, instance, completions):
-        self.clear_widgets()
+        # self.clear_widgets()
         
         if len(completions) > 5:
             print('too many completions, not showing options')
+            self.clear_widgets()
 
+        removals = self.children[:]
         for completion in completions[:5]:
             print('doing completion', completion, completion.complete)
             if not completion.complete:
                 continue
-            self.add_widget(CompletionButton(
-                # text=completion.name,
-                completion=completion,
-                interpreter_gui=self.interpreter_gui))
+            for widget in self.children:
+                if widget.completion.name == completion.name:
+                    widget.completion = completion
+                    removals.remove(widget)
+                    break
+            else:
+                self.add_widget(CompletionButton(
+                    # text=completion.name,
+                    completion=completion,
+                    interpreter_gui=self.interpreter_gui))
+
+        for removal in removals:
+            self.remove_widget(removal)
 
 
 

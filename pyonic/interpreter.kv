@@ -396,8 +396,7 @@
 
 
 <CompletionButton>:
-    completion_type: self.completion.type
-    text: '{}[color=6666aa]{}[/color]'.format(self.completion.name[:-len(self.completion.complete)], self.completion.name[-len(self.completion.complete):])
+    text: '{}[color=6666aa]{}[/color]'.format(self.completion_name[:-len(self.completion_complete)], self.completion_name[-len(self.completion_complete):])
     size_hint_x: None
     width: self.texture_size[0] + dp(20)
     radius: dp(5)
