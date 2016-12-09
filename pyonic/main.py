@@ -99,10 +99,15 @@ class PyonicApp(App):
     setting__throttle_output_default = True
     setting__show_input_buttons = BooleanProperty()
     setting__show_input_buttons_default = True
+    setting__autocompletion = BooleanProperty()
+    setting__autocompletion_default = True
     setting__text_input_height = NumericProperty()
     setting__text_input_height_default = 3
     setting__rotation = StringProperty()
     setting__rotation_default = 'portrait'
+
+    def on_setting__autocompletion(self, instance, value):
+        print('app autocompletion', value)
     
     def build(self):
         self.settings_retrieved = False  # used to prevent setting

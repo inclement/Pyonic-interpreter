@@ -7,6 +7,7 @@
     setting__show_input_buttons: show_input_buttons.active
     setting__text_input_height: text_input_height.value
     setting__rotation: rotation.value
+    setting__autocompletion: autocompletion.active
 
     canvas:
         Color: 
@@ -71,6 +72,13 @@
                     description: 'If disabled, hides the extra input buttons when text is not being entered.'
                     input_column_width_setter: text_input_height.input_column_width
                     active: root.setting__show_input_buttons
+                Spacer:
+                BooleanSetting:
+                    id: autocompletion
+                    name: 'Enable autocompletion'
+                    description: 'Display autocompletion options while entering text. Also enables the documentation button.'
+                    input_column_width_setter: text_input_height.input_column_width
+                    active: root.setting__autocompletion
                 Spacer:
                 SmallIntSetting:
                     id: text_input_height

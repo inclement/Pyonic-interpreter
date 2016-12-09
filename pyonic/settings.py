@@ -87,6 +87,7 @@ class InterpreterSettingsScreen(Screen):
     # Properties relating to settings
     setting__throttle_output = BooleanProperty()
     setting__show_input_buttons = BooleanProperty()
+    setting__autocompletion = BooleanProperty()
     setting__text_input_height = NumericProperty()
     setting__rotation = StringProperty()
 
