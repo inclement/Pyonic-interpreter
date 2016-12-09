@@ -8,6 +8,7 @@ from kivy.uix.button import Button
 from kivy.uix.carousel import Carousel
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.stacklayout import StackLayout
 from kivy.uix.behaviors import FocusBehavior
 from kivy.uix.modalview import ModalView
 from kivy.event import EventDispatcher
@@ -635,7 +636,7 @@ class CompletionButton(KeyboardButton):
         self.interpreter_gui.code_input.trigger_completions = True
 
 
-class CompletionsList(GridLayout):
+class CompletionsList(StackLayout):
     completions = ListProperty([])
     completion_type = StringProperty()
     completion_completion = StringProperty()

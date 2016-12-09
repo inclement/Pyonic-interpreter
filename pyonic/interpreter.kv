@@ -103,12 +103,6 @@
             Rectangle:
                 pos: self.pos
                 size: self.size
-    CompletionsList:
-        id: completions
-        size_hint_y: None
-        height: sp(40)
-        interpreter_gui: root
-                    
     BoxLayout:
         size_hint_y: None
         height: (app.setting__text_input_height * 1.3 + 0.5) * status_label.texture_size[1]
@@ -152,6 +146,12 @@
                 background_down: 0.2, 0, 0, 1
                 radius: 0
                 padding: 0
+    CompletionsList:
+        id: completions
+        size_hint_y: None
+        height: sp(40)
+        interpreter_gui: root
+                    
     BoxLayout:
         size_hint_y: None
         height: sp(35) if (input.focus or app.setting__show_input_buttons) else 0
@@ -379,7 +379,8 @@
                 
             
 <CompletionsList>:
-    rows: 1
+    orientation: 'rl-tb'
+    spacing: dp(3)
     # canvas.before:
     #     Color:
     #         rgba: 0.1, 0.1, 0.1, 0.1
