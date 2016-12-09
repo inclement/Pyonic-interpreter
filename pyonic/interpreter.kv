@@ -146,11 +146,20 @@
                 background_down: 0.2, 0, 0, 1
                 radius: 0
                 padding: 0
-    CompletionsList:
-        id: completions
+    BoxLayout:
+        orientation: 'horizontal'
         size_hint_y: None
         height: sp(40)
-        interpreter_gui: root
+        KeyboardButton:
+            radius: dp(5)
+            padding: dp(3)
+            text: 'doc'
+            on_release: root.get_defs()
+            size_hint_x: None
+            width: self.texture_size[0] + dp(20)
+        CompletionsList:
+            id: completions
+            interpreter_gui: root
                     
     BoxLayout:
         size_hint_y: None
@@ -281,6 +290,37 @@
         Rectangle:
             pos: self.pos
             size: dp(5), self.height
+
+<DocLabel>:
+    size_hint_y: None
+    height: self.texture_size[1] + dp(2)
+    text_size: self.width, None
+    font_name: 'RobotoMono-Regular.ttf'
+    padding_x: dp(10)
+    canvas.before:
+        Color:
+            rgba: 0.976, 0.9, 0.776, 0.8
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: self.background_colour
+        Rectangle:
+            pos: self.pos
+            size: dp(5), self.height
+    KeyboardButton:
+        size: dp(30), min(dp(30), root.height)
+        text_size: self.size
+        valign: 'middle'
+        halign: 'center'
+        text: 'c'
+        font_name: 'assets/fontello.ttf'
+        background_normal: 0.6, 0.05, 0., 1
+        pos: root.right - dp(30), root.top - self.height
+        # on_press: root.parent.remove_widget(root)
+        on_press: root.remove()
+        
+                
 
 <NotificationLabel>:
     size_hint_y: None

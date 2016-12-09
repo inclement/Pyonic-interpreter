@@ -30,10 +30,10 @@ from functools import partial
 if platform == 'android':
     from interpreterwrapper import InterpreterWrapper
     import pydoc_data
-    from jediinterface import get_completions
+    from jediinterface import get_completions, get_defs
 else:
     from pyonic.interpreterwrapper import InterpreterWrapper
-    from pyonic.jediinterface import get_completions
+    from pyonic.jediinterface import get_completions, get_defs
 
 import menu
 
@@ -168,6 +168,16 @@ class InputLabel(Label):
 class UserMessageLabel(Label):
     background_colour = ListProperty([1, 1, 0, 1])
 
+class DocLabel(Label):
+    background_colour = ListProperty([0.8, 0.8, 0, 1])
+
+    def remove(self):
+        anim = Animation(height=0, opacity=0, d=0.9, t='out_expo')
+        anim.bind(on_complete=self._remove)
+        anim.start(self)
+
+    def _remove(self, *args):
+        self.parent.remove_widget(self)
 
 class NotificationLabel(Label):
     background_colour = ListProperty([1, 0, 0, 0.5])
@@ -448,6 +458,11 @@ class InterpreterGui(BoxLayout):
         self.output_window.add_widget(l)
         self.scrollview.scroll_to(l)
 
+    def add_doc_label(self, text, **kwargs):
+        l = DocLabel(text=text, **kwargs)
+        self.output_window.add_widget(l)
+        self.scrollview.scroll_to(l)
+
     def add_input_label(self, text, index):
         l = InputLabel(text=text, index=index, root=self)
         self.output_window.add_widget(l)
@@ -589,6 +604,34 @@ class InterpreterGui(BoxLayout):
         self.lock_input = False
         self.halting = False
         self.ensure_no_ctrl_c_button()
+
+    def get_defs(self):
+        previous_text = '\n'.join(self.interpreted_lines)
+        num_previous_lines = len(previous_text.split('\n'))
+        print('num previous is', num_previous_lines)
+
+        text = self.code_input.text
+        row_index, line, col_index = self.code_input.currently_edited_line()
+
+        get_defs('\n'.join([previous_text, text]),
+                 self.show_defs,
+                 line=row_index + num_previous_lines + 1,
+                 col=col_index)
+
+    def show_defs(self, defs):
+        print('docs are', defs)
+        if not defs:
+            self.add_doc_label('No definition found at cursor')
+            return
+
+        d = defs[0]
+        
+        text = '\n'.join(['module: {}'.format(d.module_name),
+                          'type: {}'.format(d.type),
+                          'params: {}'.format(d.params),
+                          'docstring:',
+                          d.doc])
+        self.add_doc_label(text)
 
     def get_completions(self, extra_text=''):
 
