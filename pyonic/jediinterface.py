@@ -50,15 +50,18 @@ def get_completions(source, func, line=None, col=None):
     t.start()
 
 def _get_completions(source, func, line=None, column=None):
-    num_lines = len(source.split('\n'))
-    if line is None:
-        line = num_lines
-    s = Script(source, line=line, column=column)
-    completions = s.completions()
-    print('### input:')
-    print(source)
-    print('### completions:')
-    print('\n'.join([c.name for c in completions]))
+    try:
+        num_lines = len(source.split('\n'))
+        if line is None:
+            line = num_lines
+        s = Script(source, line=line, column=column)
+        completions = s.completions()
+        print('### input:')
+        print(source)
+        print('### completions:')
+        print('\n'.join([c.name for c in completions]))
+    except:
+        completions = []
 
     mainthread(WrappablePartial(func, [c for c in completions]))()
 
@@ -68,10 +71,15 @@ def get_defs(source, func, line=None, col=None):
     t.start()
 
 def _get_defs(source, func, line=None, column=None):
-    num_lines = len(source.split('\n'))
-    if line is None:
-        line = num_lines
-    s = Script(source, line=line, column=column)
-    defs = s.goto_definitions()
+    error = None
+    try:
+        num_lines = len(source.split('\n'))
+        if line is None:
+            line = num_lines
+        s = Script(source, line=line, column=column)
+        defs = s.goto_definitions()
+    except:
+        defs = []
+        error = 'Could not retrieve docstring'
 
-    mainthread(WrappablePartial(func, defs))()
+    mainthread(WrappablePartial(func, defs, error=error))()

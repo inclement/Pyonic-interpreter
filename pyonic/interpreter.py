@@ -245,12 +245,13 @@ class InterpreterInput(InputWidget):
 
     def get_completions(self, extra_text=''):
         row_index, line, col_index = self.currently_edited_line()
-        print('current line', row_index, line, col_index)
         if col_index == 0:
             self.root.clear_completions()
             return
 
-        completion_breakers = [' ', '.', ',', '(', ')', ':']
+        completion_breakers = [' ', '.', ',', '(', ')', ':',
+                               '#', '[', ']', '{', '}', '&',
+                               '\\', '/', '+', '*',]
         if line[col_index - 1] in completion_breakers:
             self.root.clear_completions()
             return
@@ -615,7 +616,6 @@ class InterpreterGui(BoxLayout):
             return
         previous_text = '\n'.join(self.interpreted_lines)
         num_previous_lines = len(previous_text.split('\n'))
-        print('num previous is', num_previous_lines)
 
         text = self.code_input.text
         row_index, line, col_index = self.code_input.currently_edited_line()
@@ -625,8 +625,11 @@ class InterpreterGui(BoxLayout):
                  line=row_index + num_previous_lines + 1,
                  col=col_index)
 
-    def show_defs(self, defs):
+    def show_defs(self, defs, error=None):
         print('docs are', defs)
+        if error is not None:
+            self.add_doc_label(error)
+            return
         if not defs:
             self.add_doc_label('No definition found at cursor')
             return
@@ -658,6 +661,7 @@ class InterpreterGui(BoxLayout):
 
         text = self.code_input.text
         row_index, line, col_index = self.code_input.currently_edited_line()
+        print('num running completions is', self.num_running_completions)
         if self.num_running_completions > 3:
             return
         self.num_running_completions += 1
