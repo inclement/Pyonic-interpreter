@@ -21,6 +21,7 @@ options = {'apk': {'window': None,
                    'arch': 'armeabi-v7a',
                    'icon': 'build_assets/icon_py3-96.png',
                    'presplash': 'build_assets/presplash.png',
+                   'whitelist': 'build_assets/whitelist.txt',
                    # 'release': None,
                    # 'debug': None,
                    }}
