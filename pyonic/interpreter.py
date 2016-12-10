@@ -748,6 +748,12 @@ class CompletionsList(StackLayout):
         for removal in removals:
             self.remove_widget(removal)
 
+    def on_width(self, instance, value):
+        self.on_minimum_width(self, self.minimum_width)
+
+    def on_minimum_width(self, instance, value):
+        while sum([c.width for c in self.children]) > self.width:
+            self.remove_widget(self.children[0])
 
 
 
