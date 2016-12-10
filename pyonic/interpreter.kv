@@ -321,6 +321,12 @@
         Rectangle:
             pos: self.pos
             size: dp(5), self.height
+        Color:
+            rgba: 0.3, 0.3, 0.3, 1
+        Rectangle:
+            pos: self.pos
+            size: self.width, 1
+                
     KeyboardButton:
         size: dp(40), min(dp(40), root.height)
         text_size: self.size

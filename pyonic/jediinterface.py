@@ -38,12 +38,6 @@ class WrappablePartial(partial):
 
 def get_completions(source, func, line=None, col=None):
 
-    print('============')
-    print('asked to complete for:')
-    print(source)
-    print('row', line, 'col', col)
-    print('============')
-
     func = partial(func, time=time())
 
     t = threading.Thread(target=WrappablePartial(_get_completions, source, func, line=line, column=col))
@@ -58,10 +52,10 @@ def _get_completions(source, func, line=None, column=None):
             line = num_lines
         s = Script(source, line=line, column=column)
         completions = s.completions()
-        print('### input:')
-        print(source)
-        print('### completions:')
-        print('\n'.join([c.name for c in completions]))
+        # print('### input:')
+        # print(source)
+        # print('### completions:')
+        # print('\n'.join([c.name for c in completions]))
     except:
         completions = []
 

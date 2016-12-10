@@ -251,7 +251,8 @@ class InterpreterInput(InputWidget):
 
         completion_breakers = [' ', '.', ',', '(', ')', ':',
                                '#', '[', ']', '{', '}', '&',
-                               '\\', '/', '+', '*',]
+                               '\\', '/', '+', '*', '\'', '\"',
+                               '|', '=', '^', '%']
         if line[col_index - 1] in completion_breakers:
             self.root.clear_completions()
             return
@@ -641,7 +642,7 @@ class InterpreterGui(BoxLayout):
         #                   d.doc])
         if hasattr(d, 'params'):
             text = '{}({})\n{}'.format(d.desc_with_module,
-                                            ', '.join([p.name for p in d.params]),
+                                            ', '.join([p.description for p in d.params]),
                                             d.doc)
         else:
             text = '{}\n{}'.format(d.desc_with_module,
@@ -654,7 +655,6 @@ class InterpreterGui(BoxLayout):
             if not thread.is_alive():
                 print('thread {} has finished'.format(thread))
                 self.completion_threads.remove(thread)
-        print('pruned completions', self.completion_threads)
 
     def get_completions(self, extra_text=''):
         if not self.enable_autocompletion:
@@ -662,17 +662,12 @@ class InterpreterGui(BoxLayout):
         
         previous_text = '\n'.join(self.interpreted_lines)
         num_previous_lines = len(previous_text.split('\n'))
-        print('num previous is', num_previous_lines)
 
         text = self.code_input.text
         row_index, line, col_index = self.code_input.currently_edited_line()
         self.check_completion_threads()
         if len(self.completion_threads) > 3:
             return
-
-        print('previous text is', previous_text)
-        print('text is', text)
-        print('join is', '\n'.join([previous_text, text + extra_text]))
 
         thread = get_completions('\n'.join([previous_text, text + extra_text]),
                                  self.show_completions,
@@ -686,13 +681,11 @@ class InterpreterGui(BoxLayout):
                 return
             self.most_recent_completion_time = time
 
-        print('got completions', completions)
         self.ids.completions.completions = completions
         # self.ids.completions.text = ', '.join(completions[:5])
         # print('set text')
 
     def clear_completions(self):
-        print('clearing completions')
         self.most_recent_completion_time = time()  # block running completions
         self.ids.completions.completions = []
 
@@ -739,7 +732,6 @@ class CompletionsList(StackLayout):
 
         removals = self.children[:]
         for completion in completions[:5]:
-            print('doing completion', completion, completion.complete)
             if not completion.complete:
                 continue
             for widget in self.children:
