@@ -8,6 +8,8 @@ from kivy.clock import mainthread
 
 from functools import partial
 
+from time import time
+
 import threading
 
 
@@ -42,6 +44,8 @@ def get_completions(source, func, line=None, col=None):
     print('row', line, 'col', col)
     print('============')
 
+    func = partial(func, time=time())
+
     t = threading.Thread(target=WrappablePartial(_get_completions, source, func, line=line, column=col))
     t.start()
 
@@ -60,7 +64,6 @@ def _get_completions(source, func, line=None, column=None):
 
 
 def get_defs(source, func, line=None, col=None):
-
     t = threading.Thread(target=WrappablePartial(_get_defs, source, func, line=line, column=col))
     t.start()
 

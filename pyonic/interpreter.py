@@ -346,6 +346,9 @@ class InterpreterGui(BoxLayout):
     num_running_completions = 0
     '''Counts the number of active jedi completion threads.'''
 
+    most_recent_completion_time = 0.
+    '''The most recent timestamp from a completion. New completions with
+    older timestamps will be ignored.'''
 
     def __init__(self, *args, **kwargs):
         super(InterpreterGui, self).__init__(*args, **kwargs)
@@ -635,9 +638,14 @@ class InterpreterGui(BoxLayout):
         #                   'params: {}'.format(d.params),
         #                   'docstring:',
         #                   d.doc])
-        text = '{}({})\n{}'.format(d.desc_with_module,
-                                          ', '.join([p.name for p in d.params]),
-                                          d.doc)
+        if hasattr(d, 'params'):
+            text = '{}({})\n{}'.format(d.desc_with_module,
+                                            ', '.join([p.name for p in d.params]),
+                                            d.doc)
+        else:
+            text = '{}\n{}'.format(d.desc_with_module,
+                                   d.doc)
+            
         self.add_doc_label(text)
 
     def get_completions(self, extra_text=''):
@@ -663,14 +671,21 @@ class InterpreterGui(BoxLayout):
                         line=row_index + num_previous_lines + 1,
                         col=col_index)
 
-    def show_completions(self, completions):
+    def show_completions(self, completions, time=None):
+        self.num_running_completions -= 1
+        if time is not None:
+            if time < self.most_recent_completion_time:
+                return
+            self.most_recent_completion_time = time
+
         print('got completions', completions)
         self.ids.completions.completions = completions
-        self.num_running_completions -= 1
         # self.ids.completions.text = ', '.join(completions[:5])
         # print('set text')
 
     def clear_completions(self):
+        print('clearing completions')
+        self.most_recent_completion_time = time()  # block running completions
         self.ids.completions.completions = []
 
 
