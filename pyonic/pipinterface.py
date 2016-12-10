@@ -41,7 +41,8 @@ class PipGui(BoxLayout):
     def __init__(self, *args, **kwargs):
         print('args kwargs', args, kwargs)
         super(PipGui, self).__init__(*args, **kwargs)
-        self.interpreter = InterpreterWrapper(throttle_output=False, use_thread=False)
+        self.interpreter = InterpreterWrapper(throttle_output=False, use_thread=False,
+                                              thread_name='pip')
 
         self.interpreter.bind(on_stdout=self.on_stdout)
         self.interpreter.bind(on_stderr=self.on_stderr)

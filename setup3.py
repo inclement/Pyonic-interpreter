@@ -10,7 +10,7 @@ with open(join(dirname(__file__), 'version.txt'), 'r') as fileh:
     version = fileh.read().strip()
 
 options = {'apk': {'window': None,
-                   'requirements': 'sdl2,kivy,python3crystax,pygments',
+                   'requirements': 'sdl2,kivy,python3crystax,pygments,jedi',
                    'android-api': 19,
                    'ndk-dir': '/home/asandy/android/crystax-ndk-10.3.2',
                    'dist-name': 'pyonic_python3',
@@ -35,5 +35,6 @@ setup(
     package_data={'pyonic': ['*.py', '*.kv'],
                   'pyonic/interpreter_subprocess': ['*.py'],
                   'pyonic/assets': ['*.ttf', '*.txt'],
+                  'pyonic/pydoc_data': ['*.py'],
                   'pyonic/osc': ['*.py']}
 )

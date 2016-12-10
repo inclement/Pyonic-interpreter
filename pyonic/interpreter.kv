@@ -17,6 +17,8 @@
     scrollview: scrollview
     orientation: 'vertical'
     throttle_label_output: app.setting__throttle_output
+    enable_autocompletion: app.setting__autocompletion
+    on_enable_autocompletion: print('interpretergui autocompletion')
     canvas:
         Color:
             rgba: 0.9, 0.9, 0.9, 1
@@ -147,6 +149,24 @@
                 radius: 0
                 padding: 0
     BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: sp(40) if root.enable_autocompletion else 0
+        opacity: 1 if root.enable_autocompletion else 0
+        disabled: not root.enable_autocompletion
+        KeyboardButton:
+            radius: dp(5)
+            padding: dp(3)
+            text: 'doc'
+            on_release: root.get_defs()
+            size_hint_x: None
+            width: self.texture_size[0] + dp(20)
+            background_normal: 0.5, 0.5, 0.8, 0.8
+        CompletionsList:
+            id: completions
+            interpreter_gui: root
+                    
+    BoxLayout:
         size_hint_y: None
         height: sp(35) if (input.focus or app.setting__show_input_buttons) else 0
         opacity: 1 if (input.focus or app.setting__show_input_buttons) else 0
@@ -276,6 +296,39 @@
             pos: self.pos
             size: dp(5), self.height
 
+<DocLabel>:
+    size_hint_y: None
+    height: self.texture_size[1] + dp(2)
+    text_size: self.width, None
+    font_name: 'RobotoMono-Regular.ttf'
+    padding_x: dp(10)
+    opacity: max(0, 2*(self.double_opacity - 0.5))
+    markup: True
+    canvas.before:
+        Color:
+            rgba: 1., 0.95, 0.678, 1.
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: self.background_colour
+        Rectangle:
+            pos: self.pos
+            size: dp(5), self.height
+    KeyboardButton:
+        size: dp(40), min(dp(40), root.height)
+        text_size: self.size
+        valign: 'middle'
+        halign: 'center'
+        text: 'c'
+        font_name: 'assets/fontello.ttf'
+        background_normal: 0.4, 0.4, 0.4, 0.4
+        pos: root.right - self.width - dp(10), root.top - self.height
+        # on_press: root.parent.remove_widget(root)
+        on_press: root.remove()
+        
+                
+
 <NotificationLabel>:
     size_hint_y: None
     height: self.texture_size[1] + dp(8)
@@ -372,3 +425,29 @@
 
                 
             
+<CompletionsList>:
+    orientation: 'rl-tb'
+    spacing: dp(3)
+    # canvas.before:
+    #     Color:
+    #         rgba: 0.1, 0.1, 0.1, 0.1
+    #     Rectangle:
+    #         pos: self.pos
+    #         size: self.size
+    canvas.after:
+        Color:
+            rgba: 0.3, 0.3, 0.3
+        Rectangle:
+            pos: self.pos
+            size: self.width, 1
+
+
+<CompletionButton>:
+    text: '{}[color=6666aa]{}[/color]'.format(self.completion_name[:-len(self.completion_complete)], self.completion_name[-len(self.completion_complete):])
+    size_hint_x: None
+    width: self.texture_size[0] + dp(20)
+    radius: dp(5)
+    markup: True
+    background_normal: self.colour_mappings.get(self.completion_type, (0.8, 0, 0.8, 0.1))
+    padding: dp(3)
+    color: 0, 0, 0, 1

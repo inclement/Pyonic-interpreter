@@ -8,6 +8,7 @@ from kivy.uix.button import Button
 from kivy.uix.carousel import Carousel
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.stacklayout import StackLayout
 from kivy.uix.behaviors import FocusBehavior
 from kivy.uix.modalview import ModalView
 from kivy.event import EventDispatcher
@@ -28,8 +29,11 @@ from functools import partial
 
 if platform == 'android':
     from interpreterwrapper import InterpreterWrapper
+    import pydoc_data
+    from jediinterface import get_completions, get_defs
 else:
     from pyonic.interpreterwrapper import InterpreterWrapper
+    from pyonic.jediinterface import get_completions, get_defs
 
 import menu
 
@@ -164,6 +168,18 @@ class InputLabel(Label):
 class UserMessageLabel(Label):
     background_colour = ListProperty([1, 1, 0, 1])
 
+class DocLabel(Label):
+    background_colour = ListProperty([1, 0.922, 0.478, 1])
+
+    double_opacity = NumericProperty(1)
+
+    def remove(self):
+        anim = Animation(height=0, double_opacity=0, d=0.9, t='out_expo')
+        anim.bind(on_complete=self._remove)
+        anim.start(self)
+
+    def _remove(self, *args):
+        self.parent.remove_widget(self)
 
 class NotificationLabel(Label):
     background_colour = ListProperty([1, 0, 0, 0.5])
@@ -197,6 +213,8 @@ class InterpreterInput(InputWidget):
     '''
     root = ObjectProperty()
 
+    trigger_completions = BooleanProperty(True)
+
     def __init__(self, *args, **kwargs):
         super(InterpreterInput, self).__init__(*args, **kwargs)
         if platform != 'android':
@@ -221,12 +239,51 @@ class InterpreterInput(InputWidget):
         if not self.is_focusable:
             self.focus = False
 
+    def on_cursor(self, instance, value):
+        super(InterpreterInput, self).on_cursor(instance, value)
+        self.get_completions()
+
+    def get_completions(self, extra_text=''):
+        row_index, line, col_index = self.currently_edited_line()
+        print('current line', row_index, line, col_index)
+        if col_index == 0:
+            self.root.clear_completions()
+            return
+
+        completion_breakers = [' ', '.', ',', '(', ')', ':']
+        if line[col_index - 1] in completion_breakers:
+            self.root.clear_completions()
+            return
+        if col_index + 1 < len(line) and line[col_index] not in completion_breakers:
+            self.root.clear_completions()
+            return
+
+        if not self.trigger_completions:
+            self.root.clear_completions()
+            return
+        self.root.get_completions(extra_text)
+
+    def currently_edited_line(self):
+        '''Returns the row number, line text and column number for the current cursor pos.'''
+        index = self.cursor_index()
+        lines = self.text.split('\n')
+        cur_num = 0
+        for i, line in enumerate(lines):
+            line_length = len(line) + 1  # The +1 is for the deleted \n
+            if cur_num + line_length > index:
+                return i, line, index - cur_num
+            cur_num += line_length
+        raise ValueError('Could not identify currently edited line')  # TODO: make not an error
+
     def insert_text(self, text, from_undo=False):
         if self.disabled:
             return
         if text != '\n' or self.text == '':
+            # self.get_completions(text)
             return super(InterpreterInput, self).insert_text(text,
                                                              from_undo=from_undo)
+
+        self.root.ids.completions.completions = []
 
         print(self.text.split('\n'))
         last_line = self.text.split('\n')[-1].rstrip()
@@ -283,6 +340,13 @@ class InterpreterGui(BoxLayout):
     e.g. a constantly printing while loop.
     '''
 
+    interpreted_lines = ListProperty([])
+    '''A list of the lines of code that have been executed so far.'''
+
+    num_running_completions = 0
+    '''Counts the number of active jedi completion threads.'''
+
+
     def __init__(self, *args, **kwargs):
         super(InterpreterGui, self).__init__(*args, **kwargs)
         self.animation = Animation(input_fail_alpha=0., t='out_expo',
@@ -290,7 +354,8 @@ class InterpreterGui(BoxLayout):
 
         self.interpreter = InterpreterWrapper(
             use_thread=True,
-            throttle_output=App.get_running_app().setting__throttle_output)
+            throttle_output=App.get_running_app().setting__throttle_output,
+            thread_name='interpreter')
         self.interpreter.bind(interpreter_state=self.setter('interpreter_state'))
         self.interpreter.bind(lock_input=self.setter('lock_input'))
 
@@ -385,12 +450,18 @@ class InterpreterGui(BoxLayout):
         self.animation.start(self)
 
     def interpret_line(self, text):
+        self.interpreted_lines.append(text)
         index = self.interpreter.interpret_line(text)
         self.add_input_label(text, index)
         self.ensure_ctrl_c_button()
 
     def add_user_message_label(self, text, **kwargs):
         l = UserMessageLabel(text=text, **kwargs)
+        self.output_window.add_widget(l)
+        self.scrollview.scroll_to(l)
+
+    def add_doc_label(self, text, **kwargs):
+        l = DocLabel(text=text, **kwargs)
         self.output_window.add_widget(l)
         self.scrollview.scroll_to(l)
 
@@ -535,6 +606,135 @@ class InterpreterGui(BoxLayout):
         self.lock_input = False
         self.halting = False
         self.ensure_no_ctrl_c_button()
+
+    def get_defs(self):
+        if not self.enable_autocompletion:
+            return
+        previous_text = '\n'.join(self.interpreted_lines)
+        num_previous_lines = len(previous_text.split('\n'))
+        print('num previous is', num_previous_lines)
+
+        text = self.code_input.text
+        row_index, line, col_index = self.code_input.currently_edited_line()
+
+        get_defs('\n'.join([previous_text, text]),
+                 self.show_defs,
+                 line=row_index + num_previous_lines + 1,
+                 col=col_index)
+
+    def show_defs(self, defs):
+        print('docs are', defs)
+        if not defs:
+            self.add_doc_label('No definition found at cursor')
+            return
+
+        d = defs[0]
+        
+        # text = '\n'.join(['module: {}'.format(d.module_name),
+        #                   'type: {}'.format(d.type),
+        #                   'params: {}'.format(d.params),
+        #                   'docstring:',
+        #                   d.doc])
+        text = '{}({})\n{}'.format(d.desc_with_module,
+                                          ', '.join([p.name for p in d.params]),
+                                          d.doc)
+        self.add_doc_label(text)
+
+    def get_completions(self, extra_text=''):
+        if not self.enable_autocompletion:
+            return
+        
+        previous_text = '\n'.join(self.interpreted_lines)
+        num_previous_lines = len(previous_text.split('\n'))
+        print('num previous is', num_previous_lines)
+
+        text = self.code_input.text
+        row_index, line, col_index = self.code_input.currently_edited_line()
+        if self.num_running_completions > 3:
+            return
+        self.num_running_completions += 1
+
+        print('previous text is', previous_text)
+        print('text is', text)
+        print('join is', '\n'.join([previous_text, text + extra_text]))
+
+        get_completions('\n'.join([previous_text, text + extra_text]),
+                        self.show_completions,
+                        line=row_index + num_previous_lines + 1,
+                        col=col_index)
+
+    def show_completions(self, completions):
+        print('got completions', completions)
+        self.ids.completions.completions = completions
+        self.num_running_completions -= 1
+        # self.ids.completions.text = ', '.join(completions[:5])
+        # print('set text')
+
+    def clear_completions(self):
+        self.ids.completions.completions = []
+
+
+class CompletionButton(KeyboardButton):
+    interpreter_gui = ObjectProperty()
+
+    completion_type = StringProperty()
+    completion_name = StringProperty()
+    completion_complete = StringProperty()
+
+    completion = ObjectProperty()
+
+    colour_mappings = {'keyword': (0, 0.8, 0, 0.1),
+                       'instance': (0.8, 0, 0, 0.1),
+                       'function': (0, 0, 0.8, 0.1),
+                       'module': (0.8, 0.8, 0, 0.1)}
+
+    def on_release(self):
+        self.interpreter_gui.ids.completions.completions = []
+        self.interpreter_gui.code_input.trigger_completions = False
+        for letter in self.completion.complete:
+            self.interpreter_gui.code_input.insert_text(letter)
+        self.interpreter_gui.code_input.trigger_completions = True
+
+    def on_completion(self, instance, completion):
+        self.completion_type = completion.type
+        self.completion_name = completion.name
+        self.completion_complete = completion.complete
+
+
+class CompletionsList(StackLayout):
+    completions = ListProperty([])
+    completion_type = StringProperty()
+    completion_completion = StringProperty()
+
+    interpreter_gui = ObjectProperty()
+    def on_completions(self, instance, completions):
+        # self.clear_widgets()
+        
+        if len(completions) > 5:
+            print('too many completions, not showing options')
+            self.clear_widgets()
+
+        removals = self.children[:]
+        for completion in completions[:5]:
+            print('doing completion', completion, completion.complete)
+            if not completion.complete:
+                continue
+            for widget in self.children:
+                if widget.completion.name == completion.name:
+                    widget.completion = completion
+                    removals.remove(widget)
+                    break
+            else:
+                self.add_widget(CompletionButton(
+                    # text=completion.name,
+                    completion=completion,
+                    interpreter_gui=self.interpreter_gui))
+
+        for removal in removals:
+            self.remove_widget(removal)
+
+
+
 
 class RestartPopup(ModalView):
     interpreter_gui = ObjectProperty()
