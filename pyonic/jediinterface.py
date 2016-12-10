@@ -49,6 +49,8 @@ def get_completions(source, func, line=None, col=None):
     t = threading.Thread(target=WrappablePartial(_get_completions, source, func, line=line, column=col))
     t.start()
 
+    return t
+
 def _get_completions(source, func, line=None, column=None):
     try:
         num_lines = len(source.split('\n'))

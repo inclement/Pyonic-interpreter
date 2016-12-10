@@ -344,8 +344,8 @@ class InterpreterGui(BoxLayout):
     interpreted_lines = ListProperty([])
     '''A list of the lines of code that have been executed so far.'''
 
-    num_running_completions = 0
-    '''Counts the number of active jedi completion threads.'''
+    completion_threads = []
+    '''The threads running jedi completion functions.'''
 
     most_recent_completion_time = 0.
     '''The most recent timestamp from a completion. New completions with
@@ -649,6 +649,13 @@ class InterpreterGui(BoxLayout):
             
         self.add_doc_label(text)
 
+    def check_completion_threads(self):
+        for thread in self.completion_threads:
+            if not thread.is_alive():
+                print('thread {} has finished'.format(thread))
+                self.completion_threads.remove(thread)
+        print('pruned completions', self.completion_threads)
+
     def get_completions(self, extra_text=''):
         if not self.enable_autocompletion:
             return
@@ -659,22 +666,21 @@ class InterpreterGui(BoxLayout):
 
         text = self.code_input.text
         row_index, line, col_index = self.code_input.currently_edited_line()
-        print('num running completions is', self.num_running_completions)
-        if self.num_running_completions > 3:
+        self.check_completion_threads()
+        if len(self.completion_threads) > 3:
             return
-        self.num_running_completions += 1
 
         print('previous text is', previous_text)
         print('text is', text)
         print('join is', '\n'.join([previous_text, text + extra_text]))
 
-        get_completions('\n'.join([previous_text, text + extra_text]),
-                        self.show_completions,
-                        line=row_index + num_previous_lines + 1,
-                        col=col_index)
+        thread = get_completions('\n'.join([previous_text, text + extra_text]),
+                                 self.show_completions,
+                                 line=row_index + num_previous_lines + 1,
+                                 col=col_index)
+        self.completion_threads.append(thread)
 
     def show_completions(self, completions, time=None):
-        self.num_running_completions -= 1
         if time is not None:
             if time < self.most_recent_completion_time:
                 return
