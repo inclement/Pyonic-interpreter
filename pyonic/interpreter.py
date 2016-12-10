@@ -169,10 +169,12 @@ class UserMessageLabel(Label):
     background_colour = ListProperty([1, 1, 0, 1])
 
 class DocLabel(Label):
-    background_colour = ListProperty([0.8, 0.8, 0, 1])
+    background_colour = ListProperty([1, 0.922, 0.478, 1])
+
+    double_opacity = NumericProperty(1)
 
     def remove(self):
-        anim = Animation(height=0, opacity=0, d=0.9, t='out_expo')
+        anim = Animation(height=0, double_opacity=0, d=0.9, t='out_expo')
         anim.bind(on_complete=self._remove)
         anim.start(self)
 
@@ -628,11 +630,14 @@ class InterpreterGui(BoxLayout):
 
         d = defs[0]
         
-        text = '\n'.join(['module: {}'.format(d.module_name),
-                          'type: {}'.format(d.type),
-                          'params: {}'.format(d.params),
-                          'docstring:',
-                          d.doc])
+        # text = '\n'.join(['module: {}'.format(d.module_name),
+        #                   'type: {}'.format(d.type),
+        #                   'params: {}'.format(d.params),
+        #                   'docstring:',
+        #                   d.doc])
+        text = '{}({})\n{}'.format(d.desc_with_module,
+                                          ', '.join([p.name for p in d.params]),
+                                          d.doc)
         self.add_doc_label(text)
 
     def get_completions(self, extra_text=''):
