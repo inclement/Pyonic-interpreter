@@ -12,6 +12,7 @@ from time import time
 
 import threading
 
+import traceback
 
 ###########################################################
 # python2.7.2 compatible partial from http://stackoverflow.com/questions/20594193/dynamic-create-method-and-decorator-got-error-functools-partial-object-has-no
@@ -57,6 +58,8 @@ def _get_completions(source, func, line=None, column=None):
         # print('### completions:')
         # print('\n'.join([c.name for c in completions]))
     except:
+        print('Exception in completions thread')
+        traceback.print_exc()
         completions = []
 
     mainthread(WrappablePartial(func, [c for c in completions]))()
@@ -75,6 +78,8 @@ def _get_defs(source, func, line=None, column=None):
         s = Script(source, line=line, column=column)
         defs = s.goto_definitions()
     except:
+        print('Exception in defs thread')
+        traceback.print_exc()
         defs = []
         error = 'Could not retrieve docstring'
 
