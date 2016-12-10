@@ -612,8 +612,6 @@ class InterpreterGui(BoxLayout):
         self.ensure_no_ctrl_c_button()
 
     def get_defs(self):
-        if not self.enable_autocompletion:
-            return
         previous_text = '\n'.join(self.interpreted_lines)
         num_previous_lines = len(previous_text.split('\n'))
 
