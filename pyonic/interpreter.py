@@ -590,6 +590,7 @@ class InterpreterGui(BoxLayout):
         self.interpreter.send_sigint()
 
     def restart_interpreter(self):
+        self.interpreted_lines = []
         self.interpreter.restart()
 
     def query_restart(self):
@@ -624,22 +625,19 @@ class InterpreterGui(BoxLayout):
                  line=row_index + num_previous_lines + 1,
                  col=col_index)
 
-    def show_defs(self, defs, error=None):
+    def show_defs(self, defs, sigs, error=None):
         print('docs are', defs)
         if error is not None:
             self.add_doc_label(error)
             return
-        if not defs:
+        if not defs and not sigs:
             self.add_doc_label('No definition found at cursor')
             return
 
-        d = defs[0]
-        
-        # text = '\n'.join(['module: {}'.format(d.module_name),
-        #                   'type: {}'.format(d.type),
-        #                   'params: {}'.format(d.params),
-        #                   'docstring:',
-        #                   d.doc])
+        if defs:
+            d = defs[0]
+        else:
+            d = sigs[0]
         if hasattr(d, 'params'):
             text = '{}({})\n{}'.format(d.desc_with_module,
                                             ', '.join([p.description for p in d.params]),

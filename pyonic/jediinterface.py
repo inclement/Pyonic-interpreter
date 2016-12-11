@@ -2,6 +2,9 @@
 from jedi import Script, settings
 settings.case_insensitive_completion = False
 
+from os.path import abspath, join
+settings.cache_directory = join(abspath('.'), '.cache', 'jedi')
+
 from kivy.event import EventDispatcher
 from kivy.properties import ListProperty, ObjectProperty
 from kivy.clock import mainthread
@@ -77,10 +80,12 @@ def _get_defs(source, func, line=None, column=None):
             line = num_lines
         s = Script(source, line=line, column=column)
         defs = s.goto_definitions()
+        sigs = s.call_signatures()
     except:
         print('Exception in defs thread')
         traceback.print_exc()
         defs = []
+        sigs = []
         error = 'Could not retrieve docstring'
 
-    mainthread(WrappablePartial(func, defs, error=error))()
+    mainthread(WrappablePartial(func, defs, sigs, error=error))()
