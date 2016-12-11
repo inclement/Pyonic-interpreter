@@ -709,6 +709,10 @@ class CompletionButton(KeyboardButton):
         self.interpreter_gui.code_input.trigger_completions = False
         for letter in self.completion.complete:
             self.interpreter_gui.code_input.insert_text(letter)
+        if self.completion.type in ('function', 'class'):
+            self.interpreter_gui.code_input.insert_text('(')
+            self.interpreter_gui.code_input.insert_text(')')
+            self.interpreter_gui.code_input.do_cursor_movement('cursor_left')
         self.interpreter_gui.code_input.trigger_completions = True
 
     def on_completion(self, instance, completion):
