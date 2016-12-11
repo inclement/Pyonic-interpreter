@@ -653,7 +653,6 @@ class InterpreterGui(BoxLayout):
     def check_completion_threads(self):
         for thread in self.completion_threads:
             if not thread.is_alive():
-                print('thread {} has finished'.format(thread))
                 self.completion_threads.remove(thread)
 
     def get_completions(self, extra_text=''):
@@ -709,14 +708,15 @@ class CompletionButton(KeyboardButton):
         self.interpreter_gui.code_input.trigger_completions = False
         for letter in self.completion.complete:
             self.interpreter_gui.code_input.insert_text(letter)
-        if self.completion.type in ('function', 'class'):
-            if not (self.completion.name == 'print' and sys.version_info.major == 2):
-                # This check is necessary as jedi detects print as a
-                # function in Python 2 on Android (maybe because of
-                # the __future__ import in another file?)
-                self.interpreter_gui.code_input.insert_text('(')
-                self.interpreter_gui.code_input.insert_text(')')
-                self.interpreter_gui.code_input.do_cursor_movement('cursor_left')
+        if App.get_running_app().setting__autocompletion_brackets:
+            if self.completion.type in ('function', 'class'):
+                if not (self.completion.name == 'print' and sys.version_info.major == 2):
+                    # This check is necessary as jedi detects print as a
+                    # function in Python 2 on Android (maybe because of
+                    # the __future__ import in another file?)
+                    self.interpreter_gui.code_input.insert_text('(')
+                    self.interpreter_gui.code_input.insert_text(')')
+                    self.interpreter_gui.code_input.do_cursor_movement('cursor_left')
         self.interpreter_gui.code_input.trigger_completions = True
 
     def on_completion(self, instance, completion):

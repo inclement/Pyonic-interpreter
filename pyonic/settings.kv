@@ -8,6 +8,7 @@
     setting__text_input_height: text_input_height.value
     setting__rotation: rotation.value
     setting__autocompletion: autocompletion.active
+    setting__autocompletion_brackets: autocompletion_brackets.active
 
     canvas:
         Color: 
@@ -80,6 +81,13 @@
                     input_column_width_setter: text_input_height.input_column_width
                     active: root.setting__autocompletion
                 Spacer:
+                BooleanSetting:
+                    id: autocompletion_brackets
+                    name: 'Autocomplete brackets'
+                    description: 'Add brackets to function and class calls when autocompleting their names.'
+                    input_column_width_setter: text_input_height.input_column_width
+                    active: root.setting__autocompletion_brackets
+                Spacer:
                 SmallIntSetting:
                     id: text_input_height
                     name: 'Text input height'
@@ -100,7 +108,7 @@
                 RotationSetting:
                     id: rotation
                     name: 'Orientation'
-                    description: 'The orientation of the app. This option obeys your user preferences, so if rotation is disabled in Android settings this option may be ignored.'
+                    description: 'The orientation of the app. This option obeys your user preferences, so if rotation is disabled in Android settings your orientation selection may be ignored.'
                     input_column_width_setter: text_input_height.input_column_width
                     value: root.setting__rotation
                 Spacer:

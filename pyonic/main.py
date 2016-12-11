@@ -101,6 +101,8 @@ class PyonicApp(App):
     setting__show_input_buttons_default = True
     setting__autocompletion = BooleanProperty()
     setting__autocompletion_default = True
+    setting__autocompletion_brackets = BooleanProperty()
+    setting__autocompletion_brackets_default = True
     setting__text_input_height = NumericProperty()
     setting__text_input_height_default = 3
     setting__rotation = StringProperty()
