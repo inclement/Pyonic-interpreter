@@ -39,7 +39,7 @@ class WrappablePartial(partial):
 
 def get_completions(source, func, line=None, col=None):
 
-    func = partial(func, time=time())
+    func = WrappablePartial(func, time=time())
 
     t = threading.Thread(target=WrappablePartial(_get_completions, source, func, line=line, column=col))
     t.start()
