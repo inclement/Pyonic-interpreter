@@ -26,6 +26,7 @@ from kivy.clock import Clock
 from time import time
 import os
 from functools import partial
+import traceback
 
 if platform == 'android':
     from interpreterwrapper import InterpreterWrapper
@@ -746,10 +747,16 @@ class CompletionsList(StackLayout):
                     removals.remove(widget)
                     break
             else:
-                self.add_widget(CompletionButton(
-                    # text=completion.name,
-                    completion=completion,
-                    interpreter_gui=self.interpreter_gui))
+                try:
+                    button = CompletionButton(
+                        # text=completion.name,
+                        completion=completion,
+                        interpreter_gui=self.interpreter_gui)
+                    self.add_widget(button)
+                except:
+                    print('Exception when making CompletionButton from {}'.format(
+                        completion))
+                    traceback.print_exc()
 
         for removal in removals:
             self.remove_widget(removal)
