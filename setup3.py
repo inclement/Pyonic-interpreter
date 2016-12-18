@@ -40,7 +40,7 @@ setup(
                   'pyonic/interpreter_subprocess': ['*.py'],
                   'pyonic/assets': ['*.ttf', '*.txt'],
                   'pyonic/pydoc_data': ['*.py'],
-                  'pyonic/distutils': ['*.py'],
-                  'pyonic/distutils/command': ['*.py'],
+                  # 'pyonic/distutils': ['*.py'],
+                  # 'pyonic/distutils/command': ['*.py'],
                   'pyonic/osc': ['*.py']}
 )
