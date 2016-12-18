@@ -36,8 +36,10 @@ class InterpreterWrapper(EventDispatcher):
 
     interpreter_number = 0
 
-    def __init__(self, use_thread=True, throttle_output=True,
+    def __init__(self, service_name, use_thread=True, throttle_output=True,
                  thread_name='default'):
+
+        self.service_name = service_name
 
         self.register_event_type('on_execution_complete')
         self.register_event_type('on_missing_labels')
@@ -93,6 +95,7 @@ class InterpreterWrapper(EventDispatcher):
     def start_interpreter(self, thread_name='default'):
         # if thread_name == 'interpreter':
         #     return
+        print('trying to start interpreter', self.service_name)
         interpreter_script_path = join(dirname(realpath(__file__)),
                                        'interpreter_subprocess',
                                        'interpreter.py')
@@ -110,10 +113,11 @@ class InterpreterWrapper(EventDispatcher):
 
         if platform == 'android':
             from jnius import autoclass
-            service = autoclass('{}.ServiceInterpreter'.format(package_name))
+            service = autoclass('{}.Service{}'.format(package_name, self.service_name))
             mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
             # service.start(mActivity, argument, thread_name)
             service.start(mActivity, argument)
+            print('did service start', service, mActivity)
         else:
             # This may not actually work everywhere, but let's assume it does
             print('starting subprocess')
@@ -199,7 +203,7 @@ class InterpreterWrapper(EventDispatcher):
     def restart(self):
         if platform == 'android':
             from jnius import autoclass
-            service = autoclass('{}.ServiceInterpreter'.format(package_name))
+            service = autoclass('{}.Service{}'.format(package_name, self.service_name))
             mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
             service.stop(mActivity)
             self.start_interpreter(self.thread_name)

@@ -27,14 +27,16 @@ if platform == 'android':
     import interpreter
     import settings
     import editor
+    import utils
     import pipinterface
 else:
     import pyonic.widgets  # noqa
+    import pyonic.menu  # noqa
     import pyonic.interpreter  # noqa
     import pyonic.settings  # noqa
     import pyonic.editor  # noqa
+    import pyonic.utils  # noqa
     import pyonic.pipinterface  # noqa
-    import pyonic.menu  # noqa
 
 class Manager(ScreenManager):
     back_screen_name = StringProperty('')
@@ -42,7 +44,7 @@ class Manager(ScreenManager):
     def switch_to(self, target):
         if target not in self.screen_names:
             raise ValueError('Tried to switch to {}, but screen is not '
-                             'already added')
+                             'already added'.format(target))
         self.back_screen_name = self.current
         self.transition = SlideTransition(direction='left')
         self.current = target

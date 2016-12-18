@@ -19,9 +19,7 @@ import inspect
 from os.path import dirname, split, abspath
 sys.path.append(split(dirname(abspath(__file__)))[0])
 
-from utils import platform, site_packages_path
-
-sys.path.insert(0, site_packages_path)
+from utils import platform
 
 print('python service starting!')
 
@@ -30,8 +28,10 @@ if sys.version_info.major >= 3:
     unicode_type = str
     if platform == 'android':
         import osc
+        import utils
     else:
         from pyonic import osc
+        from pyonic import utils
 else:
     unicode_type = unicode
     from kivy.lib import osc

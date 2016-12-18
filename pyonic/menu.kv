@@ -48,6 +48,17 @@
         padding_x: dp(10)
         valign: 'middle'
         on_release: app.manager.switch_to('settings'); root.dismiss(immediate=True)
+    Widget:
+        size_hint_y: None
+        height: dp(2)
+    DropDownButton:
+        text: 'manage packages'
+        size_hint_y: None
+        height: dp(40)
+        text_size: self.size
+        padding_x: dp(10)
+        valign: 'middle'
+        on_release: app.manager.switch_to('pip'); root.dismiss(immediate=True)
                 
 
 <DropDownButton>:

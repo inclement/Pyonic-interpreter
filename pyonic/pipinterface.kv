@@ -1,13 +1,45 @@
 <PipScreen>:
+    name: 'pip'
     PipGui:
 
 <PipGui>:
     orientation: 'vertical'
-    output_window: output_window
-    scrollview: scrollview
+    # output_window: output_window
+    # scrollview: scrollview
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: dp(40)
+        canvas:
+            Color:
+                rgba: 0.2, 0.2, 0.2, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        Widget:
+            size_hint_x: None
+            width: dp(3)
+        ColouredButton:
+            size_hint_x: None
+            width: self.height
+            bold: True
+            font_name: 'assets/fontello.ttf'
+            text: 'B'
+            font_size: dp(20)
+            color: 1, 1, 1, 1
+            background_down: 0.2, 0.6431, 0.8078, 1
+            background_normal: 1, 1, 1, 0
+            on_release: app.manager.go_back()
+        Label:
+            text_size: self.size
+            text: 'Manage packages'
+            font_size: dp(18)
+            padding_x: dp(10)
+            color: 1, 1, 1, 1
+            valign: 'middle'
     TextInput:
         id: textinput
-        text: 'android'
+        text: 'appdirs'
         size_hint_y: None
         height: dp(30)
     BoxLayout:
@@ -19,26 +51,37 @@
         Button:
             text: 'pip search'
             on_release: root.do_search(textinput.text)
-    ScrollView:
-        pos_hint: {'x': 0, 'y': 0}
-        id: scrollview
-        bar_width: dp(10)
-        InitiallyFullGridLayout:
-            height: max(scrollview.height, self.minimum_height)
+    RecycleView:
+        # data: root.output_lines
+        data: [{'text': x} for x in root.output_lines]
+        viewclass: 'PipOutputLabel'
+        RecycleBoxLayout:
+            default_size: None, dp(56)
+            default_size_hint: 1, None
             size_hint_y: None
-            cols: 1
-            id: output_window
-            filling_widget_minimum_height: 0
-            canvas.before:
-                Color:
-                    rgba: 0.55, 0.55, 0.55, 0.55
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
-                Color:
-                    rgba: 0, 0, 0, 1
-                Line:
-                    rectangle: [self.x, self.y, self.width, self.height]
+            height: self.minimum_height
+            orientation: 'vertical'
+
+    # ScrollView:
+    #     pos_hint: {'x': 0, 'y': 0}
+    #     id: scrollview
+    #     bar_width: dp(10)
+    #     InitiallyFullGridLayout:
+    #         height: max(scrollview.height, self.minimum_height)
+    #         size_hint_y: None
+    #         cols: 1
+    #         id: output_window
+    #         filling_widget_minimum_height: 0
+    #         canvas.before:
+    #             Color:
+    #                 rgba: 0.55, 0.55, 0.55, 0.55
+    #             Rectangle:
+    #                 pos: self.pos
+    #                 size: self.size
+    #             Color:
+    #                 rgba: 0, 0, 0, 1
+    #             Line:
+    #                 rectangle: [self.x, self.y, self.width, self.height]
 
 <PipOutputLabel>:
     size_hint_y: None

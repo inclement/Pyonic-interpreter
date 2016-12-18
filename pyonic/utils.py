@@ -29,6 +29,14 @@ platform = _get_platform()
 
 
 if platform == 'android':
-    site_packages_path = '../fake_site_packages'
+    site_packages_path = '../pyonic_site-packages'
 else:
-    site_packages_path = path.join(path.abspath(path.dirname(__file__)), '..', 'fake_site_packages')
+    site_packages_path = path.join(path.abspath(path.dirname(__file__)), '..', 'pyonic_site-packages')
+
+if site_packages_path not in sys.path:
+    sys.path.insert(0, site_packages_path)
+
+if platform == 'android':
+    import site
+    site.USER_SITE = '..'
+    site.USER_BASE = site_packages_path

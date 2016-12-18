@@ -10,14 +10,16 @@ with open(join(dirname(__file__), 'version.txt'), 'r') as fileh:
     version = fileh.read().strip()
 
 options = {'apk': {'window': None,
-                   'requirements': 'sdl2,kivy,python3crystax,pygments,jedi',
+                   'requirements': 'sdl2,kivy,python3crystax,pygments,jedi,pip,openssl',
                    'android-api': 19,
                    'ndk-dir': '/home/asandy/android/crystax-ndk-10.3.2',
                    'dist-name': 'pyonic_python3',
                    'ndk-version': '10.3.2',
                    'package': 'net.inclem.pyonicinterpreter3',
                    'permission': 'INTERNET',
-                   'service': 'interpreter:interpreter_subprocess/interpreter.py',
+                   # 'service': 'interpreter:interpreter_subprocess/interpreter.py',
+                   # 'service': 'pip:interpreter_subprocess/interpreter.py',
+                   'services': 'pip:interpreter_subprocess/interpreter.py;interpreter:interpreter_subprocess/interpreter.py',
                    'arch': 'armeabi-v7a',
                    'icon': 'build_assets/icon_py3-96.png',
                    'presplash': 'build_assets/presplash.png',
@@ -37,5 +39,7 @@ setup(
                   'pyonic/interpreter_subprocess': ['*.py'],
                   'pyonic/assets': ['*.ttf', '*.txt'],
                   'pyonic/pydoc_data': ['*.py'],
+                  'pyonic/distutils': ['*.py'],
+                  'pyonic/distutils/command': ['*.py'],
                   'pyonic/osc': ['*.py']}
 )

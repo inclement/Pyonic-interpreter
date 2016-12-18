@@ -359,6 +359,7 @@ class InterpreterGui(BoxLayout):
                                    duration=0.5)
 
         self.interpreter = InterpreterWrapper(
+            'Interpreter',
             use_thread=True,
             throttle_output=App.get_running_app().setting__throttle_output,
             thread_name='interpreter')
