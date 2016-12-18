@@ -33,18 +33,23 @@ else:
     import pyonic.widgets  # noqa
     import pyonic.menu  # noqa
     import pyonic.interpreter  # noqa
-    import pyonic.settings  # noqa
+    from pyonic import settings  # noqa
     import pyonic.editor  # noqa
     import pyonic.utils  # noqa
-    import pyonic.pipinterface  # noqa
+    from pyonic import pipinterface  # noqa
+
+openable_screen_index = {'pip': pipinterface.PipScreen}
 
 class Manager(ScreenManager):
     back_screen_name = StringProperty('')
 
     def switch_to(self, target):
         if target not in self.screen_names:
-            raise ValueError('Tried to switch to {}, but screen is not '
-                             'already added'.format(target))
+            if target in openable_screen_index:
+                self.add_widget(openable_screen_index[target]())
+            else:
+                raise ValueError('Tried to switch to {}, but screen is not '
+                                'already added'.format(target))
         self.back_screen_name = self.current
         self.transition = SlideTransition(direction='left')
         self.current = target
