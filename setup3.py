@@ -10,7 +10,7 @@ with open(join(dirname(__file__), 'version.txt'), 'r') as fileh:
     version = fileh.read().strip()
 
 options = {'apk': {'window': None,
-                   'requirements': 'sdl2,kivy,python3crystax,pygments,jedi,pip,openssl',
+                   'requirements': 'sdl2,kivy,python3crystax,pygments,jedi',
                    'android-api': 19,
                    'ndk-dir': '/home/asandy/android/crystax-ndk-10.3.2',
                    'dist-name': 'pyonic_python3',
@@ -24,6 +24,7 @@ options = {'apk': {'window': None,
                    'icon': 'build_assets/icon_py3-96.png',
                    'presplash': 'build_assets/presplash.png',
                    'whitelist': 'build_assets/whitelist.txt',
+                   'local-recipes': './p4a_recipes',
                    # 'release': None,
                    # 'debug': None,
                    }}

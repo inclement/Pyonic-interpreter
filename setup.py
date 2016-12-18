@@ -24,6 +24,7 @@ options = {'apk': {'window': None,
                    'icon': 'build_assets/icon_py2-96.png',
                    'presplash': 'build_assets/presplash.png',
                    'whitelist': 'build_assets/whitelist.txt',
+                   'local-recipes': './p4a_recipes',
                    # 'release': None,
                    # 'debug': None,
                    }}
