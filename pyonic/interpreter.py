@@ -218,6 +218,11 @@ class InterpreterInput(InputWidget):
 
     def __init__(self, *args, **kwargs):
         super(InterpreterInput, self).__init__(*args, **kwargs)
+
+        self.register_event_type('on_request_completions')
+        self.register_event_type('on_clear_completions')
+        self.register_event_type('on_get_completions')
+
         if platform != 'android':
             from pygments.lexers import PythonLexer
             self.lexer = PythonLexer()
@@ -227,6 +232,15 @@ class InterpreterInput(InputWidget):
     #     self.text = '''for i in range(5):
     # print(i)
     # time.sleep(1)'''
+
+    def on_request_completions(self):
+        pass
+
+    def on_clear_completions(self):
+        pass
+
+    def on_get_completions(self, text):
+        pass
 
     def on_pause(self, *args):
         self.focus = False
@@ -247,7 +261,7 @@ class InterpreterInput(InputWidget):
     def get_completions(self, extra_text=''):
         row_index, line, col_index = self.currently_edited_line()
         if col_index == 0:
-            self.root.clear_completions()
+            self.dispatch('on_clear_completions')
             return
 
         completion_breakers = [' ', '.', ',', '(', ')', ':',
@@ -255,16 +269,16 @@ class InterpreterInput(InputWidget):
                                '\\', '/', '+', '*', '\'', '\"',
                                '|', '=', '^', '%']
         if line[col_index - 1] in completion_breakers:
-            self.root.clear_completions()
+            self.dispatch('on_clear_completions')
             return
         if col_index + 1 < len(line) and line[col_index] not in completion_breakers:
-            self.root.clear_completions()
+            self.dispatch('on_clear_completions')
             return
 
         if not self.trigger_completions:
-            self.root.clear_completions()
+            self.dispatch('on_clear_completions')
             return
-        self.root.get_completions(extra_text)
+        self.dispatch('on_get_completions', extra_text)
 
     def currently_edited_line(self):
         '''Returns the row number, line text and column number for the current cursor pos.'''
@@ -282,11 +296,10 @@ class InterpreterInput(InputWidget):
         if self.disabled:
             return
         if text != '\n' or self.text == '':
-            # self.get_completions(text)
             return super(InterpreterInput, self).insert_text(text,
                                                              from_undo=from_undo)
 
-        self.root.ids.completions.completions = []
+        self.dispatch('on_clear_completions')
 
         print(self.text.split('\n'))
         last_line = self.text.split('\n')[-1].rstrip()

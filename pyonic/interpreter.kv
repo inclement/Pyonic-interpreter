@@ -131,6 +131,8 @@
             root: root
             disabled: root._lock_input
             font_name: 'RobotoMono-Regular.ttf'
+            on_get_completions: root.get_completions(extra_text=args[-1])
+            on_clear_completions: root.clear_completions()
             canvas.after:
                 Color:
                     rgba: 1, 0, 0, root.input_fail_alpha
