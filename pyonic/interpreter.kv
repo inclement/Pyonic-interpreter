@@ -471,6 +471,7 @@
     size_hint_x: 0.9
     height: gl.height + dp(70)
     title: 'Insert text:'
+    pos_hint: {'center_y': 0.3}
     AnchorLayout:
         id: al
         GridLayout:
@@ -487,8 +488,24 @@
                 text_size: self.width, None
                 height: self.texture_size[1] + dp(10)
                 color: 1, 1, 1, 1
-            TextInput:
+            BoxLayout:
                 size_hint_y: None
                 height: sp(30)
-                multiline: False
-                on_text_validate: root.submit_text(args[-1].text)
+                TextInput:
+                    id: ti
+                    multiline: False
+                    on_text_validate: root.submit_text(self.text)
+                    focus: True
+                ColouredButton:
+                    text: 'N'
+                    font_name: 'assets/fontello.ttf'
+                    font_size: sp(20)
+                    on_release: root.submit_text(ti.text)
+                    size_hint_x: None
+                    color: (1, 1, 1, 1)
+                    width: self.height
+                    background_normal: 0.3, 0.3, 0.3, 1
+                    background_down: 0.1, 0.1, 0.1, 1
+                    radius: 0
+                    padding: 0
+

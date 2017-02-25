@@ -13,6 +13,7 @@ from kivy.uix.behaviors import FocusBehavior
 from kivy.uix.modalview import ModalView
 from kivy.uix.popup import Popup
 from kivy.event import EventDispatcher
+from kivy.core.window import Window
 from kivy.properties import (ObjectProperty, NumericProperty,
                              OptionProperty, BooleanProperty,
                              StringProperty, ListProperty)
@@ -429,6 +430,7 @@ class InterpreterGui(BoxLayout):
         self.show_input_popup(prompt)
         
     def show_input_popup(self, prompt):
+        # Window.softinput_mode = 'below_target'
         p = InputPopup(prompt=prompt,
                        submit_func=self.send_input)
         p.open()
@@ -812,4 +814,16 @@ class InputPopup(Popup):
 
     def submit_text(self, text):
         self.submit_func(text)
+        # Window.softinput_mode = 'pan'
         self.dismiss()
+
+    # This is the normal ModalView on_touch_down, with
+    # self.submit_func added to ensure that some text is submitted.
+    def on_touch_down(self, touch):
+        if not self.collide_point(*touch.pos):
+            if self.auto_dismiss:
+                self.submit_func(self.ids.ti.text)
+                self.dismiss()
+                return True
+        super(ModalView, self).on_touch_down(touch)
+        return True
