@@ -827,3 +827,11 @@ class InputPopup(Popup):
                 return True
         super(ModalView, self).on_touch_down(touch)
         return True
+
+    # Again, modify the normal _handle_keyboard so that
+    # self.submit_func is called before self.dismiss
+    def _handle_keyboard(self, window, key, *largs):
+        if key == 27 and self.auto_dismiss:
+            self.submit_func(self.ids.ti.text)
+            self.dismiss()
+            return True
