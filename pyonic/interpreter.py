@@ -11,6 +11,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.stacklayout import StackLayout
 from kivy.uix.behaviors import FocusBehavior
 from kivy.uix.modalview import ModalView
+from kivy.uix.popup import Popup
 from kivy.event import EventDispatcher
 from kivy.properties import (ObjectProperty, NumericProperty,
                              OptionProperty, BooleanProperty,
@@ -385,6 +386,7 @@ class InterpreterGui(BoxLayout):
         self.interpreter.bind(on_notification=self.on_notification)
         self.interpreter.bind(on_user_message=self.on_user_message)
         self.interpreter.bind(on_missing_labels=self.on_missing_labels)
+        self.interpreter.bind(on_request_input=self.on_request_input)
 
         # self.interpreter = DummyInterpreter()
 
@@ -422,6 +424,18 @@ class InterpreterGui(BoxLayout):
 
     def on_user_message(self, interpreter, text):
         self.add_user_message_label(text, background_colour=(1, 0.6, 0, 1))
+
+    def on_request_input(self, interpreter, prompt):
+        self.show_input_popup(prompt)
+        
+    def show_input_popup(self, prompt):
+        p = InputPopup(prompt=prompt,
+                       submit_func=self.send_input)
+        p.open()
+
+    def send_input(self, text):
+        '''Send the given input to the Python interpreter.'''
+        self.interpreter.send_input(text)
 
     def ensure_ctrl_c_button(self):
         if not App.get_running_app().ctypes_working:
@@ -792,3 +806,10 @@ class BreakMarker(Widget):
     pass
 
 
+class InputPopup(Popup):
+    prompt = StringProperty()
+    submit_func = ObjectProperty()
+
+    def submit_text(self, text):
+        self.submit_func(text)
+        self.dismiss()

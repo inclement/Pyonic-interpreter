@@ -1,5 +1,34 @@
 import copy
+from time import sleep
 
+__input = None
+
+def input_replacement(prompt=''):
+    if not isinstance(prompt, bytes):
+        prompt = prompt.encode('utf-8')
+
+    request_input(prompt)
+
+    global __input
+
+    while __input is None:
+        sleep(0.1)
+
+    user_input = __input
+    __input = None
+
+    return user_input
+
+def eval_input_replacement(prompt=''):
+    return eval(input_replacement(prompt))
+
+try:
+    ri = raw_input
+except NameError:  # we are using Python 3
+    input = input_replacement
+else:  # we are using Python 2
+    raw_input = input_replacement
+    input = eval_input_replacement
 
 user_locals = copy.copy(locals())
 user_globals = copy.copy(globals())
@@ -120,6 +149,10 @@ def receive_message(message, *args):
         else:
             print('Error changing output throttling: received value {}'.format(body[0]))
 
+    elif address == b'/userinput':
+        global __input
+        __input = message[2].decode('utf-8')
+
     else:
         raise ValueError('Received unrecognised address {}'.format(address))
 
@@ -132,7 +165,10 @@ def complete_execution():
                     typehint='b')
     except KeyboardInterrupt:
         complete_execution()
-    
+
+def request_input(prompt):
+    osc.sendMsg(b'/requestinput', [prompt], port=send_port,
+                typehint='b')
 
 def interpret_code(code):
 
@@ -258,6 +294,7 @@ osc.bind(oscid, receive_message, b'/interpret')
 osc.bind(oscid, receive_message, b'/ping')
 osc.bind(oscid, receive_message, b'/sigint')
 osc.bind(oscid, receive_message, b'/throttling')
+osc.bind(oscid, receive_message, b'/userinput')
 
 sys.stdout = OscOut(b'/stdout', send_port)
 sys.stderr = OscOut(b'/stderr', send_port)

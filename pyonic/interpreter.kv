@@ -465,3 +465,30 @@
     background_normal: self.colour_mappings.get(self.completion_type, (0.8, 0, 0.8, 0.1))
     padding: dp(3)
     color: 0, 0, 0, 1
+
+<InputPopup>:
+    size_hint_y: None
+    size_hint_x: 0.9
+    height: gl.height + dp(70)
+    title: 'Insert text:'
+    AnchorLayout:
+        id: al
+        GridLayout:
+            id: gl
+            cols: 1
+            size_hint_y: None
+            height: self.minimum_height
+            orientation: 'vertical'
+            size_hint_x: None
+            width: al.width - dp(30)
+            Label:
+                text: root.prompt
+                size_hint_y: None
+                text_size: self.width, None
+                height: self.texture_size[1] + dp(10)
+                color: 1, 1, 1, 1
+            TextInput:
+                size_hint_y: None
+                height: sp(30)
+                multiline: False
+                on_text_validate: root.submit_text(args[-1].text)

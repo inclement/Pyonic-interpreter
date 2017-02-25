@@ -47,6 +47,7 @@ class InterpreterWrapper(EventDispatcher):
         self.register_event_type('on_stderr')
         self.register_event_type('on_notification')
         self.register_event_type('on_user_message')
+        self.register_event_type('on_request_input')
 
         self.subprocess = None
 
@@ -90,6 +91,9 @@ class InterpreterWrapper(EventDispatcher):
         pass
 
     def on_user_message(self, text):
+        pass
+
+    def on_request_input(self, text):
         pass
 
     def start_interpreter(self, thread_name='default'):
@@ -140,6 +144,7 @@ class InterpreterWrapper(EventDispatcher):
         osc.bind(self.oscid, self.receive_osc_message, b'/stderr')
         osc.bind(self.oscid, self.receive_osc_message, b'/interpreter')
         osc.bind(self.oscid, self.receive_osc_message, b'/pong')
+        osc.bind(self.oscid, self.receive_osc_message, b'/requestinput')
 
     # def begin_osc_listen(self):
     #     Clock.schedule_interval(self.read_osc_queue, 0.1)
@@ -178,6 +183,9 @@ class InterpreterWrapper(EventDispatcher):
         elif address == b'/stderr':
             self.dispatch('on_stderr', body[0])
 
+        elif address == b'/requestinput':
+            self.dispatch('on_request_input', body[0])
+
     def interpret_line(self, text):
         self.send_python_command(text.encode('utf-8'))
         self.lock_input = True
@@ -199,6 +207,9 @@ class InterpreterWrapper(EventDispatcher):
 
     def command_not_received(self, *args):
         print('command not received? something is wrong!?')
+
+    def send_input(self, text):
+        self.send_osc_message(text.encode('utf-8'), address=b'/userinput')
 
     def restart(self):
         if platform == 'android':
