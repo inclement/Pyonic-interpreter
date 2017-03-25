@@ -1,6 +1,5 @@
 from setuptools import setup, find_packages
 from distutils.extension import Extension
-from Cython.Distutils import build_ext
 
 from os.path import join, dirname
 
@@ -10,7 +9,7 @@ with open(join(dirname(__file__), 'version.txt'), 'r') as fileh:
     version = fileh.read().strip()
 
 options = {'apk': {'window': None,
-                   'requirements': 'sdl2,kivy,python3crystax,pygments,jedi',
+                   'requirements': 'sdl2,kivy,python3crystax==3.6,pygments,jedi',
                    'android-api': 19,
                    'ndk-dir': '/home/asandy/android/crystax-ndk-10.3.2',
                    'dist-name': 'pyonic_python3',
