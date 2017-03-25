@@ -4,6 +4,7 @@ from time import sleep
 __input = None
 
 def input_replacement(prompt=''):
+    prompt = str(prompt)
     if not isinstance(prompt, bytes):
         prompt = prompt.encode('utf-8')
 
