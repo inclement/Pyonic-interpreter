@@ -48,10 +48,12 @@ class MenuButton(ColouredButton):
     dropdown_holder = ObjectProperty()
     dropdown_holder_width = NumericProperty()
 
+    dropdown_cls = ObjectProperty(MenuDropDown)
+
     def __init__(self, *args, **kwargs):
         super(MenuButton, self).__init__(*args, **kwargs)
 
-        self.dropdown = MenuDropDown(parent_obj=self)
+        self.dropdown = self.dropdown_cls(parent_obj=self)
 
     def on_release(self):
         if self.dropdown.parent is None:

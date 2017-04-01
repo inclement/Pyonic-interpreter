@@ -835,3 +835,9 @@ class InputPopup(Popup):
             self.submit_func(self.ids.ti.text)
             self.dismiss()
             return True
+
+class InterpreterMenuDropDown(menu.MenuDropDown):
+    pass
+
+class InterpreterMenuButton(menu.MenuButton):
+    dropdown_cls = ObjectProperty(InterpreterMenuDropDown)

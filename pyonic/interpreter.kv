@@ -84,7 +84,7 @@
             Widget:
                 size_hint_x: None
                 width: dp(10)
-            MenuButton:
+            InterpreterMenuButton:
                 text: 'E'
                 size_hint_x: None
                 width: 1.5 * self.height
@@ -509,3 +509,46 @@
                     radius: 0
                     padding: 0
 
+
+<InterpreterMenuDropDown>:
+    DropDownButton:
+        text: 'clear output'
+        size_hint_y: None
+        height: dp(40)
+        text_size: self.size
+        padding_x: dp(10)
+        valign: 'middle'
+        on_release: root.parent_obj.root.clear_output(); root.dismiss(immediate=False)
+    Widget:
+        size_hint_y: None
+        height: dp(2)
+    DropDownButton:
+        text: 'restart interpreter'
+        padding_x: dp(10)
+        size_hint_y: None
+        height: dp(40)
+        text_size: self.size
+        valign: 'middle'
+        on_release: root.parent_obj.root.query_restart(); root.dismiss(immediate=False)
+    Widget:
+        size_hint_y: None
+        height: dp(2)
+    DropDownButton:
+        text: 'settings'
+        size_hint_y: None
+        height: dp(40)
+        text_size: self.size
+        padding_x: dp(10)
+        valign: 'middle'
+        on_release: app.manager.switch_to('settings'); root.dismiss(immediate=True)
+    # Widget:
+    #     size_hint_y: None
+    #     height: dp(2)
+    # DropDownButton:
+    #     text: 'manage packages'
+    #     size_hint_y: None
+    #     height: dp(40)
+    #     text_size: self.size
+    #     padding_x: dp(10)
+    #     valign: 'middle'
+    #     on_release: app.manager.switch_to('pip'); root.dismiss(immediate=True)
