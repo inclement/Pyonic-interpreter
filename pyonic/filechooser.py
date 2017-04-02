@@ -4,7 +4,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import Screen
 from kivy.uix.recycleview import RecycleView
 from kivy.properties import (StringProperty, OptionProperty,
-                             BooleanProperty)
+                             BooleanProperty, NumericProperty)
 from kivy.lang import Builder
 
 import os
@@ -15,6 +15,7 @@ Builder.load_file('filechooser.kv')
 class FileLabel(BoxLayout):
     file_type = OptionProperty('file', options=('folder', 'file'))
     filename = StringProperty()
+    shade = BooleanProperty(False)
 
 class FileView(RecycleView):
     folder = StringProperty('.')
@@ -26,6 +27,7 @@ class FileView(RecycleView):
 
     def on_folder(self, instance, value):
         filens = os.listdir(self.folder)
+        filens.append('..')
 
         if self.python_only:
             filens = [filen for filen in filens if filen.endswith('.py')]
@@ -36,8 +38,14 @@ class FileView(RecycleView):
         files = sorted(files, key=lambda row: row[0].lower())
         files = sorted(files, key=lambda row: (row[1] != 'folder'))
 
-        self.data = [{'filename': name, 'file_type': file_type}
-                     for (name, file_type) in files]
+        indices = range(len(files))
+
+        files = [(filen[0], filen[1], index) for filen, index in zip(files, indices)]
+
+        self.data = [{'filename': name,
+                      'file_type': file_type,
+                      'shade': index % 2}
+                     for (name, file_type, index) in files]
         print('data is', self.data)
 
 

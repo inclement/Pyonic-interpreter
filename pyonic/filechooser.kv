@@ -1,6 +1,12 @@
 
 <FileLabel>:
     orientation: 'horizontal'
+    canvas.before:
+        Color:
+            rgba: (0.95, 0.95, 0.95, 1) if root.shade else (1, 1, 1, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
     Label:
         text: root.file_type
         size_hint_x: None
@@ -22,7 +28,7 @@
 <FileView>:
     viewclass: 'FileLabel'
     RecycleBoxLayout:
-        default_size: None, dp(sp(25))
+        default_size: None, dp(sp(35))
         default_size_hint: 1, None
         size_hint_y: None
         height: self.minimum_height
@@ -55,6 +61,22 @@
         text: 'SEL: ' + root.current_selection
         size_hint_y: None
         height: self.texture_size[1] * 1.1
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: sp(40)
+        ColouredButton:
+            text: 'cancel'
+            background_normal: 1.0, 0.8, 0.8, 1
+            background_down: 0.5, 0.5, 0.5, 1
+            radius: dp(5)
+            color: (1, 1, 1, 1) if self.state == 'down' else (0, 0, 0, 1)
+        ColouredButton:
+            text: 'open'
+            background_normal: 0.8, 1.0, 0.8, 1
+            background_down: 0.5, 0.5, 0.5, 1
+            radius: dp(5)
+            color: (1, 1, 1, 1) if self.state == 'down' else (0, 0, 0, 1)
 
 <FileChooserScreen>:
     name: 'filechooser'
