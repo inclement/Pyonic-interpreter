@@ -84,7 +84,6 @@ def real_print(*s):
     real_stdout.flush()
 
 
-
 send_port = 3001 + 10 * py_ver
 receive_port = 3000 + 10 * py_ver
 
@@ -276,14 +275,14 @@ class OscOut(object):
             if self.messages_this_second > 500 and self.can_omit and throttle_output:
                 return
 
-            # s = self.buffer + s
-            if s and s[-1] == '\n':
-                s = s[:-1]
-            lines = s.split('\n')
-            # for l in lines[:-1]:
-            for l in lines:
-                self.send_message(l)
-            # self.buffer = lines[-1]
+            s = self.buffer + s
+            if '\n' in s:
+                lines = s.split('\n')
+                for l in lines[:-1]:
+                    self.send_message(l)
+                self.buffer = lines[-1]
+            else:
+                self.buffer = s
         except KeyboardInterrupt:
             raise KeyboardInterrupt('interrupted while printing')
 
