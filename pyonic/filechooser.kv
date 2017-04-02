@@ -33,9 +33,9 @@
 <FileView>:
     viewclass: 'FileLabel'
     scroll_timeout: 30
-    scroll_distance: dp(3)
+    scroll_distance: dp(1.5)
     RecycleBoxLayout:
-        default_size: None, dp(sp(35))
+        default_size: None, sp(35)
         default_size_hint: 1, None
         size_hint_y: None
         height: self.minimum_height
@@ -44,11 +44,15 @@
 
 <PyonicFileChooser>:
     orientation: 'vertical'
-    current_selection: fileview.selection_filename
-    SettingsTitle:
-        text: 'RECENT FOLDERS'
-    SettingsTitle:
-        text: 'CHOOSE FILE'
+    current_selection: fileview.selection_instance
+    current_filename: fileview.selection_filename
+    # SettingsTitle:
+    #     text: 'RECENT FOLDERS'
+    # SettingsTitle:
+    #     text: 'CHOOSE FILE'
+    Widget:
+        size_hint_y: None
+        height: dp(2)
     BoxLayout:
         orientation: 'horizontal'
         size_hint_y: None
@@ -88,7 +92,7 @@
             on_release: fileview.go_up_folder()
     Widget:
         size_hint_y: None
-        height: dp(4)
+        height: dp(0)
     AnchorLayout:
         id: al
         FileView:
@@ -147,7 +151,7 @@
             width: sp(50)
             color: (0.3, 0.3, 0.3, 1)
         Label:
-            text: root.current_selection
+            text: root.current_filename
             text_size: self.size
             halign: 'left'
             valign: 'middle'
@@ -164,6 +168,7 @@
             background_down: 0.5, 0.5, 0.5, 1
             radius: dp(5)
             color: (1, 1, 1, 1) if self.state == 'down' else (0, 0, 0, 1)
+            on_release: app.manager.go_back()
         Widget:
             size_hint_x: None
             width: dp(10)
@@ -173,13 +178,51 @@
             background_down: 0.5, 0.5, 0.5, 1
             radius: dp(5)
             color: (1, 1, 1, 1) if self.state == 'down' else (0, 0, 0, 1)
+            on_release: root.return_selection()
         Widget:
             size_hint_x: None
             width: dp(3)
+    Widget:
+        size_hint_y: None
+        height: dp(2)
 
 <FileChooserScreen>:
     name: 'filechooser'
     BoxLayout:
         orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(40)
+            canvas:
+                Color:
+                    rgba: 0.2, 0.2, 0.2, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            Widget:
+                size_hint_x: None
+                width: dp(3)
+            ColouredButton:
+                size_hint_x: None
+                width: self.height
+                bold: True
+                font_name: 'assets/fontello.ttf'
+                text: 'B'
+                font_size: dp(20)
+                color: 1, 1, 1, 1
+                background_down: 0.2, 0.6431, 0.8078, 1
+                background_normal: 1, 1, 1, 0
+                on_release: app.manager.go_back()
+            Label:
+                text_size: self.size
+                text: 'File chooser'
+                font_size: dp(18)
+                padding_x: dp(10)
+                color: 1, 1, 1, 1
+                valign: 'middle'
+            Widget:
         PyonicFileChooser:
+            id: pyonicfilechooser
+            open_method: root.open_method
             

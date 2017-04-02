@@ -107,12 +107,32 @@ class FileView(RecycleView):
             home = expanduser('~')
         self.folder = home
 
+    def reset(self, go_home=True):
+        self.select(None)
+        if go_home:
+            self.go_home()
+        self.scroll_y = 1
+
 
 class PyonicFileChooser(BoxLayout):
     folder = StringProperty(abspath('.'))
     python_only = BooleanProperty(False)
 
-    current_selection = StringProperty('.')
+    current_selection = ObjectProperty(allownone=True)
+
+    open_method = ObjectProperty()
+    # The open_method should accept a single filepath as an argument.
+
+    def return_selection(self):
+        if self.open_method is None:
+            return
+        self.open_method(join(self.folder, self.current_selection.filename))
+        from kivy.app import App
+        App.get_running_app().manager.go_back()
 
 class FileChooserScreen(Screen):
-    pass
+    open_method = ObjectProperty()
+    current_filename = StringProperty()
+
+    def on_pre_enter(self):
+        self.ids.pyonicfilechooser.ids.fileview.reset(go_home=False)

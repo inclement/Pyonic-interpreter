@@ -454,9 +454,11 @@ class InterpreterGui(BoxLayout):
             self.output_window.remove_widget(child)
 
     def run_file(self):
-        # 1) get filename
-        # 2) run file
-        pass
+        App.get_running_app().root.switch_to(
+            'filechooser', open_method=self._run_file)
+
+    def _run_file(self, filename):
+        self.add_user_message_label('Asked to run {}'.format(filename))
 
     def ensure_no_ctrl_c_button(self):
         Clock.unschedule(self._switch_to_ctrl_c_button)
