@@ -312,17 +312,17 @@
     font_name: 'assets/fontello.ttf'
     text: 't'
     # color: (1, 1, 1, 1) if self.active else (0, 0, 0, 0)
-    color: 0, 0, 0, (1 if self.active else 0)
+    color: self.text_colour[:3] + [self.text_colour[3] if self.active else 0]
     font_size: dp(20)
     box_size: dp(22)
     canvas:
         Color:
-            rgba: 0.2, 0.2, 0.2, (1 if self.state == 'down' else 0)
+            rgba: self.draw_colour[:3] + [self.draw_colour[3] if self.state == 'down' else 0]
         Rectangle: 
             pos: self.center_x - 0.5*self.box_size, self.center_y - 0.5*self.box_size
             size: self.box_size, self.box_size
         Color:
-            rgba: 0.2, 0.2, 0.2, 1
+            rgba: self.draw_colour
         Line:
             rectangle: self.center_x - 0.5*self.box_size, self.center_y - 0.5*self.box_size, self.box_size, self.box_size
             width: 1.1

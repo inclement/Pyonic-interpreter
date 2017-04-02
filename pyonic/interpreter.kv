@@ -241,6 +241,15 @@
             pos: self.x + self.padding, self.y + self.padding
             size: self.width - 2*self.padding, self.height - 2*self.padding
             radius: [(self.radius, self.radius) for _ in range(4)]
+
+<ColouredButtonContainer>:
+    canvas.before:
+        Color:
+            rgba: self.background_normal if self.state == 'normal' else self.background_down
+        RoundedRectangle:
+            pos: self.x + self.coloured_button_padding, self.y + self.coloured_button_padding
+            size: self.width - 2*self.coloured_button_padding, self.height - 2*self.coloured_button_padding
+            radius: [(self.radius, self.radius) for _ in range(4)]
     
 
 <MonoLabel@Label>:

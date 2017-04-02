@@ -13,7 +13,8 @@ file, will be handled automatically.
 from kivy.app import App
 from kivy.event import EventDispatcher
 from kivy.properties import (BooleanProperty, NumericProperty,
-                             ObjectProperty, StringProperty)
+                             ObjectProperty, StringProperty,
+                             ListProperty)
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.behaviors import ButtonBehavior
@@ -106,6 +107,8 @@ class InterpreterSettingsScreen(Screen):
 class ButtonCheckbox(ButtonBehavior, Label):
     active = BooleanProperty(True)
     box_size = NumericProperty()
+    draw_colour = ListProperty((0.2, 0.2, 0.2, 1))
+    text_colour = ListProperty((0.0, 0.0, 0.0, 1))
 
 
 class ButtonRadio(ButtonBehavior, Widget):

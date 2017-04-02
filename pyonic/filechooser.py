@@ -124,6 +124,8 @@ class PyonicFileChooser(BoxLayout):
     success_screen_name = StringProperty()
 
     def return_selection(self):
+        if self.current_selection is None:
+            return
         if self.open_method is None:
             return
         self.open_method(join(self.folder, self.current_selection.filename))

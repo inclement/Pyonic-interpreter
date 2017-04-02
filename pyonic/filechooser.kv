@@ -58,24 +58,48 @@
         orientation: 'horizontal'
         size_hint_y: None
         height: dp(40)
-        ColouredButton:
+        ColouredButtonContainer:
+            id: cb3
             color: (1, 1, 1, 1)
-            padding: 0.025 * min(self.size)
+            coloured_button_padding: 0.025 * min(self.size)
             background_down: (0.2, 0.6431, 0.8078, 1.)
-            background_normal: (0.6, 0.6, 0.6, 0.8)
+            background_normal: (0.4, 0.4, 0.4, 0.8)
             radius: dp(5)
-            text: '.py only'
             on_release: py_only.active = not py_only.active
-        ButtonCheckbox:
-            id: py_only
-            active: True
-            size_hint_x: None
-            width: 1.2 * self.height
+            GridLayout:
+                size_hint_y: None
+                height: cb3.height
+                size_hint_x: None
+                width: self.minimum_width
+                orientation: 'horizontal'
+                rows: 1
+                Label:
+                    text: '.py only'
+                    color: cb1.color
+                    size_hint_x: None
+                    width: self.texture_size[0]
+                Widget:
+                    size_hint_x: None
+                    width: dp(20)
+                # Label:
+                #     text: 'c'
+                #     color: (1.0, 0.7, 0.7, 1)
+                #     font_name: 'assets/fontello.ttf'
+                #     size_hint_x: None
+                #     width: self.texture_size[0]
+                #     font_size: dp(30)
+                ButtonCheckbox:
+                    id: py_only
+                    active: True
+                    size_hint_x: None
+                    width: 1.2 * self.height
+                    draw_colour: 0.95, 0.95, 0.95, 1
+                    text_colour: 1, 1, 1, 1
         ColouredButton:
             color: (1, 1, 1, 1)
             padding: 0.025 * min(self.size)
             background_down: (0.2, 0.6431, 0.8078, 1.)
-            background_normal: (0.6, 0.6, 0.6, 0.8)
+            background_normal: (0.4, 0.4, 0.4, 0.8)
             radius: dp(5)
             font_size: sp(25)
             text: 'Q'
@@ -85,10 +109,10 @@
             color: (1, 1, 1, 1)
             padding: 0.025 * min(self.size)
             background_down: (0.2, 0.6431, 0.8078, 1.)
-            background_normal: (0.6, 0.6, 0.6, 0.8)
+            background_normal: (0.4, 0.4, 0.4, 0.8)
             radius: dp(5)
             text: 'u'
-            font_size: sp(25)
+            font_size: sp(20)
             font_name: 'assets/fontello.ttf'
             on_release: fileview.go_up_folder()
     Widget:
@@ -163,23 +187,69 @@
         Widget:
             size_hint_x: None
             width: dp(3)
-        ColouredButton:
+        ColouredButtonContainer:
+            id: cb1
             text: 'cancel'
-            background_normal: 1.0, 0.8, 0.8, 1
-            background_down: 0.5, 0.5, 0.5, 1
+            background_down: (0.2, 0.6431, 0.8078, 1.)
+            background_normal: (0.4, 0.4, 0.4, 0.8)
             radius: dp(5)
-            color: (1, 1, 1, 1) if self.state == 'down' else (0, 0, 0, 1)
+            color: (1, 1, 1, 1)
             on_release: app.manager.go_back()
+            GridLayout:
+                size_hint_y: None
+                height: cb1.height
+                size_hint_x: None
+                width: self.minimum_width
+                orientation: 'horizontal'
+                rows: 1
+                Label:
+                    text: 'cancel'
+                    color: cb1.color
+                    size_hint_x: None
+                    width: self.texture_size[0]
+                Widget:
+                    size_hint_x: None
+                    width: dp(20)
+                Label:
+                    text: 'c'
+                    color: (1.0, 0.7, 0.7, 1)
+                    font_name: 'assets/fontello.ttf'
+                    size_hint_x: None
+                    width: self.texture_size[0]
+                    font_size: dp(30)
         Widget:
             size_hint_x: None
             width: dp(10)
-        ColouredButton:
-            text: 'open'
-            background_normal: (0.8, 1.0, 0.8, 1) if fileview.selection_filename else (0.4, 0.4, 0.4, 1)
+        ColouredButtonContainer:
+            id: cb2
+            disabled: not fileview.selection_filename
+            background_normal: (0.4, 0.4, 0.4, 0.8) if not self.disabled else (0.4, 0.4, 0.4, 0.1)
             background_down: 0.5, 0.5, 0.5, 1
             radius: dp(5)
-            color: (1, 1, 1, 1) if self.state == 'down' else (0, 0, 0, 1)
+            color: (1, 1, 1, 1)
             on_release: root.return_selection()
+            GridLayout:
+                size_hint_y: None
+                height: cb2.height
+                size_hint_x: None
+                width: self.minimum_width
+                orientation: 'horizontal'
+                rows: 1
+                Label:
+                    text: 'open'
+                    color: cb1.color
+                    size_hint_x: None
+                    width: self.texture_size[0]
+                Widget:
+                    size_hint_x: None
+                    width: dp(20)
+                Label:
+                    text: 't'
+                    color: (0.7, 1.0, 0.7, 1)
+                    font_name: 'assets/fontello.ttf'
+                    size_hint_x: None
+                    width: self.texture_size[0]
+                    font_size: dp(30)
         Widget:
             size_hint_x: None
             width: dp(3)
