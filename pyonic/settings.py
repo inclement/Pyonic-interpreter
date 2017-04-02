@@ -109,6 +109,12 @@ class ButtonCheckbox(ButtonBehavior, Label):
     box_size = NumericProperty()
     draw_colour = ListProperty((0.2, 0.2, 0.2, 1))
     text_colour = ListProperty((0.0, 0.0, 0.0, 1))
+    handle_touch = BooleanProperty(True)
+
+    def on_touch_down(self, touch):
+        if not self.handle_touch:
+            return False
+        return super(ButtonCheckbox, self).on_touch_down(touch)
 
 
 class ButtonRadio(ButtonBehavior, Widget):
