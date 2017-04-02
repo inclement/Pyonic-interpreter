@@ -8,9 +8,10 @@ from kivy.properties import (StringProperty, OptionProperty,
                              BooleanProperty, NumericProperty,
                              ObjectProperty)
 from kivy.lang import Builder
+from kivy import platform
 
 import os
-from os.path import isdir, join, abspath
+from os.path import (isdir, join, abspath, split, expanduser)
 
 Builder.load_file('filechooser.kv')
 
@@ -25,17 +26,22 @@ class FileLabel(ButtonBehavior, BoxLayout):
         return self.parent.parent
 
     def on_release(self):
-        self.selected = not self.selected
-        if self.selected:
+        selected = not self.selected
+        if selected:
             self.recycleview.select(self)
             if self.file_type == 'folder':
                 self.recycleview.folder = abspath(
                     join(self.recycleview.folder, self.filename))
         else:
             self.recycleview.select(None)
+        self.selected = selected
+
+    def on_selected(self, instance, value):
+        if self.file_type == 'folder':
+            self.selected = False
 
 class FileView(RecycleView):
-    folder = StringProperty('.')
+    folder = StringProperty(abspath('.'))
     python_only = BooleanProperty(False)
     selection_instance = ObjectProperty(allownone=True)
     selection_filename = StringProperty()
@@ -54,7 +60,11 @@ class FileView(RecycleView):
 
         file_types = ['folder' if isdir(join(self.folder, filen)) else 'file' for filen in filens]
 
+        filens = [filen + ('/' if file_type == 'folder' else '')
+                  for filen, file_type in zip(filens, file_types)]
+
         files = zip(filens, file_types)
+
         if self.python_only:
             files = [filen for filen in files if filen[0].endswith('.py') or filen[1] == 'folder']
         files = sorted(files, key=lambda row: row[0].lower())
@@ -76,7 +86,7 @@ class FileView(RecycleView):
         if self.selection_instance is not None:
             self.selection_instance.selected = False
         self.selection_instance = widget
-        if widget is not None:
+        if widget is not None and widget.file_type == 'file':
             self.selection_filename = widget.filename
         else:
             self.selection_filename = ''
@@ -84,9 +94,22 @@ class FileView(RecycleView):
     def reset_scroll(self):
         self.scroll_y = 1
 
+    def go_up_folder(self):
+        self.select(None)
+        self.folder = abspath(self.folder + '/..')
+
+    def go_home(self):
+        self.select(None)
+        if platform == 'android':
+            # TODO: use pyjnius to get external storage dir
+            home = '/storage/emulated/0'
+        else:
+            home = expanduser('~')
+        self.folder = home
+
 
 class PyonicFileChooser(BoxLayout):
-    folder = StringProperty('.')
+    folder = StringProperty(abspath('.'))
     python_only = BooleanProperty(False)
 
     current_selection = StringProperty('.')

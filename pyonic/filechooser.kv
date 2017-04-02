@@ -45,29 +45,56 @@
 <PyonicFileChooser>:
     orientation: 'vertical'
     current_selection: fileview.selection_filename
-    Label:
-        height: sp(40)
-        size_hint_y: None
-        text: 'CUR: ' + fileview.folder
-    Label:
-        height: sp(40)
-        size_hint_y: None
-        text: 'SEL: ' + root.current_selection
+    SettingsTitle:
+        text: 'RECENT FOLDERS'
+    SettingsTitle:
+        text: 'CHOOSE FILE'
     BoxLayout:
         orientation: 'horizontal'
         size_hint_y: None
         height: dp(40)
-        Label:
-            text: '.py files only'
-        CheckBox:
+        ColouredButton:
+            color: (1, 1, 1, 1)
+            padding: 0.025 * min(self.size)
+            background_down: (0.2, 0.6431, 0.8078, 1.)
+            background_normal: (0.6, 0.6, 0.6, 0.8)
+            radius: dp(5)
+            text: '.py only'
+            on_release: py_only.active = not py_only.active
+        ButtonCheckbox:
             id: py_only
             active: False
+            size_hint_x: None
+            width: 1.2 * self.height
+        ColouredButton:
+            color: (1, 1, 1, 1)
+            padding: 0.025 * min(self.size)
+            background_down: (0.2, 0.6431, 0.8078, 1.)
+            background_normal: (0.6, 0.6, 0.6, 0.8)
+            radius: dp(5)
+            font_size: sp(25)
+            text: 'Q'
+            font_name: 'assets/fontello.ttf'
+            on_release: fileview.go_home()
+        ColouredButton:
+            color: (1, 1, 1, 1)
+            padding: 0.025 * min(self.size)
+            background_down: (0.2, 0.6431, 0.8078, 1.)
+            background_normal: (0.6, 0.6, 0.6, 0.8)
+            radius: dp(5)
+            text: 'u'
+            font_size: sp(25)
+            font_name: 'assets/fontello.ttf'
+            on_release: fileview.go_up_folder()
+    Widget:
+        size_hint_y: None
+        height: dp(4)
     AnchorLayout:
         id: al
         FileView:
             id: fileview
             size_hint: None, None
-            width: int(0.98 * al.width)
+            width: int(1.00 * al.width)
             height: int(0.98 * al.height)
             folder: root.folder
             python_only: py_only.active
@@ -81,24 +108,74 @@
                 Color:
                     rgba: 0, 0, 0, 1
                 Line:
-                    points: self.x, self.y, self.x + self.width, self.y, self.x + self.width, self.y + self.height, self.x, self.y + self.height, self.x, self.y
-                    width: 2
+                    points: self.x, self.y, self.x + self.width, self.y
+                    width: dp(1.5)
+                Line:
+                    points: self.x, self.y + self.height, self.x + self.width, self.y + self.height
+                    width: dp(1.5)
     BoxLayout:
         orientation: 'horizontal'
         size_hint_y: None
         height: sp(40)
+        Widget:
+            size_hint_x: None
+            width: dp(20)
+        Label:
+            font_size: sp(25)
+            font_name: 'assets/fontello.ttf'
+            text: 'O'
+            size_hint_x: None
+            width: sp(50)
+            color: (0.3, 0.3, 0.3, 1)
+        Label:
+            text: fileview.folder .strip('/') + '/'
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: sp(40)
+        Widget:
+            size_hint_x: None
+            width: dp(20)
+        Label:
+            font_size: sp(25)
+            font_name: 'assets/fontello.ttf'
+            text: 'D'
+            size_hint_x: None
+            width: sp(50)
+            color: (0.3, 0.3, 0.3, 1)
+        Label:
+            text: root.current_selection
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: sp(40)
+        Widget:
+            size_hint_x: None
+            width: dp(3)
         ColouredButton:
             text: 'cancel'
             background_normal: 1.0, 0.8, 0.8, 1
             background_down: 0.5, 0.5, 0.5, 1
             radius: dp(5)
             color: (1, 1, 1, 1) if self.state == 'down' else (0, 0, 0, 1)
+        Widget:
+            size_hint_x: None
+            width: dp(10)
         ColouredButton:
             text: 'open'
             background_normal: (0.8, 1.0, 0.8, 1) if fileview.selection_filename else (0.4, 0.4, 0.4, 1)
             background_down: 0.5, 0.5, 0.5, 1
             radius: dp(5)
             color: (1, 1, 1, 1) if self.state == 'down' else (0, 0, 0, 1)
+        Widget:
+            size_hint_x: None
+            width: dp(3)
 
 <FileChooserScreen>:
     name: 'filechooser'
