@@ -1,0 +1,64 @@
+
+<FileLabel>:
+    orientation: 'horizontal'
+    Label:
+        text: root.file_type
+        size_hint_x: None
+        width: sp(50)
+        text_size: self.size
+        halign: 'center'
+        valign: 'middle'
+        color: (0, 0, 1, 1) if root.file_type == 'folder' else (0, 1, 0, 1)
+    Widget:
+        size_hint_x: None
+        width: sp(5)
+    Label:
+        text: root.filename
+        text_size: self.size
+        halign: 'left'
+        valign: 'middle'
+        
+
+<FileView>:
+    viewclass: 'FileLabel'
+    RecycleBoxLayout:
+        default_size: None, dp(sp(25))
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+
+
+<PyonicFileChooser>:
+    orientation: 'vertical'
+    AnchorLayout:
+        id: al
+        FileView:
+            size_hint: None, None
+            width: int(0.98 * al.width)
+            height: int(0.98 * al.height)
+            folder: root.folder
+            python_only: root.python_only
+            canvas.before:
+                Color:
+                    rgba: (0.95, 0.95, 0.95, 1)
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            canvas.after:
+                Color:
+                    rgba: 0, 0, 0, 1
+                Line:
+                    points: self.x, self.y, self.x + self.width, self.y, self.x + self.width, self.y + self.height, self.x, self.y + self.height, self.x, self.y
+                    width: 2
+    Label:
+        text: 'SEL: ' + root.current_selection
+        size_hint_y: None
+        height: self.texture_size[1] * 1.1
+
+<FileChooserScreen>:
+    name: 'filechooser'
+    BoxLayout:
+        orientation: 'vertical'
+        PyonicFileChooser:
+            

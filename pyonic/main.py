@@ -28,7 +28,8 @@ if platform == 'android':
     import settings
     import editor
     import utils
-    import pipinterface
+    import filechooser
+    # import pipinterface
 else:
     import pyonic.widgets  # noqa
     import pyonic.menu  # noqa
@@ -36,9 +37,11 @@ else:
     from pyonic import settings  # noqa
     import pyonic.editor  # noqa
     import pyonic.utils  # noqa
-    from pyonic import pipinterface  # noqa
+    import pyonic.filechooser  # noqa
+    # from pyonic import pipinterface  # noqa
 
-openable_screen_index = {'pip': pipinterface.PipScreen}
+# openable_screen_index = {'pip': pipinterface.PipScreen}
+openable_screen_index = {}
 
 class Manager(ScreenManager):
     back_screen_name = StringProperty('')

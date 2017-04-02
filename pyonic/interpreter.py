@@ -453,6 +453,11 @@ class InterpreterGui(BoxLayout):
         for child in self.output_window.children[:-1]:
             self.output_window.remove_widget(child)
 
+    def run_file(self):
+        # 1) get filename
+        # 2) run file
+        pass
+
     def ensure_no_ctrl_c_button(self):
         Clock.unschedule(self._switch_to_ctrl_c_button)
         c = self.ids.carousel
