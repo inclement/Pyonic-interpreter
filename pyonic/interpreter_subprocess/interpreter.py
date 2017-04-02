@@ -23,6 +23,15 @@ def input_replacement(prompt=''):
 def eval_input_replacement(prompt=''):
     return eval(input_replacement(prompt))
 
+def _exec_full(filepath):
+    import os
+    global_namespace = {
+        "__file__": filepath,
+        "__name__": "__main__",
+    }
+    with open(filepath, 'rb') as file:
+        exec(compile(file.read(), filepath, 'exec'), global_namespace)
+
 try:
     ri = raw_input
 except NameError:  # we are using Python 3
@@ -74,11 +83,13 @@ def real_print(*s):
     real_stdout.write(' '.join([str(item) for item in s]) + '\n')
     real_stdout.flush()
 
-# send_port = 3001 + 10 * py_ver
-# receive_port = 3000 + 10 * py_ver
 
-send_port = 3001
-receive_port = 3000
+
+send_port = 3001 + 10 * py_ver
+receive_port = 3000 + 10 * py_ver
+
+# send_port = 3001
+# receive_port = 3000
 
 use_thread = True
 thread = None
@@ -127,6 +138,23 @@ def receive_message(message, *args):
             t.start()
         else:
             interpret_code(body[0])
+
+    elif address == b'/execfile':
+        if thread is not None:
+            print('COMPUTATION FAILED: something is already running (this shouldn\'t happen)')
+            complete_execution()
+            return
+        body = [s.decode('utf-8') for s in message[2:]]
+
+        code = '_exec_full("{}")'.format(body[0])
+
+        if use_thread:
+            t = threading.Thread(target=lambda *args: interpret_code(code))
+            thread = t
+            t.start()
+        else:
+            interpret_code(code)
+
 
     elif address == b'/ping':
         osc.sendMsg(b'/pong', [b'pong'], port=send_port,
@@ -209,7 +237,6 @@ def interpret_code(code):
         osc.sendMsg(b'/interpreter', [b'keyboard_interrupted'], port=send_port,
                     typehint='b')
     except Exception as e:
-        print('an exception occurred')
         traceback.print_exc()
     finally:
         sys.stdout.can_omit = False
@@ -296,6 +323,7 @@ osc.bind(oscid, receive_message, b'/ping')
 osc.bind(oscid, receive_message, b'/sigint')
 osc.bind(oscid, receive_message, b'/throttling')
 osc.bind(oscid, receive_message, b'/userinput')
+osc.bind(oscid, receive_message, b'/execfile')
 
 sys.stdout = OscOut(b'/stdout', send_port)
 sys.stderr = OscOut(b'/stderr', send_port)

@@ -46,6 +46,7 @@
     orientation: 'vertical'
     current_selection: fileview.selection_instance
     current_filename: fileview.selection_filename
+    folder: fileview.folder
     # SettingsTitle:
     #     text: 'RECENT FOLDERS'
     # SettingsTitle:
@@ -67,7 +68,7 @@
             on_release: py_only.active = not py_only.active
         ButtonCheckbox:
             id: py_only
-            active: False
+            active: True
             size_hint_x: None
             width: 1.2 * self.height
         ColouredButton:
@@ -225,4 +226,5 @@
         PyonicFileChooser:
             id: pyonicfilechooser
             open_method: root.open_method
+            success_screen_name: root.success_screen_name
             

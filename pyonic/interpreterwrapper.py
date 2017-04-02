@@ -196,6 +196,12 @@ class InterpreterWrapper(EventDispatcher):
         # self.begin_osc_listen()
         return input_index
 
+    def exec_file(self, filename):
+        Clock.schedule_once(self.command_not_received, 1)
+        self.lock_input = True
+        self.interpreter_state = 'interpreting'
+        self.send_osc_message(filename.encode('utf-8'), address=b'/execfile')
+
     def send_python_command(self, message):
         Clock.schedule_once(self.command_not_received, 1)
         self.send_osc_message(message, address=b'/interpret')

@@ -78,7 +78,6 @@ class FileView(RecycleView):
                       'file_type': file_type,
                       'shade': index % 2}
                      for (name, file_type, index) in files]
-        print('data is', self.data)
 
         self.reset_scroll()
 
@@ -122,16 +121,22 @@ class PyonicFileChooser(BoxLayout):
 
     open_method = ObjectProperty()
     # The open_method should accept a single filepath as an argument.
+    success_screen_name = StringProperty()
 
     def return_selection(self):
         if self.open_method is None:
             return
         self.open_method(join(self.folder, self.current_selection.filename))
         from kivy.app import App
-        App.get_running_app().manager.go_back()
+
+        if self.success_screen_name:
+            App.get_running_app().manager.switch_to(self.success_screen_name)
+        else:
+            App.get_running_app().manager.go_back()
 
 class FileChooserScreen(Screen):
     open_method = ObjectProperty()
+    success_screen_name = StringProperty()
     current_filename = StringProperty()
 
     def on_pre_enter(self):

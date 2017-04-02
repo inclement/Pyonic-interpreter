@@ -28,7 +28,7 @@ if platform == 'android':
     import settings
     import editor
     import utils
-    import filechooser
+    from filechooser import FileChooserScreen
     # import pipinterface
 else:
     import pyonic.widgets  # noqa
@@ -37,22 +37,24 @@ else:
     from pyonic import settings  # noqa
     import pyonic.editor  # noqa
     import pyonic.utils  # noqa
-    import pyonic.filechooser  # noqa
+    from pyonic.filechooser import FileChooserScreen # noqa
     # from pyonic import pipinterface  # noqa
 
-# openable_screen_index = {'pip': pipinterface.PipScreen}
-openable_screen_index = {}
+openable_screen_index = {'filechooser': FileChooserScreen}
 
 class Manager(ScreenManager):
     back_screen_name = StringProperty('')
 
-    def switch_to(self, target):
+    def switch_to(self, target, **kwargs):
         if target not in self.screen_names:
             if target in openable_screen_index:
                 self.add_widget(openable_screen_index[target]())
             else:
                 raise ValueError('Tried to switch to {}, but screen is not '
                                 'already added'.format(target))
+        screen = self.get_screen(target)
+        for attribute, value in kwargs.items():
+            setattr(screen, attribute, value)
         self.back_screen_name = self.current
         self.transition = SlideTransition(direction='left')
         self.current = target
@@ -179,7 +181,6 @@ class PyonicApp(App):
         if platform != 'android':
             return
         self.remove_android_splash()
-        self.set_softinput_mode()
 
         import ctypes
         try:
@@ -199,18 +200,6 @@ class PyonicApp(App):
         from jnius import autoclass
         activity = autoclass('org.kivy.android.PythonActivity')
         activity.moveTaskToBack(True)
-
-    @run_on_ui_thread
-    def set_softinput_mode(self):
-        return
-        # from jnius import autoclass
-        # PythonActivity = autoclass('org.kivy.android.PythonActivity')
-        # WindowManager = autoclass('android.view.WindowManager')
-        # LayoutParams = autoclass('android.view.WindowManager$LayoutParams')
-        # activity = PythonActivity.mActivity
-
-        # activity.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-        
 
     def remove_android_splash(self, *args):
         from jnius import autoclass
