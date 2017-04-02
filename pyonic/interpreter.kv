@@ -543,13 +543,13 @@
         size_hint_y: None
         height: dp(2)
     DropDownButton:
-        text: 'run file'
+        text: 'exec file'
         size_hint_y: None
         height: dp(40)
         text_size: self.size
         padding_x: dp(10)
         valign: 'middle'
-        on_release: root.parent_obj.root.run_file(); root.dismiss(immediate=False)
+        on_release: root.parent_obj.root.exec_file(); root.dismiss(immediate=False)
     Widget:
         size_hint_y: None
         height: dp(2)

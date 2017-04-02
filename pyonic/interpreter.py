@@ -453,12 +453,12 @@ class InterpreterGui(BoxLayout):
         for child in self.output_window.children[:-1]:
             self.output_window.remove_widget(child)
 
-    def run_file(self):
+    def exec_file(self):
         App.get_running_app().root.switch_to(
-            'filechooser', open_method=self._run_file,
+            'filechooser', open_method=self._exec_file,
             success_screen_name='interpreter')
 
-    def _run_file(self, filename):
+    def _exec_file(self, filename):
         self.add_user_message_label('Executing {}...'.format(filename))
         self.ensure_ctrl_c_button()
         self.interpreter.exec_file(filename)
