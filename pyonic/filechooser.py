@@ -125,8 +125,9 @@ class FileView(RecycleView):
     def go_home(self):
         self.select(None)
         if platform == 'android':
-            # TODO: use pyjnius to get external storage dir
-            home = '/storage/emulated/0'
+            from jnius import autoclass
+            Environment = autoclass('android.os.Environment')
+            home = Environment.getExternalStorageDirectory().getAbsolutePath()
         else:
             home = expanduser('~')
         self.folder = home
