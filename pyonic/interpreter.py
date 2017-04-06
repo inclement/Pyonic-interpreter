@@ -456,7 +456,8 @@ class InterpreterGui(BoxLayout):
     def exec_file(self):
         App.get_running_app().root.switch_to(
             'filechooser', open_method=self._exec_file,
-            success_screen_name='interpreter')
+            success_screen_name='interpreter',
+            purpose='exec file')
 
     def _exec_file(self, filename):
         self.add_user_message_label('Executing {}...'.format(filename))

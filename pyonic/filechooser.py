@@ -148,6 +148,8 @@ class PyonicFileChooser(BoxLayout):
     # The open_method should accept a single filepath as an argument.
     success_screen_name = StringProperty()
 
+    open_button_text = StringProperty('open')
+
     def return_selection(self):
         if self.current_selection is None:
             return
@@ -165,6 +167,7 @@ class FileChooserScreen(Screen):
     open_method = ObjectProperty()
     success_screen_name = StringProperty()
     current_filename = StringProperty()
+    purpose = StringProperty('')
 
     def on_pre_enter(self):
         self.ids.pyonicfilechooser.ids.fileview.reset(go_home=False)

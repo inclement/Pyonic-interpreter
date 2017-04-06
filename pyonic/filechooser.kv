@@ -1,4 +1,17 @@
 
+<PermissionError>:
+    size_hint: 0.9, None
+    height: label.height + dp(40)
+    AnchorLayout:
+        Label:
+            id: label
+            size_hint_y: None
+            height: self.texture_size[1]
+            text: root.text
+            markup: True
+            color: 1, 1, 1, 1
+
+
 <FileLabel>:
     orientation: 'horizontal'
     on_filename: self.selected = False
@@ -86,7 +99,7 @@
                     width: self.texture_size[0]
                 Widget:
                     size_hint_x: None
-                    width: dp(10)
+                    width: dp(6)
                 # Label:
                 #     text: 'c'
                 #     color: (1.0, 0.7, 0.7, 1)
@@ -98,7 +111,7 @@
                     id: py_only
                     active: True
                     size_hint_x: None
-                    width: 1.2 * self.height
+                    width: 1.00 * self.height
                     draw_colour: 0.95, 0.95, 0.95, 1
                     text_colour: 1, 1, 1, 1
                     handle_touch: False
@@ -193,7 +206,7 @@
         height: sp(40)
         Widget:
             size_hint_x: None
-            width: dp(3)
+            width: dp(8)
         ColouredButtonContainer:
             id: cb1
             text: 'cancel'
@@ -216,7 +229,7 @@
                     width: self.texture_size[0]
                 Widget:
                     size_hint_x: None
-                    width: dp(20)
+                    width: dp(8)
                 Label:
                     text: 'C'
                     color: (1.0, 0.7, 0.7, 1)
@@ -226,7 +239,7 @@
                     font_size: dp(30)
         Widget:
             size_hint_x: None
-            width: dp(10)
+            width: dp(5)
         ColouredButtonContainer:
             id: cb2
             disabled: not fileview.selection_filename
@@ -243,13 +256,13 @@
                 orientation: 'horizontal'
                 rows: 1
                 Label:
-                    text: 'open'
+                    text: root.open_button_text
                     color: cb1.color
                     size_hint_x: None
                     width: self.texture_size[0]
                 Widget:
                     size_hint_x: None
-                    width: dp(20)
+                    width: dp(3)
                 Label:
                     text: 't'
                     color: (0.7, 1.0, 0.7, (1 if not cb2.disabled else 0.1))
@@ -293,27 +306,18 @@
                 background_normal: 1, 1, 1, 0
                 on_release: app.manager.go_back()
             Label:
-                text_size: self.size
-                text: 'File chooser'
+                text_size: None, self.height
+                text: 'File chooser' + (': {}'.format(root.purpose) if root.purpose else '')
                 font_size: dp(18)
                 padding_x: dp(10)
                 color: 1, 1, 1, 1
                 valign: 'middle'
+                halign: 'left'
+                size_hint_x: None
+                width: self.texture_size[0]
             Widget:
         PyonicFileChooser:
             id: pyonicfilechooser
             open_method: root.open_method
             success_screen_name: root.success_screen_name
-            
-
-<PermissionError>:
-    size_hint: 0.9, None
-    height: label.height + dp(40)
-    AnchorLayout:
-        Label:
-            id: label
-            size_hint_y: None
-            height: self.texture_size[1]
-            text: root.text
-            markup: True
-            color: 1, 1, 1, 1
+            open_button_text: root.purpose
