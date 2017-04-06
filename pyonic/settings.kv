@@ -44,12 +44,15 @@
                 background_normal: 1, 1, 1, 0
                 on_release: app.manager.go_back()
             Label:
-                text_size: self.size
+                text_size: None, self.height
                 text: 'Settings'
                 font_size: dp(18)
                 padding_x: dp(10)
                 color: 1, 1, 1, 1
                 valign: 'middle'
+                halign: 'left'
+                size_hint_x: None
+                width: self.texture_size[0]
             Widget:
                 
         ScrollView:
