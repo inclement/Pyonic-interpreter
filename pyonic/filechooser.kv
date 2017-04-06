@@ -246,7 +246,7 @@
                     width: dp(20)
                 Label:
                     text: 't'
-                    color: (0.7, 1.0, 0.7, 1)
+                    color: (0.7, 1.0, 0.7, (1 if not cb2.disabled else 0.1))
                     font_name: 'assets/fontello.ttf'
                     size_hint_x: None
                     width: self.texture_size[0]
@@ -299,3 +299,15 @@
             open_method: root.open_method
             success_screen_name: root.success_screen_name
             
+
+<PermissionError>:
+    size_hint: 0.9, None
+    height: label.height + dp(40)
+    AnchorLayout:
+        Label:
+            id: label
+            size_hint_y: None
+            height: self.texture_size[1]
+            text: root.text
+            markup: True
+            color: 1, 1, 1, 1

@@ -3,6 +3,7 @@ from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import Screen
 from kivy.uix.recycleview import RecycleView
+from kivy.uix.modalview import ModalView
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.properties import (StringProperty, OptionProperty,
                              BooleanProperty, NumericProperty,
@@ -12,6 +13,12 @@ from kivy import platform
 
 import os
 from os.path import (isdir, join, abspath, split, expanduser)
+
+from sys import version_info
+if version_info.major >= 3:
+    permission_errors = (PermissionError, OSError)
+else:
+    permission_errors = (OSError, )
 
 Builder.load_file('filechooser.kv')
 
@@ -30,8 +37,8 @@ class FileLabel(ButtonBehavior, BoxLayout):
         if selected:
             self.recycleview.select(self)
             if self.file_type == 'folder':
-                self.recycleview.folder = abspath(
-                    join(self.recycleview.folder, self.filename))
+                self.recycleview.safe_set_folder(abspath(
+                    join(self.recycleview.folder, self.filename)))
         else:
             self.recycleview.select(None)
         self.selected = selected
@@ -39,6 +46,9 @@ class FileLabel(ButtonBehavior, BoxLayout):
     def on_selected(self, instance, value):
         if self.file_type == 'folder':
             self.selected = False
+
+class PermissionError(ModalView):
+    text = StringProperty()
 
 class FileView(RecycleView):
     folder = StringProperty(abspath('.'))
@@ -49,8 +59,23 @@ class FileView(RecycleView):
 
     def __init__(self, *args, **kwargs):
         super(FileView, self).__init__(*args, **kwargs)
+        self.go_home()
         self.on_folder(self, self.folder)
 
+    def safe_set_folder(self, value):
+        '''Function to safely set self.folder, by checking that the folder can
+        be accessed.'''
+        current_folder = self.folder
+        try:
+            self.folder = value
+        except permission_errors as e:
+            text = '[b]Permissions error:[/b] Could not open {}'.format(value)
+            self.show_permissions_error(text)
+            self.folder = current_folder
+
+    def show_permissions_error(self, text):
+        PermissionError(text=text).open()
+            
     def on_python_only(self, instance, value):
         self.on_folder(self, self.folder)
 
