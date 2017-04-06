@@ -290,13 +290,18 @@ class OscOut(object):
         return
 
     def send_message(self, message):
-        try:
-            osc.sendMsg(self.address, [
-                message.encode('utf-8') if isinstance(message, unicode_type)
-                else message],
-                        port=self.target_port, typehint='b')
-        except KeyboardInterrupt:
-            raise KeyboardInterrupt('interrupted while printing')
+        real_print('message length is', len(message))
+
+        # If the message is very long, manually break into lines
+        for sub_string_index in range(0, len(message), 30000):
+            cur_message = message[sub_string_index:sub_string_index + 30000]
+            try:
+                osc.sendMsg(self.address, [
+                    cur_message.encode('utf-8') if isinstance(cur_message, unicode_type)
+                    else cur_message],
+                            port=self.target_port, typehint='b')
+            except KeyboardInterrupt:
+                raise KeyboardInterrupt('interrupted while printing')
 
     def isatty(self, *args):
         return False
