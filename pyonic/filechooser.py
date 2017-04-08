@@ -120,7 +120,7 @@ class FileView(RecycleView):
 
     def go_up_folder(self):
         self.select(None)
-        self.folder = abspath(self.folder + '/..')
+        self.safe_set_folder(abspath(self.folder + '/..'))
 
     def go_home(self):
         self.select(None)
