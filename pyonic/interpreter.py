@@ -1,9 +1,7 @@
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 from kivy.uix.widget import Widget
-from kivy.uix.button import Button
 from kivy.uix.carousel import Carousel
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
@@ -11,7 +9,6 @@ from kivy.uix.stacklayout import StackLayout
 from kivy.uix.behaviors import FocusBehavior
 from kivy.uix.modalview import ModalView
 from kivy.uix.popup import Popup
-from kivy.event import EventDispatcher
 from kivy.core.window import Window
 from kivy.properties import (ObjectProperty, NumericProperty,
                              OptionProperty, BooleanProperty,
@@ -25,8 +22,6 @@ from kivy.clock import Clock
 
 
 from time import time
-import os
-from functools import partial
 import traceback
 
 if platform == 'android':
@@ -44,9 +39,6 @@ Builder.load_file('interpreter.kv')
 from widgets import ColouredButton
 
 import sys
-
-import signal
-
 from os.path import realpath, join, dirname
 
     
