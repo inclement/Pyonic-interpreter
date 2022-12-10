@@ -1,4 +1,3 @@
-import copy
 from time import sleep
 
 __input = None
@@ -40,7 +39,7 @@ else:  # we are using Python 2
     raw_input = input_replacement
     input = eval_input_replacement
 
-user_globals = copy.copy(globals())
+user_globals = globals().copy()
 
 import time
 import ast
