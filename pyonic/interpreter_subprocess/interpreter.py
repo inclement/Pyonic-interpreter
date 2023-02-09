@@ -1,4 +1,3 @@
-import copy
 from time import sleep
 
 __input = None
@@ -40,8 +39,7 @@ else:  # we are using Python 2
     raw_input = input_replacement
     input = eval_input_replacement
 
-user_locals = copy.copy(locals())
-user_globals = copy.copy(globals())
+user_globals = globals().copy()
 
 import time
 import ast
@@ -221,14 +219,14 @@ def interpret_code(code):
         if len(components) > 1:
             for component in components[:-1]:
                 c = compile(ast.Module([component]), '<stdin>', mode='exec')
-                exec(c, user_locals, user_globals)
+                exec(c, user_globals)
 
         # if the last ast component is an Expr, compile in single mode to print it
         if isinstance(components[-1], ast.Expr):
             c = compile(ast.Interactive([components[-1]]), '<stdin>', mode='single')
         else:
             c = compile(ast.Module([components[-1]]), '<stdin>', mode='exec')
-        exec(c, user_locals, user_globals)
+        exec(c, user_globals)
 
     except KeyboardInterrupt as e:
         print('')
